@@ -131,7 +131,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 <SelectItem value="instagram">📷 Instagram</SelectItem>
                 <SelectItem value="youtube">📹 YouTube</SelectItem>
                 <SelectItem value="tiktok">🎵 TikTok</SelectItem>
