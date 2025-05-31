@@ -139,7 +139,7 @@ export default function Home() {
               </Card>
             </div>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Featured Listings */}
