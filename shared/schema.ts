@@ -48,6 +48,7 @@ export const listings = pgTable("listings", {
   description: text("description").notNull(),
   category: varchar("category", { length: 50 }).notNull(), // instagram, youtube, tiktok, twitter, website
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  assetUrl: text("asset_url"), // URL/link to the asset for buyer access
   followers: integer("followers"),
   engagement: decimal("engagement", { precision: 5, scale: 2 }),
   monthlyViews: integer("monthly_views"),
@@ -56,6 +57,7 @@ export const listings = pgTable("listings", {
   verificationStatus: varchar("verification_status", { length: 20 }).default("pending"), // pending, verified, rejected
   status: varchar("status", { length: 20 }).default("active"), // active, sold, expired, draft
   featured: boolean("featured").default(false),
+  featuredUntil: timestamp("featured_until"), // when featured status expires
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -170,6 +172,13 @@ export type Message = typeof messages.$inferSelect;
 // Validation schemas for API endpoints
 export const createListingSchema = insertListingSchema.extend({
   media: z.array(z.string()).optional(),
+  assetUrl: z.string().url().optional(), // Asset URL for buyer access
+  price: z.string().or(z.number()).transform(String),
+  engagement: z.string().or(z.number()).transform(String).optional(),
+  monthlyRevenue: z.string().or(z.number()).transform(String).optional(),
+  followers: z.number().optional(),
+  monthlyViews: z.number().optional(),
+  featured: z.boolean().optional(),
 });
 
 export const updateListingSchema = createListingSchema.partial();

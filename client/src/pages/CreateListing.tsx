@@ -22,10 +22,12 @@ const createListingSchema = z.object({
     required_error: "Please select a category",
   }),
   price: z.string().min(1, "Price is required").refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Price must be a positive number"),
+  assetUrl: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
   followers: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), "Followers must be a non-negative number"),
   engagement: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0 && Number(val) <= 100), "Engagement must be between 0-100%"),
   monthlyViews: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), "Monthly views must be a non-negative number"),
   monthlyRevenue: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), "Monthly revenue must be a non-negative number"),
+  featured: z.boolean().default(false),
 });
 
 type CreateListingForm = z.infer<typeof createListingSchema>;
@@ -41,10 +43,12 @@ export default function CreateListing() {
       description: "",
       category: undefined,
       price: "",
+      assetUrl: "",
       followers: "",
       engagement: "",
       monthlyViews: "",
       monthlyRevenue: "",
+      featured: false,
     },
   });
 
@@ -52,11 +56,12 @@ export default function CreateListing() {
     mutationFn: async (data: CreateListingForm) => {
       const payload = {
         ...data,
-        price: parseFloat(data.price),
-        followers: data.followers ? parseInt(data.followers) : null,
-        engagement: data.engagement ? parseFloat(data.engagement) : null,
-        monthlyViews: data.monthlyViews ? parseInt(data.monthlyViews) : null,
-        monthlyRevenue: data.monthlyRevenue ? parseFloat(data.monthlyRevenue) : null,
+        price: data.price,
+        assetUrl: data.assetUrl || undefined,
+        followers: data.followers ? parseInt(data.followers) : undefined,
+        engagement: data.engagement || undefined,
+        monthlyViews: data.monthlyViews ? parseInt(data.monthlyViews) : undefined,
+        monthlyRevenue: data.monthlyRevenue || undefined,
       };
 
       const response = await apiRequest("POST", "/api/listings", payload);
