@@ -8,11 +8,11 @@ import { TrendingUp, Users, Wallet, Star } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
-  const { data: featuredListings } = useQuery({
+  const { data: featuredListings = [] } = useQuery({
     queryKey: ["/api/listings?featured=true&limit=6"],
   });
 
-  const { data: userTransactions } = useQuery({
+  const { data: userTransactions = [] } = useQuery({
     queryKey: ["/api/users/me/transactions?limit=3"],
   });
 
@@ -78,69 +78,67 @@ export default function Home() {
       </section>
 
       {/* Dashboard Overview */}
-      {dashboardStats && (
-        <section className="py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <TrendingUp className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Active Listings</p>
-                      <p className="text-2xl font-bold text-gray-900">{dashboardStats.activeListings}</p>
-                    </div>
+      <section className="py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <TrendingUp className="h-6 w-6 text-primary" />
                   </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center">
-                    <div className="p-2 bg-emerald-100 rounded-lg">
-                      <Users className="h-6 w-6 text-emerald-600" />
-                    </div>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Active Transactions</p>
-                      <p className="text-2xl font-bold text-gray-900">{dashboardStats.activeTransactions}</p>
-                    </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Active Listings</p>
+                    <p className="text-2xl font-bold text-gray-900">{dashboardStats?.activeListings || 0}</p>
                   </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center">
-                    <div className="p-2 bg-amber-100 rounded-lg">
-                      <Wallet className="h-6 w-6 text-amber-600" />
-                    </div>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Wallet Balance</p>
-                      <p className="text-2xl font-bold text-gray-900">${dashboardStats.walletBalance}</p>
-                    </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-emerald-100 rounded-lg">
+                    <Users className="h-6 w-6 text-emerald-600" />
                   </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center">
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <Star className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-600">Total Sales</p>
-                      <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalSales}</p>
-                    </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Active Transactions</p>
+                    <p className="text-2xl font-bold text-gray-900">{dashboardStats?.activeTransactions || 0}</p>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-amber-100 rounded-lg">
+                    <Wallet className="h-6 w-6 text-amber-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Wallet Balance</p>
+                    <p className="text-2xl font-bold text-gray-900">${dashboardStats?.walletBalance || "0.00"}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <Star className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Total Sales</p>
+                    <p className="text-2xl font-bold text-gray-900">{dashboardStats?.totalSales || 0}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Featured Listings */}
       <section className="py-12">
@@ -153,10 +151,10 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredListings?.slice(0, 6).map((listing: any) => (
+            {Array.isArray(featuredListings) && featuredListings.slice(0, 6).map((listing: any) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
-            {(!featuredListings || featuredListings.length === 0) && (
+            {(!Array.isArray(featuredListings) || featuredListings.length === 0) && (
               <div className="col-span-full text-center py-12">
                 <p className="text-gray-500">No featured listings available at the moment.</p>
               </div>
@@ -176,10 +174,10 @@ export default function Home() {
           </div>
           
           <div className="space-y-4">
-            {userTransactions?.slice(0, 3).map((transaction: any) => (
+            {Array.isArray(userTransactions) && userTransactions.slice(0, 3).map((transaction: any) => (
               <TransactionCard key={transaction.id} transaction={transaction} />
             ))}
-            {(!userTransactions || userTransactions.length === 0) && (
+            {(!Array.isArray(userTransactions) || userTransactions.length === 0) && (
               <div className="text-center py-12">
                 <p className="text-gray-500">No recent transactions found.</p>
                 <Link href="/marketplace">
