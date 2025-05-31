@@ -1,0 +1,195 @@
+import { useQuery } from "@tanstack/react-query";
+import Navigation from "@/components/Navigation";
+import ListingCard from "@/components/ListingCard";
+import TransactionCard from "@/components/TransactionCard";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TrendingUp, Users, Wallet, Star } from "lucide-react";
+import { Link } from "wouter";
+
+export default function Home() {
+  const { data: featuredListings } = useQuery({
+    queryKey: ["/api/listings?featured=true&limit=6"],
+  });
+
+  const { data: userTransactions } = useQuery({
+    queryKey: ["/api/users/me/transactions?limit=3"],
+  });
+
+  const { data: dashboardStats } = useQuery({
+    queryKey: ["/api/dashboard/stats"],
+  });
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-primary to-blue-700 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-4xl lg:text-5xl font-bold mb-6">
+                Buy & Sell Digital Assets
+                <span className="text-blue-200 block">Securely</span>
+              </h1>
+              <p className="text-xl mb-8 text-blue-100">
+                The trusted marketplace for Instagram pages, YouTube channels, TikTok accounts, and more. 
+                Protected by our escrow system.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/marketplace">
+                  <Button size="lg" className="bg-white text-primary hover:bg-gray-50">
+                    Browse Marketplace
+                  </Button>
+                </Link>
+                <Link href="/create-listing">
+                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+                    List Your Asset
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            <div className="hidden lg:block">
+              <div className="bg-white/10 rounded-xl p-8 backdrop-blur-sm">
+                <h3 className="text-xl font-semibold mb-4">Platform Stats</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-2xl font-bold">$2.5M+</div>
+                    <div className="text-blue-200 text-sm">Total Volume</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">15K+</div>
+                    <div className="text-blue-200 text-sm">Assets Sold</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">99.8%</div>
+                    <div className="text-blue-200 text-sm">Success Rate</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">5K+</div>
+                    <div className="text-blue-200 text-sm">Active Users</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Dashboard Overview */}
+      {dashboardStats && (
+        <section className="py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <TrendingUp className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Active Listings</p>
+                      <p className="text-2xl font-bold text-gray-900">{dashboardStats.activeListings}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-emerald-100 rounded-lg">
+                      <Users className="h-6 w-6 text-emerald-600" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Active Transactions</p>
+                      <p className="text-2xl font-bold text-gray-900">{dashboardStats.activeTransactions}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-amber-100 rounded-lg">
+                      <Wallet className="h-6 w-6 text-amber-600" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Wallet Balance</p>
+                      <p className="text-2xl font-bold text-gray-900">${dashboardStats.walletBalance}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center">
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <Star className="h-6 w-6 text-purple-600" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Total Sales</p>
+                      <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalSales}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Featured Listings */}
+      <section className="py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">Featured Listings</h2>
+            <Link href="/marketplace">
+              <Button variant="outline">View All</Button>
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredListings?.slice(0, 6).map((listing: any) => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+            {(!featuredListings || featuredListings.length === 0) && (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500">No featured listings available at the moment.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Recent Transactions */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">Your Recent Transactions</h2>
+            <Link href="/dashboard">
+              <Button variant="outline">View All</Button>
+            </Link>
+          </div>
+          
+          <div className="space-y-4">
+            {userTransactions?.slice(0, 3).map((transaction: any) => (
+              <TransactionCard key={transaction.id} transaction={transaction} />
+            ))}
+            {(!userTransactions || userTransactions.length === 0) && (
+              <div className="text-center py-12">
+                <p className="text-gray-500">No recent transactions found.</p>
+                <Link href="/marketplace">
+                  <Button className="mt-4">Start Trading</Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
