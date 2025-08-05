@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/Navigation";
 import ListingCard from "@/components/ListingCard";
 import SearchFilters from "@/components/SearchFilters";
@@ -19,30 +18,58 @@ export default function Marketplace() {
     verified: false,
     sort: "latest",
   });
-
   const [currentPage, setCurrentPage] = useState(0);
   const limit = 12;
 
-  const buildQueryParams = () => {
-    const params = new URLSearchParams();
-    
-    if (filters.search) params.append('search', filters.search);
-    if (filters.category) params.append('category', filters.category);
-    if (filters.minPrice) params.append('minPrice', filters.minPrice);
-    if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
-    if (filters.minFollowers) params.append('minFollowers', filters.minFollowers);
-    if (filters.maxFollowers) params.append('maxFollowers', filters.maxFollowers);
-    if (filters.verified) params.append('verified', 'true');
-    
-    params.append('limit', limit.toString());
-    params.append('offset', (currentPage * limit).toString());
-    
-    return params.toString();
-  };
+  // Static listings data
+  const staticListings = [
+    {
+      id: 1,
+      title: "Demo Asset 1",
+      price: 100,
+      category: "instagram",
+      followers: 12000,
+      verified: true,
+      createdAt: new Date("2024-01-01").getTime(),
+    },
+    {
+      id: 2,
+      title: "Demo Asset 2",
+      price: 200,
+      category: "youtube",
+      followers: 8000,
+      verified: false,
+      createdAt: new Date("2024-02-01").getTime(),
+    },
+    // ...add more demo listings
+  ];
 
-  const { data: listings, isLoading } = useQuery({
-    queryKey: [`/api/listings?${buildQueryParams()}`],
+  // Filtering logic
+  let filteredListings = staticListings.filter((listing) => {
+    if (filters.search && !listing.title.toLowerCase().includes(filters.search.toLowerCase())) return false;
+    if (filters.category && listing.category !== filters.category) return false;
+    if (filters.minPrice && listing.price < Number(filters.minPrice)) return false;
+    if (filters.maxPrice && listing.price > Number(filters.maxPrice)) return false;
+    if (filters.minFollowers && listing.followers < Number(filters.minFollowers)) return false;
+    if (filters.maxFollowers && listing.followers > Number(filters.maxFollowers)) return false;
+    if (filters.verified && !listing.verified) return false;
+    return true;
   });
+
+  // Sorting logic
+  if (filters.sort === "price-low") {
+    filteredListings = filteredListings.sort((a, b) => a.price - b.price);
+  } else if (filters.sort === "price-high") {
+    filteredListings = filteredListings.sort((a, b) => b.price - a.price);
+  } else if (filters.sort === "followers") {
+    filteredListings = filteredListings.sort((a, b) => b.followers - a.followers);
+  } else {
+    filteredListings = filteredListings.sort((a, b) => b.createdAt - a.createdAt);
+  }
+
+  // Pagination logic
+  const paginatedListings = filteredListings.slice(currentPage * limit, (currentPage + 1) * limit);
+  const isLoading = false;
 
   const handleFilterChange = (newFilters: any) => {
     setFilters({ ...filters, ...newFilters });
@@ -57,15 +84,12 @@ export default function Marketplace() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          
           {/* Sidebar Filters */}
           <div className="lg:col-span-1">
             <SearchFilters filters={filters} onFilterChange={handleFilterChange} />
           </div>
-
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Search Bar */}
@@ -80,11 +104,10 @@ export default function Marketplace() {
                 />
               </div>
             </div>
-
             {/* Sort and Results Count */}
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-gray-900">
-                Digital Assets {listings && `(${listings.length} results)`}
+                Digital Assets {filteredListings && `(${filteredListings.length} results)`}
               </h2>
               <Select value={filters.sort} onValueChange={(value) => handleFilterChange({ sort: value })}>
                 <SelectTrigger className="w-48">
@@ -98,7 +121,6 @@ export default function Marketplace() {
                 </SelectContent>
               </Select>
             </div>
-
             {/* Category Tags */}
             <div className="flex flex-wrap gap-2 mb-6">
               {['', 'instagram', 'youtube', 'tiktok', 'twitter', 'website'].map((category) => (
@@ -112,7 +134,6 @@ export default function Marketplace() {
                 </Button>
               ))}
             </div>
-
             {/* Listings Grid */}
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -129,10 +150,10 @@ export default function Marketplace() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {listings?.map((listing: any) => (
+                {paginatedListings?.map((listing: any) => (
                   <ListingCard key={listing.id} listing={listing} />
                 ))}
-                {(!listings || listings.length === 0) && (
+                {(!paginatedListings || paginatedListings.length === 0) && (
                   <div className="col-span-full text-center py-12">
                     <p className="text-gray-500 text-lg">No assets found matching your criteria.</p>
                     <p className="text-gray-400 mt-2">Try adjusting your filters or search terms.</p>
@@ -140,9 +161,8 @@ export default function Marketplace() {
                 )}
               </div>
             )}
-
             {/* Load More */}
-            {listings && listings.length === limit && (
+            {filteredListings && filteredListings.length > (currentPage + 1) * limit && (
               <div className="text-center mt-8">
                 <Button
                   variant="outline"

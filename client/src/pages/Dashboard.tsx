@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/Navigation";
 import TransactionCard from "@/components/TransactionCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth";
 import { 
   TrendingUp, 
   Users, 
@@ -21,22 +19,51 @@ import {
 import { Link } from "wouter";
 
 export default function Dashboard() {
-  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
 
-  const { data: dashboardStats } = useQuery({
-    queryKey: ["/api/dashboard/stats"],
-  });
+  // Static dashboard data
+  const dashboardStats = {
+    activeListings: 2,
+    activeTransactions: 1,
+    walletBalance: 500,
+    totalSales: 2,
+  };
 
-  const { data: userListings } = useQuery({
-    queryKey: [`/api/users/${user?.id}/listings`],
-    enabled: !!user?.id,
-  });
+  const userListings = [
+    {
+      id: 1,
+      title: "Demo Asset 1",
+      price: 100,
+      category: "instagram",
+      status: "active",
+      description: "A great digital asset.",
+    },
+    {
+      id: 2,
+      title: "Demo Asset 2",
+      price: 200,
+      category: "youtube",
+      status: "sold",
+      description: "Another awesome asset.",
+    },
+    // ...more
+  ];
 
-  const { data: userTransactions } = useQuery({
-    queryKey: [`/api/users/${user?.id}/transactions`],
-    enabled: !!user?.id,
-  });
+  const userTransactions = [
+    {
+      id: 1,
+      status: "completed",
+      amount: 100,
+      createdAt: new Date("2024-03-01").toISOString(),
+    },
+    {
+      id: 2,
+      status: "payment_received",
+      amount: 200,
+      createdAt: new Date("2024-03-10").toISOString(),
+    },
+    // ...more
+  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -61,7 +88,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -76,7 +102,6 @@ export default function Dashboard() {
             </Button>
           </Link>
         </div>
-
         {/* Stats Overview */}
         {dashboardStats && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -93,7 +118,6 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
-            
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
@@ -107,7 +131,6 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
-            
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
@@ -121,7 +144,6 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
-            
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
@@ -137,7 +159,6 @@ export default function Dashboard() {
             </Card>
           </div>
         )}
-
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3">
@@ -145,7 +166,6 @@ export default function Dashboard() {
             <TabsTrigger value="listings">My Listings</TabsTrigger>
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
           </TabsList>
-
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Recent Transactions */}
@@ -153,7 +173,7 @@ export default function Dashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     Recent Transactions
-                    <Link href="#" onClick={() => setActiveTab("transactions")}>
+                    <Link href="#" onClick={() => setActiveTab("transactions")}> 
                       <Button variant="ghost" size="sm">
                         View All <ArrowUpRight className="h-4 w-4 ml-1" />
                       </Button>
@@ -186,13 +206,12 @@ export default function Dashboard() {
                   </div>
                 </CardContent>
               </Card>
-
               {/* Recent Listings */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     Recent Listings
-                    <Link href="#" onClick={() => setActiveTab("listings")}>
+                    <Link href="#" onClick={() => setActiveTab("listings")}> 
                       <Button variant="ghost" size="sm">
                         View All <ArrowUpRight className="h-4 w-4 ml-1" />
                       </Button>
@@ -230,7 +249,6 @@ export default function Dashboard() {
               </Card>
             </div>
           </TabsContent>
-
           <TabsContent value="listings" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold text-gray-900">My Listings</h2>
@@ -241,7 +259,6 @@ export default function Dashboard() {
                 </Button>
               </Link>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {userListings?.map((listing: any) => (
                 <Card key={listing.id}>
@@ -254,13 +271,11 @@ export default function Dashboard() {
                         {listing.category}
                       </Badge>
                     </div>
-                    
                     <h3 className="font-semibold text-gray-900 mb-2">{listing.title}</h3>
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">{listing.description}</p>
-                    
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-bold text-gray-900">
-                        ${parseFloat(listing.price).toLocaleString()}
+                        ${parseFloat(listing.price.toString()).toLocaleString()}
                       </span>
                       <Link href={`/listing/${listing.id}`}>
                         <Button size="sm" variant="outline">
@@ -283,10 +298,8 @@ export default function Dashboard() {
               )}
             </div>
           </TabsContent>
-
           <TabsContent value="transactions" className="space-y-6">
             <h2 className="text-xl font-semibold text-gray-900">Transaction History</h2>
-            
             <div className="space-y-4">
               {userTransactions?.map((transaction: any) => (
                 <TransactionCard key={transaction.id} transaction={transaction} />

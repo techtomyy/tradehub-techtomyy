@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield, Users, MessageSquare, Gavel, TrendingUp, Star, CheckCircle } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Landing() {
   return (
@@ -13,9 +14,9 @@ export default function Landing() {
               <h1 className="text-2xl font-bold text-gray-900">AssetVault</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Button onClick={() => window.location.href = '/api/login'}>
-                Sign In
-              </Button>
+              <Link href="/login">
+                <Button>Sign In</Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -34,13 +35,14 @@ export default function Landing() {
             Your transactions are protected every step of the way.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="bg-white text-primary hover:bg-gray-100"
-              onClick={() => window.location.href = '/api/login'}
-            >
-              Get Started Now
-            </Button>
+            <Link href="/signup">
+              <Button 
+                size="lg" 
+                className="bg-white text-primary hover:bg-gray-100"
+              >
+                Get Started Now
+              </Button>
+            </Link>
             <Button 
               size="lg" 
               variant="outline" 
@@ -201,13 +203,14 @@ export default function Landing() {
           <p className="text-xl text-blue-100 mb-8">
             Join our secure marketplace today and discover thousands of verified digital assets.
           </p>
-          <Button 
-            size="lg" 
-            className="bg-white text-primary hover:bg-gray-100"
-            onClick={() => window.location.href = '/api/login'}
-          >
-            Sign Up Now - It's Free
-          </Button>
+          <Link href="/signup">
+            <Button 
+              size="lg" 
+              className="bg-white text-primary hover:bg-gray-100"
+            >
+              Sign Up Now - It's Free
+            </Button>
+          </Link>
         </div>
       </section>
 

@@ -118,6 +118,8 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
   const StatusIcon = statusInfo.icon;
   
   const amount = parseFloat(transaction.amount);
+  
+  // Static time remaining calculation - for demo purposes
   const timeRemaining = transaction.verificationDeadline 
     ? Math.max(0, Math.ceil((new Date(transaction.verificationDeadline).getTime() - Date.now()) / (1000 * 60 * 60)))
     : null;
@@ -137,7 +139,7 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
                 {transaction.listing?.title || 'Asset Purchase'}
               </h4>
               <p className="text-sm text-gray-600">
-                Transaction #{transaction.id.slice(-8)}
+                Transaction #{transaction.id.toString().slice(-8)}
               </p>
             </div>
           </div>

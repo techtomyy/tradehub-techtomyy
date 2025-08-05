@@ -9,25 +9,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
 import { Bell, User, Wallet, Settings, LogOut, Shield } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Navigation() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
 
-  const { data: dashboardStats } = useQuery({
-    queryKey: ["/api/dashboard/stats"],
-    enabled: isAuthenticated,
-  });
+  // Static dashboard stats
+  const dashboardStats = {
+    walletBalance: "1250.00",
+    escrowBalance: "500.00",
+  };
 
   if (!isAuthenticated || !user) {
     return null;
   }
-
-  const handleLogout = () => {
-    window.location.href = '/api/logout';
-  };
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -35,7 +31,7 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo and Main Navigation */}
           <div className="flex items-center space-x-8">
-            <Link href="/">
+            <Link href="/Home">
               <div className="flex items-center space-x-2 cursor-pointer">
                 <Shield className="h-8 w-8 text-primary" />
                 <span className="text-xl font-bold text-gray-900">AssetVault</span>
@@ -64,17 +60,15 @@ export default function Navigation() {
           {/* Right Side */}
           <div className="flex items-center space-x-4">
             {/* Wallet Balance */}
-            {dashboardStats && (
-              <div className="hidden md:flex items-center space-x-2 bg-gray-100 rounded-lg px-3 py-2">
-                <Wallet className="h-4 w-4 text-emerald-600" />
-                <span className="text-sm font-medium">${dashboardStats.walletBalance}</span>
-              </div>
-            )}
+            <div className="hidden md:flex items-center space-x-2 bg-gray-100 rounded-lg px-3 py-2">
+              <Wallet className="h-4 w-4 text-emerald-600" />
+              <span className="text-sm font-medium">${dashboardStats.walletBalance}</span>
+            </div>
 
             {/* Notifications */}
             <Button variant="ghost" size="sm" className="relative">
               <Bell className="h-5 w-5" />
-              {/* Notification badge - would be dynamic based on actual notifications */}
+              {/* Notification badge - static demo data */}
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 3
               </span>
@@ -130,7 +124,7 @@ export default function Navigation() {
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>

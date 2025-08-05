@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Upload, AlertCircle } from "lucide-react";
 import { Link } from "wouter";
 
@@ -39,57 +37,35 @@ export default function CreateListing() {
   const form = useForm<CreateListingForm>({
     resolver: zodResolver(createListingSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      category: undefined,
-      price: "",
-      assetUrl: "",
-      followers: "",
-      engagement: "",
-      monthlyViews: "",
-      monthlyRevenue: "",
+      title: "Travel Photography Instagram Account",
+      description: "High-quality travel photography Instagram account with engaged audience. Features stunning landscape and city photography from around the world. Strong engagement rate with travel enthusiasts and photography lovers. Monetized through sponsored posts and affiliate marketing.",
+      category: "instagram",
+      price: "2500",
+      assetUrl: "https://instagram.com/travelphotography_demo",
+      followers: "15000",
+      engagement: "4.2",
+      monthlyViews: "45000",
+      monthlyRevenue: "800",
       featured: false,
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (data: CreateListingForm) => {
-      const payload = {
-        ...data,
-        price: data.price,
-        assetUrl: data.assetUrl || undefined,
-        followers: data.followers ? parseInt(data.followers) : undefined,
-        engagement: data.engagement || undefined,
-        monthlyViews: data.monthlyViews ? parseInt(data.monthlyViews) : undefined,
-        monthlyRevenue: data.monthlyRevenue || undefined,
-      };
-
-      const response = await apiRequest("POST", "/api/listings", payload);
-      return response.json();
-    },
-    onSuccess: (listing) => {
-      toast({
-        title: "Listing Created",
-        description: "Your asset listing has been created and is pending verification.",
-      });
-      window.location.href = `/listing/${listing.id}`;
-    },
-    onError: (error) => {
-      toast({
-        title: "Failed to Create Listing",
-        description: error.message,
-        variant: "destructive",
-      });
     },
   });
 
   const onSubmit = async (data: CreateListingForm) => {
     setIsSubmitting(true);
-    try {
-      await createMutation.mutateAsync(data);
-    } finally {
+    
+    // Simulate API call delay
+    setTimeout(() => {
       setIsSubmitting(false);
-    }
+      
+      // Show success message
+      toast({
+        title: "Listing Created",
+        description: "Your asset listing has been created and is pending verification.",
+      });
+      
+      // Redirect to dashboard
+      window.location.href = "/dashboard";
+    }, 1500);
   };
 
   const getCategoryDescription = (category: string) => {
@@ -219,6 +195,27 @@ export default function CreateListing() {
                             </FormControl>
                             <FormDescription>
                               Set your asking price. Remember, both buyer and seller pay 2.5% platform fees
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="assetUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Asset URL <span className="text-gray-500">(Optional)</span></FormLabel>
+                            <FormControl>
+                              <Input
+                                type="url"
+                                placeholder="https://instagram.com/youraccount"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Provide a link to your asset (e.g., Instagram profile, YouTube channel). This will be shared with the buyer after purchase.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>

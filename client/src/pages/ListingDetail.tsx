@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
 import Navigation from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -8,8 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { apiRequest } from "@/lib/queryClient";
 import { 
   Users, 
   TrendingUp, 
@@ -24,57 +21,92 @@ import {
 
 export default function ListingDetail() {
   const { id } = useParams();
-  const { user } = useAuth();
   const { toast } = useToast();
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
 
-  const { data: listing, isLoading } = useQuery({
-    queryKey: [`/api/listings/${id}`],
-  });
+  // Static user (mocked)
+  const user = { id: "1", name: "Demo User" };
 
-  const { data: fees } = useQuery({
-    queryKey: [`/api/calculate-fees`],
-    queryFn: async () => {
-      if (!listing?.price) return null;
-      const response = await apiRequest("POST", "/api/calculate-fees", {
-        amount: listing.price,
-      });
-      return response.json();
+  // Static listings data
+  const staticListings = [
+    {
+      id: "1",
+      title: "Demo Asset 1",
+      price: 100,
+      description: "A great digital asset.",
+      category: "instagram",
+      media: [],
+      verificationStatus: "verified",
+      followers: 12000,
+      engagement: 5.2,
+      monthlyViews: 50000,
+      monthlyRevenue: 200,
+      status: "active",
+      sellerId: "2",
+      seller: {
+        firstName: "Alice",
+        lastName: "Smith",
+        username: "alicesmith",
+        profileImageUrl: "",
+        rating: 4.8,
+        totalSales: 12,
+        kycVerified: true,
+        bio: "Experienced seller of digital assets."
+      }
     },
-    enabled: !!listing?.price,
-  });
+    {
+      id: "2",
+      title: "Demo Asset 2",
+      price: 200,
+      description: "Another awesome asset.",
+      category: "youtube",
+      media: [],
+      verificationStatus: "unverified",
+      followers: 8000,
+      engagement: 3.1,
+      monthlyViews: 20000,
+      monthlyRevenue: 100,
+      status: "active",
+      sellerId: "3",
+      seller: {
+        firstName: "Bob",
+        lastName: "Jones",
+        username: "bobjones",
+        profileImageUrl: "",
+        rating: 4.2,
+        totalSales: 5,
+        kycVerified: false,
+        bio: "Selling high-quality YouTube channels."
+      }
+    }
+    // ...add more demo listings as needed
+  ];
 
-  const purchaseMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/transactions", {
-        listingId: id,
-        amount: listing.price,
-      });
-      return response.json();
-    },
-    onSuccess: (transaction) => {
-      toast({
-        title: "Purchase Initiated",
-        description: "Your payment has been placed in escrow. The seller will provide asset credentials shortly.",
-      });
-      // Redirect to transaction page or dashboard
-      window.location.href = `/dashboard`;
-    },
-    onError: (error) => {
-      toast({
-        title: "Purchase Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+  // Find the listing by id
+  const listing = staticListings.find(l => l.id === id);
+  const isLoading = false;
 
+  // Calculate fees locally
+  const fees = listing
+    ? {
+        assetPrice: listing.price,
+        buyerFee: listing.price * 0.025,
+        totalBuyerPays: listing.price * 1.025,
+      }
+    : null;
+
+  // Simulate purchase logic locally
   const handlePurchase = async () => {
     if (!user) {
-      window.location.href = '/api/login';
+      toast({
+        title: "Login Required",
+        description: "Please log in to purchase this asset.",
+        variant: "destructive",
+      });
       return;
     }
-    
+
     if (listing?.sellerId === user.id) {
       toast({
         title: "Cannot Purchase",
@@ -85,11 +117,14 @@ export default function ListingDetail() {
     }
 
     setIsPurchasing(true);
-    try {
-      await purchaseMutation.mutateAsync();
-    } finally {
+    setTimeout(() => {
       setIsPurchasing(false);
-    }
+      setPurchaseSuccess(true);
+      toast({
+        title: "Purchase Initiated",
+        description: "Your payment has been placed in escrow. The seller will provide asset credentials shortly.",
+      });
+    }, 1500);
   };
 
   if (isLoading) {
@@ -148,7 +183,6 @@ export default function ListingDetail() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <Link href="/marketplace">
@@ -157,7 +191,6 @@ export default function ListingDetail() {
             Back to Marketplace
           </Button>
         </Link>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
@@ -193,7 +226,6 @@ export default function ListingDetail() {
                 <div className="p-6">
                   <h1 className="text-3xl font-bold text-gray-900 mb-4">{listing.title}</h1>
                   <p className="text-gray-600 mb-6">{listing.description}</p>
-                  
                   {/* Stats */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {listing.followers && (
@@ -236,7 +268,6 @@ export default function ListingDetail() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Seller Info */}
             <Card>
               <CardHeader>
@@ -277,13 +308,12 @@ export default function ListingDetail() {
               </CardContent>
             </Card>
           </div>
-
           {/* Purchase Card */}
           <div className="lg:col-span-1">
             <Card className="sticky top-8">
               <CardHeader>
                 <CardTitle className="text-2xl">
-                  ${parseFloat(listing.price).toLocaleString()}
+                  ${parseFloat(listing.price.toString()).toLocaleString()}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -304,16 +334,14 @@ export default function ListingDetail() {
                     </div>
                   </div>
                 )}
-
                 <Button
                   size="lg"
                   className="w-full"
                   onClick={handlePurchase}
                   disabled={isPurchasing || !listing || listing.status !== 'active'}
                 >
-                  {isPurchasing ? "Processing..." : "Buy Now"}
+                  {isPurchasing ? "Processing..." : purchaseSuccess ? "Purchased!" : "Buy Now"}
                 </Button>
-
                 <div className="space-y-2 text-sm text-gray-600">
                   <div className="flex items-center">
                     <Shield className="h-4 w-4 mr-2 text-emerald-500" />
@@ -328,9 +356,7 @@ export default function ListingDetail() {
                     <span>Dispute resolution available</span>
                   </div>
                 </div>
-
                 <Separator />
-
                 <div className="text-xs text-gray-500">
                   By purchasing, you agree to our Terms of Service and acknowledge 
                   that funds will be held in escrow until asset verification is complete.

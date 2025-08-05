@@ -8,7 +8,6 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { X, Wallet } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
 
 interface SearchFiltersProps {
   filters: {
@@ -27,10 +26,11 @@ interface SearchFiltersProps {
 export default function SearchFilters({ filters, onFilterChange }: SearchFiltersProps) {
   const { user } = useAuth();
 
-  const { data: dashboardStats } = useQuery({
-    queryKey: ["/api/dashboard/stats"],
-    enabled: !!user,
-  });
+  // Static dashboard stats
+  const dashboardStats = {
+    walletBalance: "1250.00",
+    escrowBalance: "500.00",
+  };
 
   const handleInputChange = (field: string, value: string | boolean) => {
     onFilterChange({ [field]: value });
@@ -75,34 +75,32 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
   return (
     <div className="space-y-6">
       {/* Wallet Overview */}
-      {dashboardStats && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Wallet className="h-5 w-5 mr-2 text-emerald-600" />
-              Wallet
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Available Balance</span>
-              <span className="text-lg font-semibold text-gray-900">
-                ${dashboardStats.walletBalance}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">In Escrow</span>
-              <span className="text-sm font-medium text-amber-600">
-                ${dashboardStats.escrowBalance}
-              </span>
-            </div>
-            <Separator />
-            <Button variant="outline" size="sm" className="w-full">
-              Add Funds
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Wallet className="h-5 w-5 mr-2 text-emerald-600" />
+            Wallet
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Available Balance</span>
+            <span className="text-lg font-semibold text-gray-900">
+              ${dashboardStats.walletBalance}
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">In Escrow</span>
+            <span className="text-sm font-medium text-amber-600">
+              ${dashboardStats.escrowBalance}
+            </span>
+          </div>
+          <Separator />
+          <Button variant="outline" size="sm" className="w-full">
+            Add Funds
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Filters */}
       <Card>

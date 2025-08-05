@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import Navigation from "@/components/Navigation";
 import ListingCard from "@/components/ListingCard";
 import TransactionCard from "@/components/TransactionCard";
@@ -8,17 +7,105 @@ import { TrendingUp, Users, Wallet, Star } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
-  const { data: featuredListings = [] } = useQuery({
-    queryKey: ["/api/listings?featured=true&limit=6"],
-  });
+  // Static featured listings data
+  const featuredListings = [
+    {
+      id: 1,
+      title: "Travel Photography Instagram",
+      price: 2500,
+      category: "instagram",
+      followers: 15000,
+      engagement: 4.2,
+      verified: true,
+      featured: true,
+    },
+    {
+      id: 2,
+      title: "Gaming YouTube Channel",
+      price: 5000,
+      category: "youtube",
+      followers: 25000,
+      engagement: 3.8,
+      verified: true,
+      featured: true,
+    },
+    {
+      id: 3,
+      title: "Fitness TikTok Account",
+      price: 1800,
+      category: "tiktok",
+      followers: 12000,
+      engagement: 5.1,
+      verified: false,
+      featured: true,
+    },
+    {
+      id: 4,
+      title: "Tech News Twitter",
+      price: 3200,
+      category: "twitter",
+      followers: 18000,
+      engagement: 4.7,
+      verified: true,
+      featured: true,
+    },
+    {
+      id: 5,
+      title: "E-commerce Website",
+      price: 8000,
+      category: "website",
+      followers: 5000,
+      engagement: 2.1,
+      verified: true,
+      featured: true,
+    },
+    {
+      id: 6,
+      title: "Food Blog Instagram",
+      price: 1200,
+      category: "instagram",
+      followers: 8000,
+      engagement: 6.2,
+      verified: false,
+      featured: true,
+    },
+  ];
 
-  const { data: userTransactions = [] } = useQuery({
-    queryKey: ["/api/users/me/transactions?limit=3"],
-  });
+  // Static user transactions data
+  const userTransactions = [
+    {
+      id: 1,
+      type: "purchase",
+      amount: 2500,
+      status: "completed",
+      assetTitle: "Travel Photography Instagram",
+      createdAt: new Date("2024-03-15").toISOString(),
+    },
+    {
+      id: 2,
+      type: "sale",
+      amount: 1800,
+      status: "payment_received",
+      assetTitle: "Fitness TikTok Account",
+      createdAt: new Date("2024-03-10").toISOString(),
+    },
+    {
+      id: 3,
+      type: "purchase",
+      amount: 5000,
+      status: "credentials_sent",
+      assetTitle: "Gaming YouTube Channel",
+      createdAt: new Date("2024-03-05").toISOString(),
+    },
+  ];
 
-  const { data: dashboardStats } = useQuery({
-    queryKey: ["/api/dashboard/stats"],
-  });
+  // Static dashboard stats
+  const dashboardStats = {
+    activeListings: 3,
+    activeTransactions: 2,
+    walletBalance: "1250.00",
+    totalSales: 5,
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -89,7 +176,7 @@ export default function Home() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Active Listings</p>
-                    <p className="text-2xl font-bold text-gray-900">{dashboardStats?.activeListings || 0}</p>
+                    <p className="text-2xl font-bold text-gray-900">{dashboardStats.activeListings}</p>
                   </div>
                 </div>
               </CardContent>
@@ -103,7 +190,7 @@ export default function Home() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Active Transactions</p>
-                    <p className="text-2xl font-bold text-gray-900">{dashboardStats?.activeTransactions || 0}</p>
+                    <p className="text-2xl font-bold text-gray-900">{dashboardStats.activeTransactions}</p>
                   </div>
                 </div>
               </CardContent>
@@ -117,7 +204,7 @@ export default function Home() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Wallet Balance</p>
-                    <p className="text-2xl font-bold text-gray-900">${dashboardStats?.walletBalance || "0.00"}</p>
+                    <p className="text-2xl font-bold text-gray-900">${dashboardStats.walletBalance}</p>
                   </div>
                 </div>
               </CardContent>
@@ -131,7 +218,7 @@ export default function Home() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Total Sales</p>
-                    <p className="text-2xl font-bold text-gray-900">{dashboardStats?.totalSales || 0}</p>
+                    <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalSales}</p>
                   </div>
                 </div>
               </CardContent>
@@ -151,14 +238,9 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.isArray(featuredListings) && featuredListings.slice(0, 6).map((listing: any) => (
+            {featuredListings.slice(0, 6).map((listing: any) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
-            {(!Array.isArray(featuredListings) || featuredListings.length === 0) && (
-              <div className="col-span-full text-center py-12">
-                <p className="text-gray-500">No featured listings available at the moment.</p>
-              </div>
-            )}
           </div>
         </div>
       </section>
@@ -174,17 +256,9 @@ export default function Home() {
           </div>
           
           <div className="space-y-4">
-            {Array.isArray(userTransactions) && userTransactions.slice(0, 3).map((transaction: any) => (
+            {userTransactions.slice(0, 3).map((transaction: any) => (
               <TransactionCard key={transaction.id} transaction={transaction} />
             ))}
-            {(!Array.isArray(userTransactions) || userTransactions.length === 0) && (
-              <div className="text-center py-12">
-                <p className="text-gray-500">No recent transactions found.</p>
-                <Link href="/marketplace">
-                  <Button className="mt-4">Start Trading</Button>
-                </Link>
-              </div>
-            )}
           </div>
         </div>
       </section>
