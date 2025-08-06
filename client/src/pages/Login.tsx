@@ -11,6 +11,7 @@ import { Shield, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { FcGoogle } from "react-icons/fc";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -37,21 +38,21 @@ export default function Login() {
 
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
-    
+
     // Simulate API call delay
     setTimeout(() => {
       setIsLoading(false);
-      
+
       // Static login logic - always succeed with demo credentials
       if (data.email === "demo@example.com" && data.password === "demo123") {
         // Set authentication state
         login();
-        
+
         toast({
           title: "Login Successful",
           description: "Welcome back! Redirecting to dashboard...",
         });
-        
+
         // Redirect to dashboard after successful login
         setTimeout(() => {
           window.location.href = "/home";
@@ -88,7 +89,7 @@ export default function Login() {
             <CardTitle className="text-2xl font-bold text-gray-900">Welcome Back</CardTitle>
             <p className="text-gray-600">Sign in to your AssetVault account</p>
           </CardHeader>
-          
+
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -176,7 +177,15 @@ export default function Login() {
                 >
                   {isLoading ? "Signing In..." : "Sign In"}
                 </Button>
-
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full flex items-center justify-center space-x-2"
+                  onClick={() => toast({ title: "Google Login", description: "Google login not yet implemented." })}
+                >
+                  <FcGoogle className="h-5 w-5" />
+                  <span>Sign in with Google</span>
+                </Button>
                 <div className="text-center">
                   <p className="text-sm text-gray-600">
                     Don't have an account?{" "}
