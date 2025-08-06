@@ -2,15 +2,15 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { 
-  Clock, 
-  CheckCircle, 
-  AlertTriangle, 
+import {
+  Clock,
+  CheckCircle,
+  AlertTriangle,
   MessageSquare,
   Eye,
-  Flag
+  Flag,
 } from "lucide-react";
-
+import { Link } from "wouter";
 interface TransactionCardProps {
   transaction: {
     id: string;
@@ -116,11 +116,11 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
 
   const statusInfo = getStatusInfo(transaction.status);
   const StatusIcon = statusInfo.icon;
-  
+
   const amount = parseFloat(transaction.amount);
-  
+
   // Static time remaining calculation - for demo purposes
-  const timeRemaining = transaction.verificationDeadline 
+  const timeRemaining = transaction.verificationDeadline
     ? Math.max(0, Math.ceil((new Date(transaction.verificationDeadline).getTime() - Date.now()) / (1000 * 60 * 60)))
     : null;
 
@@ -153,7 +153,7 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
             </Badge>
           </div>
         </div>
-        
+
         {/* Progress Bar */}
         <div className="mb-4">
           <div className="flex justify-between text-sm text-gray-600 mb-2">
@@ -170,9 +170,8 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
         {/* Transaction Steps */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <div className="flex items-center text-sm">
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${
-              statusInfo.progress >= 25 ? 'bg-emerald-500 text-white' : 'bg-gray-300 text-gray-600'
-            }`}>
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${statusInfo.progress >= 25 ? 'bg-emerald-500 text-white' : 'bg-gray-300 text-gray-600'
+              }`}>
               {statusInfo.progress >= 25 ? <CheckCircle className="h-3 w-3" /> : '1'}
             </div>
             <span className={statusInfo.progress >= 25 ? 'text-gray-900' : 'text-gray-500'}>
@@ -180,9 +179,8 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
             </span>
           </div>
           <div className="flex items-center text-sm">
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${
-              statusInfo.progress >= 50 ? 'bg-emerald-500 text-white' : 'bg-gray-300 text-gray-600'
-            }`}>
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${statusInfo.progress >= 50 ? 'bg-emerald-500 text-white' : 'bg-gray-300 text-gray-600'
+              }`}>
               {statusInfo.progress >= 50 ? <CheckCircle className="h-3 w-3" /> : '2'}
             </div>
             <span className={statusInfo.progress >= 50 ? 'text-gray-900' : 'text-gray-500'}>
@@ -190,21 +188,19 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
             </span>
           </div>
           <div className="flex items-center text-sm">
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${
-              statusInfo.progress >= 75 ? 'bg-emerald-500 text-white' : 
-              statusInfo.progress >= 50 ? 'bg-primary text-white' : 'bg-gray-300 text-gray-600'
-            }`}>
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${statusInfo.progress >= 75 ? 'bg-emerald-500 text-white' :
+                statusInfo.progress >= 50 ? 'bg-primary text-white' : 'bg-gray-300 text-gray-600'
+              }`}>
               {statusInfo.progress >= 75 ? <CheckCircle className="h-3 w-3" /> : '3'}
             </div>
-            <span className={statusInfo.progress >= 75 ? 'text-gray-900' : 
+            <span className={statusInfo.progress >= 75 ? 'text-gray-900' :
               statusInfo.progress >= 50 ? 'text-primary font-medium' : 'text-gray-500'}>
               Transfer
             </span>
           </div>
           <div className="flex items-center text-sm">
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${
-              statusInfo.progress >= 100 ? 'bg-emerald-500 text-white' : 'bg-gray-300 text-gray-600'
-            }`}>
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${statusInfo.progress >= 100 ? 'bg-emerald-500 text-white' : 'bg-gray-300 text-gray-600'
+              }`}>
               {statusInfo.progress >= 100 ? <CheckCircle className="h-3 w-3" /> : '4'}
             </div>
             <span className={statusInfo.progress >= 100 ? 'text-gray-900' : 'text-gray-500'}>
@@ -221,17 +217,21 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
               Verify & Complete
             </Button>
           )}
-          
-          <Button variant="outline" className="flex-1">
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Messages
-          </Button>
-          
+
+          {transaction.status !== 'completed' && (
+            <Link href={`/message/${transaction.id}`}>
+              <Button variant="outline" className="flex-1">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Messages
+              </Button>
+            </Link>
+          )}
+
           <Button variant="outline">
             <Eye className="h-4 w-4 mr-2" />
             View Details
           </Button>
-          
+
           {['payment_received', 'credentials_sent', 'verified'].includes(transaction.status) && (
             <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">
               <Flag className="h-4 w-4 mr-2" />

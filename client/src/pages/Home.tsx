@@ -3,7 +3,7 @@ import ListingCard from "@/components/ListingCard";
 import TransactionCard from "@/components/TransactionCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Users, Wallet, Star } from "lucide-react";
+import { TrendingUp, Users, Wallet, Star, MessageSquare } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
@@ -262,6 +262,19 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Floating Inbox Button */}
+      <div
+        className="fixed z-50 bottom-8 right-8 bg-primary text-white rounded-full shadow-lg p-4 flex items-center justify-center hover:bg-blue-700 transition-colors"
+        title="Inbox"
+        style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.15)' }}
+      >
+        <Link href="/inbox">
+        
+        <MessageSquare className="h-7 w-7" />
+        <span className="sr-only">Inbox</span>
+        </Link>
+      </div>
     </div>
   );
 }
