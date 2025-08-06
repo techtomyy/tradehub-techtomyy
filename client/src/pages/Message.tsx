@@ -58,7 +58,7 @@ export default function Message() {
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       <div className="max-w-6xl mx-auto py-12 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Buyer/Seller Info */}
         <div className="bg-white rounded-2xl shadow p-6">
           <a href="/inbox" className="text-sm text-blue-600 font-medium hover:underline flex items-center mb-6">
@@ -106,11 +106,10 @@ export default function Message() {
                 return (
                   <div key={index} className="text-center">
                     <div
-                      className={`h-8 w-8 rounded-full flex items-center justify-center border-2 z-10 relative ${
-                        isCompleted
-                          ? "border-green-500 text-green-500 bg-white"
-                          : "border-gray-300 text-gray-400 bg-white"
-                      }`}
+                      className={`h-8 w-8 rounded-full flex items-center justify-center border-2 z-10 relative ${isCompleted
+                        ? "border-green-500 text-green-500 bg-white"
+                        : "border-gray-300 text-gray-400 bg-white"
+                        }`}
                     >
                       {index + 1}
                     </div>
@@ -128,9 +127,8 @@ export default function Message() {
             {transaction.messages.map((msg) => (
               <div key={msg.id} className={`mb-3 ${msg.type === "buyer" ? "text-right" : "text-left"}`}>
                 <p
-                  className={`inline-block px-4 py-2 rounded-lg ${
-                    msg.type === "buyer" ? "bg-yellow-100 text-yellow-800" : "bg-blue-100 text-blue-800"
-                  }`}
+                  className={`inline-block px-4 py-2 rounded-lg ${msg.type === "buyer" ? "bg-yellow-100 text-yellow-800" : "bg-blue-100 text-blue-800"
+                    }`}
                 >
                   {msg.text}
                 </p>
@@ -141,21 +139,20 @@ export default function Message() {
             ))}
           </div>
 
+
           {/* Input */}
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-3 sm:space-y-0 mt-4">
             <input
               type="text"
               placeholder="Type your message..."
-              className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring focus:ring-blue-200"
+              className="flex-1 min-w-0 border rounded-lg px-4 py-2 focus:outline-none focus:ring focus:ring-blue-200"
             />
-            <button className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800">
+            <button className="shrink-0 bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800">
               Send
             </button>
           </div>
 
-          <button className="mt-4 bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200">
-            Raise Dispute
-          </button>
+
         </div>
       </div>
     </div>

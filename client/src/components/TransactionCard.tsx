@@ -222,7 +222,7 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
             <Link href={`/message/${transaction.id}`}>
               <Button variant="outline" className="flex-1">
                 <MessageSquare className="h-4 w-4 mr-2" />
-                Messages
+                Message To Buyer
               </Button>
             </Link>
           )}
@@ -233,10 +233,13 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
           </Button>
 
           {['payment_received', 'credentials_sent', 'verified'].includes(transaction.status) && (
-            <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">
-              <Flag className="h-4 w-4 mr-2" />
-              Dispute
-            </Button>
+         <Link href={`/dispute/${transaction.id}`}>
+         <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">
+           <Flag className="h-4 w-4 mr-2" />
+           Dispute
+         </Button>
+       </Link>
+       
           )}
         </div>
 

@@ -13,6 +13,7 @@ import Dashboard from "@/pages/Dashboard";
 import Inbox from "@/pages/Inbox";
 import NotFound from "@/pages/not-found";
 import Message from "./pages/Message";
+import Dispute from "./pages/Dispute";
 
 function Router() {
   const { isAuthenticated } = useAuth();
@@ -40,6 +41,7 @@ function Router() {
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/inbox" component={Inbox} />
           <Route path="/message/:id" component={Message} />
+          <Route path="/dispute/:transactionId" component={Dispute} />
         </>
       ) : (
         <>
