@@ -14,6 +14,8 @@ import Inbox from "@/pages/Inbox";
 import NotFound from "@/pages/not-found";
 import Message from "./pages/Message";
 import Dispute from "./pages/Dispute";
+import WalletPage from "./pages/wallet";
+
 
 function Router() {
   const { isAuthenticated } = useAuth();
@@ -39,6 +41,7 @@ function Router() {
           <Route path="/listing/:id" component={ListingDetail} />
           <Route path="/create-listing" component={CreateListing} />
           <Route path="/dashboard" component={Dashboard} />
+          <Route path="/Wallet" component={WalletPage} />
           <Route path="/inbox" component={Inbox} />
           <Route path="/message/:id" component={Message} />
           <Route path="/dispute/:transactionId" component={Dispute} />

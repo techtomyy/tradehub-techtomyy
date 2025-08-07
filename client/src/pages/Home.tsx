@@ -4,9 +4,11 @@ import TransactionCard from "@/components/TransactionCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, Wallet, Star, MessageSquare } from "lucide-react";
+import { useWalletStore } from "@/lib/store/walletStore";
 import { Link } from "wouter";
 
 export default function Home() {
+  const walletBalance = useWalletStore((state) => state.balance);
   // Static featured listings data
   const featuredListings = [
     {
@@ -103,7 +105,6 @@ export default function Home() {
   const dashboardStats = {
     activeListings: 3,
     activeTransactions: 2,
-    walletBalance: "1250.00",
     totalSales: 5,
   };
 
@@ -204,7 +205,7 @@ export default function Home() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Wallet Balance</p>
-                    <p className="text-2xl font-bold text-gray-900">${dashboardStats.walletBalance}</p>
+                    <p className="text-2xl font-bold text-gray-900">${walletBalance.toFixed(2)}</p>
                   </div>
                 </div>
               </CardContent>

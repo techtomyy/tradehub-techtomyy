@@ -11,13 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { Bell, User, Wallet, Settings, LogOut, Shield } from "lucide-react";
 import { Link } from "wouter";
+import { useWalletStore } from "@/lib/store/walletStore";
 
 export default function Navigation() {
   const { user, isAuthenticated, logout } = useAuth();
+  const walletBalance = useWalletStore((state) => state.balance);
 
   // Static dashboard stats
   const dashboardStats = {
-    walletBalance: "1250.00",
     escrowBalance: "500.00",
   };
 
@@ -62,7 +63,7 @@ export default function Navigation() {
             {/* Wallet Balance */}
             <div className="hidden md:flex items-center space-x-2 bg-gray-100 rounded-lg px-3 py-2">
               <Wallet className="h-4 w-4 text-emerald-600" />
-              <span className="text-sm font-medium">${dashboardStats.walletBalance}</span>
+              <span className="text-sm font-medium">${walletBalance.toFixed(2)}</span>
             </div>
 
             {/* Notifications */}
@@ -114,7 +115,7 @@ export default function Navigation() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard" className="w-full">
+                  <Link href="/Wallet" className="w-full">
                     <Wallet className="mr-2 h-4 w-4" />
                     <span>Wallet</span>
                   </Link>
