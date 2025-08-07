@@ -5,10 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, Wallet, Star, MessageSquare } from "lucide-react";
 import { useWalletStore } from "@/lib/store/walletStore";
+import { useInboxStore } from "@/lib/store/inboxStore";
 import { Link } from "wouter";
 
 export default function Home() {
   const walletBalance = useWalletStore((state) => state.balance);
+  const unreadMessages = useInboxStore((state) => state.unreadCount);
+
   // Static featured listings data
   const featuredListings = [
     {
@@ -111,7 +114,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
+
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary to-blue-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -122,7 +125,7 @@ export default function Home() {
                 <span className="text-blue-200 block">Securely</span>
               </h1>
               <p className="text-xl mb-8 text-blue-100">
-                The trusted marketplace for Instagram pages, YouTube channels, TikTok accounts, and more. 
+                The trusted marketplace for Instagram pages, YouTube channels, TikTok accounts, and more.
                 Protected by our escrow system.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -182,7 +185,7 @@ export default function Home() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
@@ -196,7 +199,7 @@ export default function Home() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
@@ -210,7 +213,7 @@ export default function Home() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
@@ -237,7 +240,7 @@ export default function Home() {
               <Button variant="outline">View All</Button>
             </Link>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredListings.slice(0, 6).map((listing: any) => (
               <ListingCard key={listing.id} listing={listing} />
@@ -255,7 +258,7 @@ export default function Home() {
               <Button variant="outline">View All</Button>
             </Link>
           </div>
-          
+
           <div className="space-y-4">
             {userTransactions.slice(0, 3).map((transaction: any) => (
               <TransactionCard key={transaction.id} transaction={transaction} />
@@ -266,16 +269,22 @@ export default function Home() {
 
       {/* Floating Inbox Button */}
       <div
-        className="fixed z-50 bottom-8 right-8 bg-primary text-white rounded-full shadow-lg p-4 flex items-center justify-center hover:bg-blue-700 transition-colors"
+        className="fixed z-50 bottom-8 right-8"
         title="Inbox"
-        style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.15)' }}
       >
         <Link href="/inbox">
-        
-        <MessageSquare className="h-7 w-7" />
-        <span className="sr-only">Inbox</span>
+          <div className="relative bg-primary text-white rounded-full shadow-lg p-4 flex items-center justify-center hover:bg-blue-700 transition-colors">
+            <MessageSquare className="h-7 w-7" />
+            {unreadMessages > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">
+                {unreadMessages}
+              </span>
+            )}
+            <span className="sr-only">Inbox</span>
+          </div>
         </Link>
       </div>
+
     </div>
   );
 }

@@ -1,31 +1,11 @@
 import Navigation from "@/components/Navigation";
 import { Link } from "wouter"; // FIX: Use Link from wouter
+import { useInboxStore } from "@/lib/store/inboxStore";
 
 export default function Inbox() {
   // Static inbox data
-  const inboxMessages = [
-    {
-      id: 1,
-      name: "Seller Name",
-      verified: true,
-      platform: "YouTube Channel",
-      price: 2500,
-    },
-    {
-      id: 2,
-      name: "Instagram Seller",
-      verified: false,
-      platform: "Instagram handle",
-      price: 1500,
-    },
-    {
-      id: 3,
-      name: "TikTok Seller",
-      verified: false,
-      platform: "Channel page",
-      price: 1800,
-    },
-  ];
+  const inboxMessages = useInboxStore((state) => state.messages);
+  const markAsRead = useInboxStore((state) => state.markAsRead);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -42,9 +22,9 @@ export default function Inbox() {
             {inboxMessages.map((message, index) => (
               <Link key={message.id} href={`/message/${message.id}`}>
                 <a
-                  className={`flex items-center justify-between px-6 py-4 ${
-                    index !== inboxMessages.length - 1 ? "border-b" : ""
-                  } hover:bg-gray-50 transition-colors`}
+                  onClick={() => markAsRead(message.id)}
+                  className={`flex items-center justify-between px-6 py-4 ${index !== inboxMessages.length - 1 ? "border-b" : ""
+                    } hover:bg-gray-50 transition-colors`}
                 >
                   <div className="flex items-center space-x-3">
                     {/* Profile Icon (Placeholder) */}

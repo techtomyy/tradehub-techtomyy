@@ -14,7 +14,8 @@ import Inbox from "@/pages/Inbox";
 import NotFound from "@/pages/not-found";
 import Message from "./pages/Message";
 import Dispute from "./pages/Dispute";
-import WalletPage from "./pages/wallet";
+import Wallet from "./pages/wallet";
+import Settings from "./pages/settings";
 
 
 function Router() {
@@ -41,8 +42,9 @@ function Router() {
           <Route path="/listing/:id" component={ListingDetail} />
           <Route path="/create-listing" component={CreateListing} />
           <Route path="/dashboard" component={Dashboard} />
-          <Route path="/Wallet" component={WalletPage} />
-          <Route path="/inbox" component={Inbox} />
+          <Route path="/Wallet" component={Wallet} />
+          <Route path="/inbox" component={Inbox}/>
+          <Route path="/settings" component={Settings} />
           <Route path="/message/:id" component={Message} />
           <Route path="/dispute/:transactionId" component={Dispute} />
         </>

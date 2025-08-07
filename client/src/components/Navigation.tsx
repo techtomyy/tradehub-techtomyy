@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,7 +38,7 @@ export default function Navigation() {
                 <span className="text-xl font-bold text-gray-900">AssetVault</span>
               </div>
             </Link>
-            
+
             <div className="hidden md:flex space-x-6">
               <Link href="/marketplace">
                 <Button variant="ghost" className="text-gray-600 hover:text-gray-900">
@@ -80,9 +80,9 @@ export default function Navigation() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage 
-                      src={user.profileImageUrl} 
-                      alt={user.firstName || user.email || 'User'} 
+                    <AvatarImage
+                      src={user.profileImageUrl}
+                      alt={user.firstName || user.email || 'User'}
                     />
                     <AvatarFallback>
                       {user.firstName?.[0] || user.email?.[0] || 'U'}
@@ -120,10 +120,13 @@ export default function Navigation() {
                     <span>Wallet</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
+                <DropdownMenuItem asChild>
+                  <Link href="/settings" className="w-full">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
                 </DropdownMenuItem>
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />
