@@ -55,7 +55,6 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Linked Social Accounts */}
-                {/* Linked Social Accounts */}
                 <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
                     <h3 className="text-lg font-medium">Linked Social Accounts</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
