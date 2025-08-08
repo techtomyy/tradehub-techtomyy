@@ -14,7 +14,6 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-SignupTable();
 app.use("/auth", authRoute);
 
 const PORT = process.env.PORT || 4000;

@@ -9,7 +9,7 @@ interface SignupBody {
   lastName: string;
   email: string;
   password: string;
-  ConditionAgree: boolean;
+  conditionagree: boolean;
 }
 
 export async function SignupUser(
@@ -17,13 +17,13 @@ export async function SignupUser(
   res: Response
 ): Promise<Response> {
   try {
-    const { firstName, lastName, email, password, ConditionAgree } = req.body;
-
+    const { firstName, lastName, email, password, conditionagree } = req.body;
+    console.log(req.body)
     // 1. Check if user already exists
     const { data: existingUser, error: checkError } = await supabase
       .from("users")
       .select("id")
-      .eq("Email", email)
+      .eq("email", email)
       .maybeSingle();
 
     if (checkError) {
@@ -45,10 +45,10 @@ export async function SignupUser(
       .from("users")
       .insert([
         {
-          FirstName: firstName,
-          LastName: lastName,
-          Email: email,
-          ConditionAgree,
+          firstname: firstName,
+          lastname: lastName,
+          email: email,
+        conditionagree:conditionagree,
         },
       ])
       .select()
@@ -67,9 +67,9 @@ export async function SignupUser(
     const { error: authError } = await supabase.from("auth").insert([
       {
         user_id: userId,
-        Password: hashedPassword,
-        IsPasswordSet: true,
-        GoogleID: null,
+        password: hashedPassword,
+        ispasswordset: true,
+        googleid: null,
       },
     ]);
 
@@ -105,6 +105,7 @@ export async function SignupUser(
       email: email,
       role: roleAdd.role,
     };
+    console.log(user)
 
     const token = generateToken(user);
 
@@ -113,7 +114,7 @@ export async function SignupUser(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 6 * 60 * 60 * 1000, // 6 hours
+      maxAge: 24 * 60 * 60 * 1000, // 6 hours
     });
 
     return res

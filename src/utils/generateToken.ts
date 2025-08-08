@@ -6,7 +6,7 @@ const { sign } = jwt;
 interface UserData {
     id: string;
     email: string;
-    role: 'user' | 'admin';
+    role: 'User' | 'Admin';
 }
 
 // ---------------- Generate Token JWT(json web Token) ----------------
@@ -14,10 +14,10 @@ export const generateToken = (userData: UserData): string => {
     let secretKey: string | undefined;
 
     switch (userData.role) {
-        case "user":
+        case "User":
             secretKey = process.env.SECRET_KEY;
             break;
-        case "admin":
+        case "Admin":
             secretKey = process.env.ADMIN_SECRET_KEY;
             break;
         default:

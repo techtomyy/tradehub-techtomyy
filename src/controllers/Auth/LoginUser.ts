@@ -19,8 +19,8 @@ export async function LoginUser(
     // 1. Get user by email from 'users' table
     const { data: user, error: userError } = await supabase
       .from("users")
-      .select("id, Email")
-      .eq("Email", email)
+      .select("id, email")
+      .eq("email", email)
       .maybeSingle();
 
     if (userError) {
@@ -37,7 +37,7 @@ export async function LoginUser(
     // 2. Get hashed password from auth table
     const { data: authData, error: authError } = await supabase
       .from("auth")
-      .select("Password")
+      .select("password")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -47,7 +47,7 @@ export async function LoginUser(
     }
 
     // 3. Compare password
-    const isMatch = await bcrypt.compare(password, authData.Password);
+    const isMatch = await bcrypt.compare(password, authData.password);
     if (!isMatch) {
       return res
         .status(401)
@@ -69,7 +69,7 @@ export async function LoginUser(
     // 5. Generate Token
     const tokenPayload = {
       id: user.id,
-      email: user.Email,
+      email: user.email,
       role: roleData.role,
     };
     const token = generateToken(tokenPayload);

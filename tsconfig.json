@@ -112,15 +112,18 @@
 
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
+    "target": "es6",
+    "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "./js",
+    "rootDir": "./src",
     "esModuleInterop": true,
-    "moduleDetection": "force",
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
-  }
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+        "allowJs": true
+
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
