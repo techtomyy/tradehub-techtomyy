@@ -114,7 +114,7 @@ export async function SignupUser(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000, // 6 hours
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     return res
