@@ -26,7 +26,7 @@ const SignupTable = () => __awaiter(void 0, void 0, void 0, function* () {
   `;
     // 2. Users Table
     const createUsersTableSql = `
-    CREATE TABLE IF NOT EXISTS users (
+    CREATE TABLE IF NOT EXISTS public.users (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
       FirstName TEXT NOT NULL,
       LastName TEXT NOT NULL,
@@ -37,7 +37,7 @@ const SignupTable = () => __awaiter(void 0, void 0, void 0, function* () {
   `;
     // 3. Auth Table
     const createAuthTableSql = `
-    CREATE TABLE IF NOT EXISTS auth (
+    CREATE TABLE IF NOT EXISTS public.auth (
       user_id uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
       Password TEXT,
       IsPasswordSet BOOLEAN DEFAULT FALSE,
@@ -46,7 +46,7 @@ const SignupTable = () => __awaiter(void 0, void 0, void 0, function* () {
   `;
     // 4. Roles Table
     const createRolesTableSql = `
-    CREATE TABLE IF NOT EXISTS roles (
+    CREATE TABLE IF NOT EXISTS public.roles (
       user_id uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
       Role user_role DEFAULT 'User'
     );

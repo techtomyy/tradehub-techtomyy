@@ -8,5 +8,5 @@ const SignupUser_1 = require("../controllers/Auth/SignupUser");
 const LoginUser_1 = require("../controllers/Auth/LoginUser");
 const router = express_1.default.Router();
 router.post('/register/signup', SignupUser_1.SignupUser);
-router.get('/user/login', LoginUser_1.LoginUser);
+router.post('/user/login', LoginUser_1.LoginUser);
 exports.default = router;

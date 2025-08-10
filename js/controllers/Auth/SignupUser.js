@@ -20,12 +20,13 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 function SignupUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { firstName, lastName, email, password, ConditionAgree } = req.body;
+            const { firstName, lastName, email, password, conditionagree } = req.body;
+            console.log(req.body);
             // 1. Check if user already exists
             const { data: existingUser, error: checkError } = yield client_1.default
                 .from("users")
                 .select("id")
-                .eq("Email", email)
+                .eq("email", email)
                 .maybeSingle();
             if (checkError) {
                 console.error("❌ Error checking existing user:", checkError.message);
@@ -43,10 +44,10 @@ function SignupUser(req, res) {
                 .from("users")
                 .insert([
                 {
-                    FirstName: firstName,
-                    LastName: lastName,
-                    Email: email,
-                    ConditionAgree,
+                    firstname: firstName,
+                    lastname: lastName,
+                    email: email,
+                    conditionagree: conditionagree,
                 },
             ])
                 .select()
@@ -62,9 +63,9 @@ function SignupUser(req, res) {
             const { error: authError } = yield client_1.default.from("auth").insert([
                 {
                     user_id: userId,
-                    Password: hashedPassword,
-                    IsPasswordSet: true,
-                    GoogleID: null,
+                    password: hashedPassword,
+                    ispasswordset: true,
+                    googleid: null,
                 },
             ]);
             if (authError) {
@@ -96,13 +97,14 @@ function SignupUser(req, res) {
                 email: email,
                 role: roleAdd.role,
             };
+            console.log(user);
             const token = (0, generateToken_1.generateToken)(user);
             // 7. Set Cookie
             res.cookie("token", token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "strict",
-                maxAge: 6 * 60 * 60 * 1000, // 6 hours
+                maxAge: 24 * 60 * 60 * 1000,
             });
             return res
                 .status(201)

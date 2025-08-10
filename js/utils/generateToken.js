@@ -11,10 +11,10 @@ const { sign } = jsonwebtoken_1.default;
 const generateToken = (userData) => {
     let secretKey;
     switch (userData.role) {
-        case "user":
+        case "User":
             secretKey = process.env.SECRET_KEY;
             break;
-        case "admin":
+        case "Admin":
             secretKey = process.env.ADMIN_SECRET_KEY;
             break;
         default:

@@ -24,8 +24,8 @@ function LoginUser(req, res) {
             // 1. Get user by email from 'users' table
             const { data: user, error: userError } = yield client_1.default
                 .from("users")
-                .select("id, Email")
-                .eq("Email", email)
+                .select("id, email")
+                .eq("email", email)
                 .maybeSingle();
             if (userError) {
                 console.error("❌ Error fetching user:", userError.message);
@@ -39,7 +39,7 @@ function LoginUser(req, res) {
             // 2. Get hashed password from auth table
             const { data: authData, error: authError } = yield client_1.default
                 .from("auth")
-                .select("Password")
+                .select("password")
                 .eq("user_id", user.id)
                 .maybeSingle();
             if (authError || !authData) {
@@ -47,7 +47,7 @@ function LoginUser(req, res) {
                 return res.status(401).json({ error: errorMessages_1.ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS });
             }
             // 3. Compare password
-            const isMatch = yield bcrypt_1.default.compare(password, authData.Password);
+            const isMatch = yield bcrypt_1.default.compare(password, authData.password);
             if (!isMatch) {
                 return res
                     .status(401)
@@ -66,7 +66,7 @@ function LoginUser(req, res) {
             // 5. Generate Token
             const tokenPayload = {
                 id: user.id,
-                email: user.Email,
+                email: user.email,
                 role: roleData.role,
             };
             const token = (0, generateToken_1.generateToken)(tokenPayload);
@@ -75,7 +75,7 @@ function LoginUser(req, res) {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "strict",
-                maxAge: 6 * 60 * 60 * 1000, // 6 hours
+                maxAge: 24 * 60 * 60 * 1000, // 24 hours
             });
             // 7. Return success
             return res.status(200).json({ message: "✅ Login successful!" });
