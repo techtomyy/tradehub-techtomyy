@@ -15,6 +15,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRoute);
 
+app.get("/", (req, res) => {
+  res.send("Server is live 🚀");
+});
+
+
 const PORT = Number(process.env.PORT) || 4000;
 app.listen(PORT, () => {
   console.log(`✅ Server is running on port ${PORT}`);
