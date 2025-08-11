@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ERROR_MESSAGES } from "../../constants/errorMessages";
+import { ERROR_MESSAGES,ERROR_CODES } from "../../constants/errorMessages";
 import supabase from "../../config/client";
 import bcrypt from "bcrypt";
 import { generateToken } from "../../utils/generateToken";
@@ -30,7 +30,7 @@ export async function LoginUser(
 
     if (!user) {
       return res
-        .status(401)
+        .status(ERROR_CODES.NOT_FOUND)
         .json({ error: ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS_EMAIL });
     }
 
@@ -43,7 +43,7 @@ export async function LoginUser(
 
     if (authError || !authData) {
       console.error("❌ Error fetching password:", authError?.message);
-      return res.status(401).json({ error: ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS });
+      return res.status(ERROR_CODES.UNAUTHORIZED).json({ error: ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS });
     }
 
     // 3. Compare password
@@ -63,7 +63,7 @@ export async function LoginUser(
 
     if (roleError || !roleData) {
       console.error("❌ Error fetching role:", roleError?.message);
-      return res.status(500).json({ error: ERROR_MESSAGES.AUTH.SERVER_ERROR });
+      return res.status(ERROR_CODES.SERVER_ERROR).json({ error: ERROR_MESSAGES.AUTH.SERVER_ERROR });
     }
 
     // 5. Generate Token
@@ -83,7 +83,7 @@ export async function LoginUser(
     });
 
     // 7. Return success
-    return res.status(200).json({ message: "✅ Login successful!" });
+    return res.status(ERROR_CODES.SUCCESS).json({ message: "✅ Login successful!" });
 
   } catch (error) {
     console.error("❌ Login Error:", error);

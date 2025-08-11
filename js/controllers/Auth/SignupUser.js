@@ -30,11 +30,13 @@ function SignupUser(req, res) {
                 .maybeSingle();
             if (checkError) {
                 console.error("❌ Error checking existing user:", checkError.message);
-                return res.status(500).json({ error: errorMessages_1.ERROR_MESSAGES.AUTH.SERVER_ERROR });
+                return res
+                    .status(errorMessages_1.ERROR_CODES.SERVER_ERROR)
+                    .json({ error: errorMessages_1.ERROR_MESSAGES.DB.USERS_TABLE_ERROR });
             }
             if (existingUser) {
                 return res
-                    .status(400)
+                    .status(errorMessages_1.ERROR_CODES.BAD_REQUEST)
                     .json({ error: errorMessages_1.ERROR_MESSAGES.GENERAL.USER_ALREADY_EXISTS });
             }
             // 2. Hash password
@@ -55,8 +57,8 @@ function SignupUser(req, res) {
             if (userError || !userInsert) {
                 console.error("❌ Error inserting user:", userError === null || userError === void 0 ? void 0 : userError.message);
                 return res
-                    .status(500)
-                    .json({ error: errorMessages_1.ERROR_MESSAGES.GENERAL.SIGNUP_FAILED });
+                    .status(errorMessages_1.ERROR_CODES.SERVER_ERROR)
+                    .json({ error: errorMessages_1.ERROR_MESSAGES.DB.USERS_INSERT_ERROR });
             }
             const userId = userInsert.id;
             // 4. Insert into `auth` table
@@ -71,8 +73,8 @@ function SignupUser(req, res) {
             if (authError) {
                 console.error("❌ Error inserting auth:", authError.message);
                 return res
-                    .status(500)
-                    .json({ error: errorMessages_1.ERROR_MESSAGES.GENERAL.SIGNUP_FAILED });
+                    .status(errorMessages_1.ERROR_CODES.SERVER_ERROR)
+                    .json({ error: errorMessages_1.ERROR_MESSAGES.DB.AUTH_TABLE_ERROR });
             }
             // 5. Insert into `roles` table
             const { data: roleAdd, error: roleError } = yield client_1.default
@@ -80,7 +82,7 @@ function SignupUser(req, res) {
                 .insert([
                 {
                     user_id: userId,
-                    role: "User", // default role
+                    role: "User",
                 },
             ])
                 .select()
@@ -88,8 +90,8 @@ function SignupUser(req, res) {
             if (roleError || !roleAdd) {
                 console.error("❌ Error inserting role:", roleError === null || roleError === void 0 ? void 0 : roleError.message);
                 return res
-                    .status(500)
-                    .json({ error: errorMessages_1.ERROR_MESSAGES.GENERAL.SIGNUP_FAILED });
+                    .status(errorMessages_1.ERROR_CODES.SERVER_ERROR)
+                    .json({ error: errorMessages_1.ERROR_MESSAGES.DB.ROLES_TABLE_ERROR });
             }
             // 6. Generate Token
             const user = {
@@ -97,7 +99,6 @@ function SignupUser(req, res) {
                 email: email,
                 role: roleAdd.role,
             };
-            console.log(user);
             const token = (0, generateToken_1.generateToken)(user);
             // 7. Set Cookie
             res.cookie("token", token, {
@@ -106,13 +107,15 @@ function SignupUser(req, res) {
                 sameSite: "strict",
                 maxAge: 24 * 60 * 60 * 1000,
             });
-            return res
-                .status(201)
-                .json({ message: "✅ User signed up successfully!" });
+            return res.status(201).json({
+                message: "✅ User signed up successfully!",
+            });
         }
         catch (error) {
             console.error("❌ Unexpected error:", error);
-            return res.status(500).json({ error: errorMessages_1.ERROR_MESSAGES.AUTH.SERVER_ERROR });
+            return res
+                .status(errorMessages_1.ERROR_CODES.SERVER_ERROR)
+                .json({ error: errorMessages_1.ERROR_MESSAGES.AUTH.SERVER_ERROR });
         }
     });
 }
