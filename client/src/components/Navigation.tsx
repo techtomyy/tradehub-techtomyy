@@ -36,7 +36,7 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo and Main Navigation */}
           <div className="flex items-center space-x-8">
-            <Link href="/Home">
+            <Link href="/home">
               <div className="flex items-center space-x-2 cursor-pointer">
                 <Shield className="h-8 w-8 text-primary" />
                 <span className="text-xl font-bold text-gray-900">AssetVault</span>
@@ -142,7 +142,7 @@ export default function Navigation() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/Wallet" className="w-full">
+                  <Link href="/wallet" className="w-full">
                     <Wallet className="mr-2 h-4 w-4" />
                     <span>Wallet</span>
                   </Link>

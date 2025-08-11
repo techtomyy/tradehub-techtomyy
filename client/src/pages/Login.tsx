@@ -24,7 +24,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const { toast } = useToast();
-  const { login } = useAuth();
+  const { demoLogin } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -59,6 +59,10 @@ export default function Login() {
         });
       } else {
         console.log("Google OAuth initiated successfully");
+        toast({
+          title: "Google Sign-in Initiated",
+          description: "Redirecting to Google for authentication...",
+        });
       }
     } catch (error) {
       console.error("Unexpected error during Google sign-in:", error);
@@ -82,18 +86,17 @@ export default function Login() {
 
       // Static login logic - always succeed with demo credentials
       if (data.email === "demo@example.com" && data.password === "demo123") {
+        console.log("Demo credentials matched, calling demoLogin");
         // Set authentication state
-        login();
-
+        demoLogin();
+        console.log("demoLogin called successfully");
+        
         toast({
-          title: "Login Successful",
-          description: "Welcome back! Redirecting to dashboard...",
+          title: "Demo Login Successful",
+          description: "Welcome back! Redirecting to home page...",
         });
 
-        // Redirect to dashboard after successful login
-        setTimeout(() => {
-          window.location.href = "/home";
-        }, 1000);
+        // Redirect is handled by demoLogin method
       } else {
         toast({
           title: "Login Failed",

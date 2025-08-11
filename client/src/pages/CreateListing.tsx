@@ -21,6 +21,7 @@ const createListingSchema = z.object({
   }),
   price: z.string().min(1, "Price is required").refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Price must be a positive number"),
   assetUrl: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  assetProofImage: z.instanceof(File, { message: "Asset proof screenshot is required" }),
   followers: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), "Followers must be a non-negative number"),
   engagement: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0 && Number(val) <= 100), "Engagement must be between 0-100%"),
   monthlyViews: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), "Monthly views must be a non-negative number"),
@@ -57,10 +58,14 @@ export default function CreateListing() {
     setTimeout(() => {
       setIsSubmitting(false);
       
-      // Show success message
+      // Show success message with image info if provided
+      const imageInfo = data.assetProofImage 
+        ? ` with proof screenshot (${data.assetProofImage.name})`
+        : '';
+      
       toast({
         title: "Listing Created",
-        description: "Your asset listing has been created and is pending verification.",
+        description: `Your asset listing has been created${imageInfo} and is pending verification.`,
       });
       
       // Redirect to dashboard
@@ -216,6 +221,110 @@ export default function CreateListing() {
                             </FormControl>
                             <FormDescription>
                               Provide a link to your asset (e.g., Instagram profile, YouTube channel). This will be shared with the buyer after purchase.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="assetProofImage"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Asset Proof Screenshot <span className="text-red-500">*</span></FormLabel>
+                            <FormControl>
+                              <div className="space-y-3">
+                                <div className="flex items-center justify-center w-full">
+                                  <label
+                                    htmlFor="asset-proof-upload"
+                                    className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                                      !field.value 
+                                        ? 'border-red-300 bg-red-50 hover:bg-red-100' 
+                                        : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
+                                    }`}
+                                  >
+                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                      <Upload className={`w-8 h-8 mb-3 ${!field.value ? 'text-red-400' : 'text-gray-400'}`} />
+                                      <p className={`mb-2 text-sm ${!field.value ? 'text-red-600' : 'text-gray-500'}`}>
+                                        <span className="font-semibold">Click to upload</span> or drag and drop
+                                      </p>
+                                      <p className={`text-xs ${!field.value ? 'text-red-500' : 'text-gray-500'}`}>
+                                        PNG, JPG, JPEG up to 2MB
+                                      </p>
+                                      {!field.value && (
+                                        <p className="text-xs text-red-500 font-medium mt-1">
+                                          * Required for verification
+                                        </p>
+                                      )}
+                                    </div>
+                                    <input
+                                      id="asset-proof-upload"
+                                      type="file"
+                                      className="hidden"
+                                      accept="image/png,image/jpeg,image/jpg"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          // Check file size (2MB = 2 * 1024 * 1024 bytes)
+                                          if (file.size > 2 * 1024 * 1024) {
+                                            toast({
+                                              title: "File Too Large",
+                                              description: "Please select an image smaller than 2MB.",
+                                              variant: "destructive",
+                                            });
+                                            return;
+                                          }
+                                          field.onChange(file);
+                                        }
+                                      }}
+                                    />
+                                  </label>
+                                </div>
+                                {field.value && (
+                                  <div className="space-y-3">
+                                    {/* File Info */}
+                                    <div className="flex items-center space-x-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <Upload className="w-5 h-5 text-green-600" />
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium text-green-900 truncate">
+                                          {field.value.name}
+                                        </p>
+                                        <p className="text-xs text-green-600">
+                                          {(field.value.size / 1024 / 1024).toFixed(2)} MB
+                                        </p>
+                                      </div>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => field.onChange(undefined)}
+                                        className="text-green-600 hover:text-green-700"
+                                      >
+                                        Remove
+                                      </Button>
+                                    </div>
+                                    
+                                    {/* Image Preview */}
+                                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                                      <img
+                                        src={URL.createObjectURL(field.value)}
+                                        alt="Asset proof preview"
+                                        className="w-full h-48 object-cover"
+                                        onLoad={(e) => {
+                                          // Clean up the object URL when image loads
+                                          URL.revokeObjectURL(e.currentTarget.src);
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </FormControl>
+                            <FormDescription>
+                              Upload a screenshot proving ownership of your asset (e.g., Instagram analytics, YouTube dashboard). <span className="font-semibold text-red-600">Required for verification.</span> Max size: 2MB.
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
