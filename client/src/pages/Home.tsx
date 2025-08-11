@@ -77,32 +77,92 @@ export default function Home() {
   ];
 
   // Static user transactions data
-  const userTransactions = [
-    {
-      id: 1,
-      type: "purchase",
-      amount: 2500,
-      status: "completed",
-      assetTitle: "Travel Photography Instagram",
-      createdAt: new Date("2024-03-15").toISOString(),
+  // Example static user transactions
+const userTransactions = [
+  {
+    id: "1",
+    buyerId: "B001",
+    sellerId: "S001",
+    listingId: "L001",
+    amount: "2500",
+    buyerFee: "50",
+    sellerFee: "75",
+    totalAmount: "2625",
+    status: "completed",
+    verificationDeadline: "2024-03-20T23:59:59.000Z",
+    disputeReason: undefined,
+    createdAt: "2024-03-15T10:30:00.000Z",
+    updatedAt: "2024-03-16T14:45:00.000Z",
+    listing: {
+      title: "Travel Photography Instagram",
+      category: "Social Media",
     },
-    {
-      id: 2,
-      type: "sale",
-      amount: 1800,
-      status: "payment_received",
-      assetTitle: "Fitness TikTok Account",
-      createdAt: new Date("2024-03-10").toISOString(),
+    buyer: {
+      firstName: "John",
+      lastName: "Doe",
     },
-    {
-      id: 3,
-      type: "purchase",
-      amount: 5000,
-      status: "credentials_sent",
-      assetTitle: "Gaming YouTube Channel",
-      createdAt: new Date("2024-03-05").toISOString(),
+    seller: {
+      firstName: "Alice",
+      lastName: "Smith",
     },
-  ];
+  },
+  {
+    id: "2",
+    buyerId: "B002",
+    sellerId: "S002",
+    listingId: "L002",
+    amount: "1800",
+    buyerFee: "40",
+    sellerFee: "60",
+    totalAmount: "1900",
+    status: "payment_received",
+    verificationDeadline: "2024-03-15T23:59:59.000Z",
+    disputeReason: undefined,
+    createdAt: "2024-03-10T09:15:00.000Z",
+    updatedAt: "2024-03-11T11:25:00.000Z",
+    listing: {
+      title: "Fitness TikTok Account",
+      category: "Social Media",
+    },
+    buyer: {
+      firstName: "Michael",
+      lastName: "Brown",
+    },
+    seller: {
+      firstName: "Sophia",
+      lastName: "Johnson",
+    },
+  },
+  {
+    id: "3",
+    buyerId: "B003",
+    sellerId: "S003",
+    listingId: "L003",
+    amount: "5000",
+    buyerFee: "100",
+    sellerFee: "150",
+    totalAmount: "5250",
+    status: "credentials_sent",
+    verificationDeadline: "2024-03-12T23:59:59.000Z",
+    disputeReason: "Credentials not matching description",
+    createdAt: "2024-03-05T14:00:00.000Z",
+    updatedAt: "2024-03-06T16:40:00.000Z",
+    listing: {
+      title: "Gaming YouTube Channel",
+      category: "Gaming",
+    },
+    buyer: {
+      firstName: "David",
+      lastName: "Wilson",
+    },
+    seller: {
+      firstName: "Emma",
+      lastName: "Davis",
+    },
+  },
+];
+
+
 
   // Static dashboard stats
   const dashboardStats = {
