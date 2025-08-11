@@ -123,7 +123,7 @@ export default function Marketplace() {
             </div>
             {/* Category Tags */}
             <div className="flex flex-wrap gap-2 mb-6">
-              {['', 'instagram', 'youtube', 'tiktok', 'twitter', 'website'].map((category) => (
+              {['all', 'instagram', 'youtube', 'tiktok', 'twitter', 'website'].map((category) => (
                 <Button
                   key={category}
                   variant={filters.category === category ? "default" : "outline"}
@@ -131,6 +131,7 @@ export default function Marketplace() {
                   onClick={() => handleFilterChange({ category })}
                 >
                  {category === 'all' ? 'All Categories' : category}
+                 
                 </Button>
               ))}
             </div>
