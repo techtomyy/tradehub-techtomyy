@@ -1,19 +1,43 @@
 import { useState, useEffect } from "react";
+import supabase from "@/config/client";
+import { User } from "@supabase/supabase-js";
 
 export function useAuth() {
-  // Initialize authentication state from localStorage
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const stored = localStorage.getItem('isAuthenticated');
-    return stored ? JSON.parse(stored) : true; // Default to true for demo
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Update localStorage when authentication state changes
+  // Check for existing session on mount
   useEffect(() => {
-    localStorage.setItem('isAuthenticated', JSON.stringify(isAuthenticated));
-  }, [isAuthenticated]);
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsAuthenticated(true);
+        setUser(session.user);
+      }
+      setIsLoading(false);
+    };
 
-  // Static user data
-  const user = {
+    getSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          setIsAuthenticated(true);
+          setUser(session.user);
+        } else if (event === 'SIGNED_OUT') {
+          setIsAuthenticated(false);
+          setUser(null);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // User data from Supabase or fallback to demo data
+  const userData = user || {
     id: "1",
     name: "Demo User",
     email: "demo@example.com",
@@ -27,26 +51,25 @@ export function useAuth() {
     bio: "Experienced digital asset trader.",
   };
 
-  const logout = () => {
-    // Clear any stored authentication data
-    localStorage.removeItem('auth_token');
-    sessionStorage.removeItem('auth_token');
-    
-    // Set authentication to false
-    setIsAuthenticated(false);
-    
-    // Redirect to landing page
-    window.location.href = '/';
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setIsAuthenticated(false);
+      setUser(null);
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const login = () => {
-    // Set authentication to true
-    setIsAuthenticated(true);
+    // This is now handled by Supabase OAuth
+    // The auth state will be updated automatically
   };
 
   return {
-    user,
-    isLoading: false,
+    user: userData,
+    isLoading,
     isAuthenticated,
     logout,
     login,

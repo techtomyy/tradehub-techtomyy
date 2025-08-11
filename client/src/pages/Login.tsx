@@ -12,6 +12,7 @@ import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { FcGoogle } from "react-icons/fc";
+import supabase from "@/config/client";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -35,7 +36,43 @@ export default function Login() {
       rememberMe: false,
     },
   });
-
+  async function signInWithGoogle() {
+    try {
+      setIsLoading(true);
+      
+      console.log("Starting Google OAuth...");
+      console.log("Redirect URL:", `${window.location.origin}/auth/callback`);
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      
+      if (error) {
+        console.error("Google sign-in error:", error.message);
+        toast({
+          title: "Google Sign-in Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        console.log("Google OAuth initiated successfully");
+      }
+    } catch (error) {
+      console.error("Unexpected error during Google sign-in:", error);
+      toast({
+        title: "Sign-in Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  
+  
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
 
@@ -181,11 +218,13 @@ export default function Login() {
                   type="button"
                   variant="outline"
                   className="w-full flex items-center justify-center space-x-2"
-                  onClick={() => toast({ title: "Google Login", description: "Google login not yet implemented." })}
+                  onClick={signInWithGoogle}
+                  disabled={isLoading}
                 >
                   <FcGoogle className="h-5 w-5" />
-                  <span>Sign in with Google</span>
+                  <span>{isLoading ? "Signing in..." : "Sign in with Google"}</span>
                 </Button>
+
                 <div className="text-center">
                   <p className="text-sm text-gray-600">
                     Don't have an account?{" "}

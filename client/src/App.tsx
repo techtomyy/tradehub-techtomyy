@@ -16,6 +16,7 @@ import Message from "./pages/Message";
 import Dispute from "./pages/Dispute";
 import Wallet from "./pages/wallet";
 import Settings from "./pages/settings";
+import AuthCallback from "./pages/AuthCallback";
 
 
 function Router() {
@@ -26,14 +27,15 @@ function Router() {
       {/* Public routes - always accessible */}
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
-      
+      <Route path="/auth/callback" component={AuthCallback} />
+
       {/* Root path - redirect based on authentication */}
       {isAuthenticated ? (
         <Route path="/" component={Dashboard} />
       ) : (
         <Route path="/" component={Landing} />
       )}
-      
+
       {/* Protected routes - only for authenticated users */}
       {isAuthenticated ? (
         <>
@@ -42,14 +44,16 @@ function Router() {
           <Route path="/listing/:id" component={ListingDetail} />
           <Route path="/create-listing" component={CreateListing} />
           <Route path="/dashboard" component={Dashboard} />
-          <Route path="/Wallet" component={Wallet} />
-          <Route path="/inbox" component={Inbox}/>
+          <Route path="/wallet" component={Wallet} />
+          <Route path="/inbox" component={Inbox} />
           <Route path="/settings" component={Settings} />
           <Route path="/message/:id" component={Message} />
           <Route path="/dispute/:transactionId" component={Dispute} />
+
         </>
       ) : (
         <>
+
           <Route path="/home" component={Landing} />
           <Route path="/marketplace" component={Landing} />
           <Route path="/listing/:id" component={Landing} />

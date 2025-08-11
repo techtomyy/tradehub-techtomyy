@@ -12,6 +12,7 @@ import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { FcGoogle } from "react-icons/fc";
+import supabase from "@/config/client";
 
 const signupSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -48,6 +49,22 @@ export default function Signup() {
     },
   });
 
+  async function signUpWithGoogle() {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) {
+      console.error("Signup error:", error.message);
+      toast({
+        title: "Google Sign-up Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  }
   const onSubmit = async (data: SignupForm) => {
     setIsLoading(true);
 
@@ -279,11 +296,12 @@ export default function Signup() {
                   type="button"
                   variant="outline"
                   className="w-full flex items-center justify-center space-x-2"
-                  onClick={() => toast({ title: "Google Singup", description: "Google Singup not yet implemented." })}
+                  onClick={signUpWithGoogle}
                 >
                   <FcGoogle className="h-5 w-5" />
                   <span>Sign up with Google</span>
                 </Button>
+
                 <div className="text-center">
                   <p className="text-sm text-gray-600">
                     Already have an account?{" "}
