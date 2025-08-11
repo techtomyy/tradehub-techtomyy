@@ -196,21 +196,190 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-primary text-white">
+      {/* Security Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Your Security is Our Priority</h2>
+            <p className="text-xl text-gray-600">We employ industry-leading security measures to protect your assets and personal information.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Shield className="h-6 w-6 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-2">Escrow Protection</h3>
+                  <p className="text-gray-600">100% of all funds are held securely in our trusted escrow system until both parties confirm satisfaction.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-2">Two-Factor Authentication</h3>
+                  <p className="text-gray-600">Enhanced account security with SMS and app-based 2FA protection for all users.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Gavel className="h-6 w-6 text-purple-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-2">Regulatory Compliance</h3>
+                  <p className="text-gray-600">Fully licensed and compliant with international financial regulations and standards.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Users className="h-6 w-6 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-2">24/7 Monitoring</h3>
+                  <p className="text-gray-600">Continuous security monitoring and threat detection systems protect your transactions.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <Card className="border-0 shadow-2xl bg-gradient-to-b from-blue-500 to-emerald-600 text-white">
+                <CardContent className="p-8">
+                  <h3 className="text-2xl font-bold mb-4">Multi-Layer Security</h3>
+                  <p className="text-blue-100 mb-6">Your assets protected at every level</p>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-3">
+                      <Shield className="h-5 w-5 text-white" />
+                      <span className="font-medium">Application Security</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Shield className="h-5 w-5 text-white" />
+                      <span className="font-medium">Infrastructure Security</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Shield className="h-5 w-5 text-white" />
+                      <span className="font-medium">Data Encryption</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Users className="h-5 w-5 text-white" />
+                      <span className="font-medium">User Authentication</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Trusted by Traders Worldwide</h2>
+            <p className="text-xl text-gray-600">See what our users have to say about their trading experience.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="border-0 shadow-lg bg-white">
+              <CardContent className="p-6 text-center">
+                <div className="flex justify-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-500 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-6 italic">
+                  "AssetVault made selling my Instagram account incredibly easy. The escrow system gave me peace of mind, and the verification process was smooth."
+                </p>
+                <div className="flex items-center justify-center space-x-3">
+                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                    JD
+                  </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-900">John Davis</div>
+                    <div className="text-sm text-gray-600">Social Media Seller</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-0 shadow-lg bg-white">
+              <CardContent className="p-6 text-center">
+                <div className="flex justify-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-500 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-6 italic">
+                  "I've bought multiple YouTube channels through AssetVault. The platform's security and verification process is unmatched in the industry."
+                </p>
+                <div className="flex items-center justify-center space-x-3">
+                  <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
+                    SM
+                  </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-900">Sarah Miller</div>
+                    <div className="text-sm text-gray-600">Content Creator</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-0 shadow-lg bg-white">
+              <CardContent className="p-6 text-center">
+                <div className="flex justify-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-500 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-6 italic">
+                  "The dispute resolution system is excellent. When I had an issue, the support team resolved it quickly and fairly. Highly recommend!"
+                </p>
+                <div className="flex items-center justify-center space-x-3">
+                  <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                    RJ
+                  </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-900">Robert Johnson</div>
+                    <div className="text-sm text-gray-600">Digital Asset Investor</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-500 to-emerald-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Start Trading?</h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Join our secure marketplace today and discover thousands of verified digital assets.
+          <h2 className="text-4xl font-bold mb-6">Ready to Start Trading?</h2>
+          <p className="text-xl text-blue-100 mb-10">
+            Join thousands of users who trust AssetVault for their digital asset trading needs.
           </p>
-          <Link href="/signup">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/signup">
+              <Button 
+                size="lg" 
+                className="bg-white text-blue-600 hover:bg-gray-100 border-2 border-white font-semibold px-8 py-4"
+              >
+                Create Free Account
+              </Button>
+            </Link>
             <Button 
               size="lg" 
-              className="bg-white text-primary hover:bg-gray-100"
+              variant="outline" 
+              className="border-white bg-transparent text-white"
             >
-              Sign Up Now - It's Free
+              View Demo
             </Button>
-          </Link>
+          </div>
         </div>
       </section>
 
