@@ -5,9 +5,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Navigation from "@/components/Navigation";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import { useCurrency } from "@/lib/context/CurrencyContext";
 
 export default function SettingsPage() {
     const [twoFA, setTwoFA] = useState(false);
+    const { selectedCurrency, setCurrency, conversionRate } = useCurrency();
 
     return (
 
@@ -15,6 +17,39 @@ export default function SettingsPage() {
             <Navigation />
             <div className="max-w-4xl mx-auto space-y-6 py-10 px-4 sm:px-6 lg:px-8">
                 <h2 className="text-2xl font-semibold text-gray-800">Account Settings</h2>
+
+                {/* Currency Preferences */}
+                <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
+                    <h3 className="text-lg font-medium">Currency Preferences</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <Label>Preferred Currency</Label>
+                            <Select value={selectedCurrency} onValueChange={(value: string) => setCurrency(value as 'USD' | 'PKR')}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select Currency" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="USD">USD - US Dollar</SelectItem>
+                                    <SelectItem value="PKR">PKR - Pakistani Rupee</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <p className="text-sm text-gray-500 mt-1">
+                                This currency will be used for displaying wallet balance and transaction amounts
+                            </p>
+                        </div>
+                        <div>
+                            <Label>Exchange Rate</Label>
+                            <div className="p-3 bg-gray-50 rounded-md">
+                                <p className="text-sm text-gray-700">
+                                    1 USD = 287 PKR (approximate)
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Rates are updated periodically
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Profile Section */}
                 <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/lib/context/CurrencyContext";
 import { 
   Users, 
   TrendingUp, 
@@ -24,6 +25,7 @@ import { Input } from "@/components/ui/input";
 export default function ListingDetail() {
   const { id } = useParams();
   const { toast } = useToast();
+  const { selectedCurrency, formatAmount, convertAmount } = useCurrency();
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
@@ -94,6 +96,9 @@ export default function ListingDetail() {
         assetPrice: listing.price,
         buyerFee: listing.price * 0.025,
         totalBuyerPays: listing.price * 1.025,
+        assetPriceInSelectedCurrency: convertAmount(listing.price, 'USD', selectedCurrency),
+        buyerFeeInSelectedCurrency: convertAmount(listing.price * 0.025, 'USD', selectedCurrency),
+        totalBuyerPaysInSelectedCurrency: convertAmount(listing.price * 1.025, 'USD', selectedCurrency),
       }
     : null;
 
@@ -288,23 +293,25 @@ export default function ListingDetail() {
           <div className="lg:col-span-1">
             <Card className="sticky top-8">
               <CardHeader>
-                <CardTitle className="text-2xl">${parseFloat(listing.price.toString()).toLocaleString()}</CardTitle>
+                <CardTitle className="text-2xl">
+                  {formatAmount(convertAmount(parseFloat(listing.price.toString()), 'USD', selectedCurrency), selectedCurrency)}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {fees && (
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Asset Price</span>
-                      <span>${fees.assetPrice.toLocaleString()}</span>
+                      <span>{formatAmount(fees.assetPriceInSelectedCurrency, selectedCurrency)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Buyer Fee (2.5%)</span>
-                      <span>${fees.buyerFee.toFixed(2)}</span>
+                      <span>{formatAmount(fees.buyerFeeInSelectedCurrency, selectedCurrency)}</span>
                     </div>
                     <Separator />
                     <div className="flex justify-between font-semibold">
                       <span>Total</span>
-                      <span>${fees.totalBuyerPays.toLocaleString()}</span>
+                      <span>{formatAmount(fees.totalBuyerPaysInSelectedCurrency, selectedCurrency)}</span>
                     </div>
                   </div>
                 )}

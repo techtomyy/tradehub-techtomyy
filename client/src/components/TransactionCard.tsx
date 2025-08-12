@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useCurrency } from "@/lib/context/CurrencyContext";
 import {
   Clock,
   CheckCircle,
@@ -53,6 +54,7 @@ interface TransactionCardProps {
 
 export default function TransactionCard({ transaction }: TransactionCardProps) {
   const [open, setOpen] = useState(false);
+  const { selectedCurrency, formatAmount, convertAmount } = useCurrency();
 
   const getCategoryIcon = (category?: string) => {
     switch (category) {
@@ -168,9 +170,9 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
               </div>
             </div>
             <div className="text-right">
-              <p className="text-lg font-semibold text-gray-900">
-                ${amount.toLocaleString()}
-              </p>
+                              <p className="text-lg font-semibold text-gray-900">
+                 {formatAmount(convertAmount(amount, 'USD', selectedCurrency), selectedCurrency)}
+                </p>
               <Badge className={statusInfo.color}>
                 <StatusIcon className="h-3 w-3 mr-1" />
                 {statusInfo.label}
@@ -282,7 +284,9 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
 
             <div>
               <p className="font-medium text-gray-800">Price</p>
-              <p>${parseFloat(transaction.amount).toLocaleString()}</p>
+                             <p>
+                 {formatAmount(convertAmount(parseFloat(transaction.amount), 'USD', selectedCurrency), selectedCurrency)}
+               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

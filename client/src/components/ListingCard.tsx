@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useCurrency } from "@/lib/context/CurrencyContext";
 import { Users, TrendingUp, Eye, DollarSign, Star, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 
@@ -28,6 +29,8 @@ interface ListingCardProps {
 }
 
 export default function ListingCard({ listing }: ListingCardProps) {
+  const { selectedCurrency, formatAmount, convertAmount } = useCurrency();
+  
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'instagram': return '📷';
@@ -51,6 +54,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
   };
 
   const price = parseFloat(listing.price);
+  const priceInSelectedCurrency = convertAmount(price, 'USD', selectedCurrency);
 
   return (
     <Card className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
@@ -137,7 +141,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
         <div className="flex items-center justify-between">
           <div>
             <span className="text-2xl font-bold text-gray-900">
-              ${price.toLocaleString()}
+              {formatAmount(priceInSelectedCurrency, selectedCurrency)}
             </span>
             <span className="text-sm text-gray-500 ml-1">+ fees</span>
           </div>
