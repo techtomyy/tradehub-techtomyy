@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ERROR_MESSAGES = exports.ERROR_CODES = void 0;
+exports.ASSETS_ERROR_MESSAGES = exports.ERROR_MESSAGES = exports.ERROR_CODES = void 0;
 exports.ERROR_CODES = {
     UNAUTHORIZED: 401,
     BAD_REQUEST: 400,
@@ -24,7 +24,9 @@ exports.ERROR_MESSAGES = {
     },
     JWT: {
         SECRET_KEY_NOT_DEFINE: "Secret key not defined in environment variables",
-        INVALID_DATA_USER: "Invalid user role"
+        INVALID_DATA_USER: "Invalid user role",
+        TOKEN_NOT_EXIST: "Token not exists! Please Login",
+        TOKEN_INVALID: "Your Token Invaled"
     },
     GOOGLE: {
         TOKEN_MISSING: "No token provided",
@@ -38,4 +40,10 @@ exports.ERROR_MESSAGES = {
         ROLES_TABLE_ERROR: "Roles table error",
         ROLES_FETCH_ERROR: "Role fetch failed"
     }
+};
+exports.ASSETS_ERROR_MESSAGES = {
+    ONLY_ALLOWED: "Only JPG, PNG, WebP, and GIF are allowed.",
+    BAD_REQUEST: "Missing required fields",
+    UPLOAD_FAILED: "File Save in Storage Failed",
+    MESSAGE: "✅ Asset saved successfully"
 };

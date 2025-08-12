@@ -22,7 +22,9 @@ export const ERROR_MESSAGES = {
   },
   JWT: {
     SECRET_KEY_NOT_DEFINE: "Secret key not defined in environment variables",
-    INVALID_DATA_USER: "Invalid user role"
+    INVALID_DATA_USER: "Invalid user role",
+    TOKEN_NOT_EXIST:"Token not exists! Please Login",
+    TOKEN_INVALID:"Your Token Invaled"
   },
   GOOGLE: {
     TOKEN_MISSING: "No token provided",
@@ -37,3 +39,12 @@ export const ERROR_MESSAGES = {
     ROLES_FETCH_ERROR: "Role fetch failed"
   }
 } as const;
+
+
+export const ASSETS_ERROR_MESSAGES={
+  ONLY_ALLOWED:"Only JPG, PNG, WebP, and GIF are allowed.",
+  BAD_REQUEST:"Missing required fields",
+  UPLOAD_FAILED:"File Save in Storage Failed",
+  MESSAGE:"✅ Asset saved successfully"
+
+}
