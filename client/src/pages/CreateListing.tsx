@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/lib/context/CurrencyContext";
 import { ArrowLeft, Upload, AlertCircle } from "lucide-react";
 import { Link } from "wouter";
 
@@ -34,6 +35,7 @@ type CreateListingForm = z.infer<typeof createListingSchema>;
 export default function CreateListing() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { selectedCurrency, getCurrencySymbol } = useCurrency();
 
   const form = useForm<CreateListingForm>({
     resolver: zodResolver(createListingSchema),
@@ -188,7 +190,7 @@ export default function CreateListing() {
                         name="price"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Price (USD)</FormLabel>
+                                                          <FormLabel>Price ({getCurrencySymbol(selectedCurrency)})</FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
@@ -401,7 +403,7 @@ export default function CreateListing() {
                           name="monthlyRevenue"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Monthly Revenue ($)</FormLabel>
+                                                             <FormLabel>Monthly Revenue ({getCurrencySymbol(selectedCurrency)})</FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"

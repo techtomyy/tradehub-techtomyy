@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { Bell, User, Wallet, Settings, LogOut, Shield } from "lucide-react";
+import { useCurrency } from "@/lib/context/CurrencyContext";
+import { Bell, User, Wallet, Settings, LogOut, Shield, Globe } from "lucide-react";
 import { Link } from "wouter";
 import { useWalletStore } from "@/lib/store/walletStore";
 import { formatDistanceToNow } from "date-fns";
@@ -18,6 +19,7 @@ import { formatDistanceToNow } from "date-fns";
 export default function Navigation() {
   const { user, isAuthenticated, logout } = useAuth();
   const walletBalance = useWalletStore((state) => state.balance);
+  const { selectedCurrency, formatAmount, convertAmount, setCurrency } = useCurrency();
 
   // Static notifications for demo
   const [notifications] = useState([
@@ -64,10 +66,30 @@ export default function Navigation() {
 
           {/* Right Side */}
           <div className="flex items-center space-x-4">
+            {/* Currency Selector */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                  <Globe className="h-4 w-4" />
+                  <span className="text-sm font-medium">{selectedCurrency}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setCurrency('USD')}>
+                  USD - US Dollar
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setCurrency('PKR')}>
+                  PKR - Pakistani Rupee
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {/* Wallet Balance */}
             <div className="hidden md:flex items-center space-x-2 bg-gray-100 rounded-lg px-3 py-2">
               <Wallet className="h-4 w-4 text-emerald-600" />
-              <span className="text-sm font-medium">${walletBalance.toFixed(2)}</span>
+              <span className="text-sm font-medium">
+                {formatAmount(convertAmount(walletBalance, 'USD', selectedCurrency), selectedCurrency)}
+              </span>
             </div>
 
             {/* Notifications */}

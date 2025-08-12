@@ -8,11 +8,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Shield, Eye, EyeOff, ArrowLeft } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
 import { FcGoogle } from "react-icons/fc";
 import supabase from "@/config/client";
+import { authApi, ApiError } from "@/lib/api";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -24,24 +24,23 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const { toast } = useToast();
-  const { demoLogin } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [, setLocation] = useLocation();
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "demo@example.com",
-      password: "demo123",
+      email: "",
+      password: "",
       rememberMe: false,
     },
   });
-  async function signInWithGoogle() {
+
+  // Handle Google OAuth
+  const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      
-      console.log("Starting Google OAuth...");
-      console.log("Redirect URL:", `${window.location.origin}/auth/callback`);
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -51,61 +50,151 @@ export default function Login() {
       });
       
       if (error) {
-        console.error("Google sign-in error:", error.message);
         toast({
-          title: "Google Sign-in Failed",
+          title: "❌ Google Sign-in Failed",
           description: error.message,
           variant: "destructive",
+          className: "bg-red-50 border-red-200 text-red-800",
         });
       } else {
-        console.log("Google OAuth initiated successfully");
         toast({
-          title: "Google Sign-in Initiated",
+          title: "🔐 Google Sign-in Initiated",
           description: "Redirecting to Google for authentication...",
+          className: "bg-blue-50 border-blue-200 text-blue-800",
         });
       }
     } catch (error) {
-      console.error("Unexpected error during Google sign-in:", error);
+      console.error("Google sign-in error:", error);
       toast({
-        title: "Sign-in Error",
+        title: "❌ Sign-in Error",
         description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
+        className: "bg-red-50 border-red-200 text-red-800",
       });
     } finally {
       setIsLoading(false);
     }
-  }
-  
-  
-  const onSubmit = async (data: LoginForm) => {
+  };
+
+  // Handle form submission
+  const handleSubmit = async (data: LoginForm) => {
+    if (isLoading) return;
+    
     setIsLoading(true);
-
-    // Simulate API call delay
-    setTimeout(() => {
-      setIsLoading(false);
-
-      // Static login logic - always succeed with demo credentials
-      if (data.email === "demo@example.com" && data.password === "demo123") {
-        console.log("Demo credentials matched, calling demoLogin");
+    
+    try {
+      console.log("Attempting login with:", { email: data.email });
+      
+      // Make API call
+      const response = await authApi.login({
+        email: data.email,
+        password: data.password,
+      });
+      
+      console.log("API Response:", response);
+      console.log("Response type:", typeof response);
+      console.log("Response keys:", Object.keys(response || {}));
+      console.log("Response.success value:", response?.success);
+      console.log("Response.success type:", typeof response?.success);
+      console.log("Response.success === true:", response?.success === true);
+      console.log("Response.message:", response?.message);
+      console.log("Response.status:", (response as any)?.status);
+      
+      // Check if login was successful - handle different API response structures
+      const isSuccess = response && (
+        response.success === true || 
+        (response as any).status === "success" || 
+        response.message?.includes("successful") ||
+        response.message?.includes("✅")
+      );
+      
+      console.log("Is success check:", isSuccess);
+      
+      if (isSuccess) {
+        console.log("Login successful, setting auth state...");
+        
         // Set authentication state
-        demoLogin();
-        console.log("demoLogin called successfully");
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userEmail', data.email);
+        
+        // Show success message
+        toast({
+          title: "🎉 Login Successful!",
+          description: "Welcome back! Redirecting to home page...",
+          className: "bg-green-50 border-green-200 text-green-800",
+        });
+        
+        // Redirect to home page - try multiple methods
+        console.log("Starting redirect process...");
+        
+        // Method 1: Try wouter router first
+        try {
+          setLocation("/home");
+          console.log("setLocation called successfully");
+        } catch (error) {
+          console.error("setLocation failed:", error);
+        }
+        
+        // Method 2: Force redirect after delay
+        setTimeout(() => {
+          console.log("Checking if redirect worked...");
+          console.log("Current pathname:", window.location.pathname);
+          console.log("Target pathname: /home");
+          
+          if (window.location.pathname !== "/home") {
+            console.log("setLocation didn't work, using window.location.href");
+            window.location.href = "/home";
+          } else {
+            console.log("Redirect successful!");
+          }
+        }, 1000);
+        
+        // Method 3: Alternative redirect to dashboard
+        setTimeout(() => {
+          if (window.location.pathname !== "/home") {
+            console.log("Trying alternative redirect to dashboard...");
+            setLocation("/dashboard");
+          }
+        }, 2000);
+        
+      } else {
+        // Login failed
+        const errorMessage = response?.message || "Login failed. Please check your credentials.";
+        console.log("Login failed:", errorMessage);
+        console.log("Full response:", response);
         
         toast({
-          title: "Demo Login Successful",
-          description: "Welcome back! Redirecting to home page...",
-        });
-
-        // Redirect is handled by demoLogin method
-      } else {
-        toast({
-          title: "Login Failed",
-          description: "Please use demo@example.com / demo123 to login",
+          title: "❌ Login Failed",
+          description: errorMessage,
           variant: "destructive",
+          className: "bg-red-50 border-red-200 text-red-800",
         });
       }
-    }, 1500);
+      
+    } catch (error) {
+      console.error("Login error:", error);
+      
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      
+      if (error instanceof ApiError) {
+        errorMessage = error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: "❌ Login Failed",
+        description: errorMessage,
+        variant: "destructive",
+        className: "bg-red-50 border-red-200 text-red-800",
+      });
+      
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-blue-50 to-purple-50 flex items-center justify-center p-4">
@@ -132,7 +221,7 @@ export default function Login() {
 
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
                   name="email"
@@ -217,11 +306,12 @@ export default function Login() {
                 >
                   {isLoading ? "Signing In..." : "Sign In"}
                 </Button>
+                
                 <Button
                   type="button"
                   variant="outline"
                   className="w-full flex items-center justify-center space-x-2"
-                  onClick={signInWithGoogle}
+                  onClick={handleGoogleLogin}
                   disabled={isLoading}
                 >
                   <FcGoogle className="h-5 w-5" />
@@ -240,17 +330,6 @@ export default function Login() {
                 </div>
               </form>
             </Form>
-
-            {/* Demo Credentials */}
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800 font-medium mb-2">Demo Credentials:</p>
-              <p className="text-sm text-blue-700">
-                Email: <span className="font-mono">demo@example.com</span>
-              </p>
-              <p className="text-sm text-blue-700">
-                Password: <span className="font-mono">demo123</span>
-              </p>
-            </div>
           </CardContent>
         </Card>
       </div>

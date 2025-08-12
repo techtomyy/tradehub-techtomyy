@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { useCurrency } from "@/lib/context/CurrencyContext";
 import { 
   TrendingUp, 
   Users, 
@@ -20,12 +21,13 @@ import { Link } from "wouter";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
+  const { selectedCurrency, formatAmount, convertAmount } = useCurrency();
 
   // Static dashboard data
   const dashboardStats = {
     activeListings: 2,
     activeTransactions: 1,
-    walletBalance: 500,
+    walletBalance: 500, // Base amount in USD
     totalSales: 2,
   };
 
@@ -209,7 +211,10 @@ const userTransactions = [
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Wallet Balance</p>
-                    <p className="text-2xl font-bold text-gray-900">${dashboardStats.walletBalance}</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {formatAmount(convertAmount(dashboardStats.walletBalance, 'USD', selectedCurrency), selectedCurrency)}
+                    </p>
+                    <p className="text-xs text-gray-500">{selectedCurrency}</p>
                   </div>
                 </div>
               </CardContent>
@@ -258,7 +263,7 @@ const userTransactions = [
                           <div className="w-2 h-2 bg-primary rounded-full"></div>
                           <div>
                             <p className="text-sm font-medium text-gray-900">
-                              ${transaction.amount}
+                              {formatAmount(convertAmount(parseFloat(transaction.amount), 'USD', selectedCurrency), selectedCurrency)}
                             </p>
                             <p className="text-xs text-gray-500">
                               {new Date(transaction.createdAt).toLocaleDateString()}

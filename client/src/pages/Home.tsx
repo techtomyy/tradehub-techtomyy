@@ -6,18 +6,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, Wallet, Star, MessageSquare } from "lucide-react";
 import { useWalletStore } from "@/lib/store/walletStore";
 import { useInboxStore } from "@/lib/store/inboxStore";
+import { useCurrency } from "@/lib/context/CurrencyContext";
 import { Link } from "wouter";
 
 export default function Home() {
   const walletBalance = useWalletStore((state) => state.balance);
   const unreadMessages = useInboxStore((state) => state.unreadCount);
+  const { selectedCurrency, formatAmount, convertAmount } = useCurrency();
 
-  // Static featured listings data
+  // Static featured listings data with currency conversion
   const featuredListings = [
     {
       id: 1,
       title: "Travel Photography Instagram",
-      price: 2500,
+      price: selectedCurrency === 'PKR' ? (2500 * 280).toString() : "2500",
       category: "instagram",
       followers: 15000,
       engagement: 4.2,
@@ -27,7 +29,7 @@ export default function Home() {
     {
       id: 2,
       title: "Gaming YouTube Channel",
-      price: 5000,
+      price: selectedCurrency === 'PKR' ? (5000 * 280).toString() : "5000",
       category: "youtube",
       followers: 25000,
       engagement: 3.8,
@@ -37,7 +39,7 @@ export default function Home() {
     {
       id: 3,
       title: "Fitness TikTok Account",
-      price: 1800,
+      price: selectedCurrency === 'PKR' ? (1800 * 280).toString() : "1800",
       category: "tiktok",
       followers: 12000,
       engagement: 5.1,
@@ -47,7 +49,7 @@ export default function Home() {
     {
       id: 4,
       title: "Tech News Twitter",
-      price: 3200,
+      price: selectedCurrency === 'PKR' ? (3200 * 280).toString() : "3200",
       category: "twitter",
       followers: 18000,
       engagement: 4.7,
@@ -57,7 +59,7 @@ export default function Home() {
     {
       id: 5,
       title: "E-commerce Website",
-      price: 8000,
+      price: selectedCurrency === 'PKR' ? (8000 * 280).toString() : "8000",
       category: "website",
       followers: 5000,
       engagement: 2.1,
@@ -67,7 +69,7 @@ export default function Home() {
     {
       id: 6,
       title: "Food Blog Instagram",
-      price: 1200,
+      price: selectedCurrency === 'PKR' ? (1200 * 280).toString() : "1200",
       category: "instagram",
       followers: 8000,
       engagement: 6.2,
@@ -84,10 +86,10 @@ const userTransactions = [
     buyerId: "B001",
     sellerId: "S001",
     listingId: "L001",
-    amount: "2500",
-    buyerFee: "50",
-    sellerFee: "75",
-    totalAmount: "2625",
+    amount: selectedCurrency === 'PKR' ? (2500 * 287).toString() : "2500",
+    buyerFee: selectedCurrency === 'PKR' ? (50 * 287).toString() : "50",
+    sellerFee: selectedCurrency === 'PKR' ? (75 * 287).toString() : "75",
+    totalAmount: selectedCurrency === 'PKR' ? (2625 * 287).toString() : "2625",
     status: "completed",
     verificationDeadline: "2024-03-20T23:59:59.000Z",
     disputeReason: undefined,
@@ -111,10 +113,10 @@ const userTransactions = [
     buyerId: "B002",
     sellerId: "S002",
     listingId: "L002",
-    amount: "1800",
-    buyerFee: "40",
-    sellerFee: "60",
-    totalAmount: "1900",
+    amount: selectedCurrency === 'PKR' ? (1800 * 287).toString() : "1800",
+    buyerFee: selectedCurrency === 'PKR' ? (40 * 287).toString() : "40",
+    sellerFee: selectedCurrency === 'PKR' ? (60 * 287).toString() : "60",
+    totalAmount: selectedCurrency === 'PKR' ? (1900 * 287).toString() : "1900",
     status: "payment_received",
     verificationDeadline: "2024-03-15T23:59:59.000Z",
     disputeReason: undefined,
@@ -138,10 +140,10 @@ const userTransactions = [
     buyerId: "B003",
     sellerId: "S003",
     listingId: "L003",
-    amount: "5000",
-    buyerFee: "100",
-    sellerFee: "150",
-    totalAmount: "5250",
+    amount: selectedCurrency === 'PKR' ? (5000 * 287).toString() : "5000",
+    buyerFee: selectedCurrency === 'PKR' ? (100 * 287).toString() : "100",
+    sellerFee: selectedCurrency === 'PKR' ? (150 * 287).toString() : "150",
+    totalAmount: selectedCurrency === 'PKR' ? (5250 * 287).toString() : "5250",
     status: "credentials_sent",
     verificationDeadline: "2024-03-12T23:59:59.000Z",
     disputeReason: "Credentials not matching description",
@@ -268,7 +270,10 @@ const userTransactions = [
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Wallet Balance</p>
-                    <p className="text-2xl font-bold text-gray-900">${walletBalance.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {formatAmount(convertAmount(walletBalance, 'USD', selectedCurrency), selectedCurrency)}
+                    </p>
+                    <p className="text-xs text-gray-500">{selectedCurrency}</p>
                   </div>
                 </div>
               </CardContent>

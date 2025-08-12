@@ -1,9 +1,16 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Navigation from "@/components/Navigation";
 import { useWalletStore } from "@/lib/store/walletStore";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/lib/context/CurrencyContext";
+import visa from "../attached_assets/debit_payment_visa_icon.svg";
+import mastercard from "../attached_assets/mastercard_payment_icon.svg";
+import amex from "../attached_assets/amex_charge_credit card_payment_icon.svg";
+import discover from "../attached_assets/discover_payment_icon.svg";
+import jcb from "../attached_assets/jcb_payment_icon.svg";
+import dinersclub from "../attached_assets/diners club_payment_icon.svg";
 
 export default function WalletPage() {
     const { toast } = useToast();
@@ -11,6 +18,14 @@ export default function WalletPage() {
     const transactions = useWalletStore((state) => state.transactions);
     const addFunds = useWalletStore((state) => state.addFunds);
     const withdrawFunds = useWalletStore((state) => state.withdrawFunds);
+    
+    const { 
+        selectedCurrency, 
+        setCurrency, 
+        getBalanceInCurrency, 
+        convertAmount, 
+        formatAmount 
+    } = useCurrency();
 
     const [addAmount, setAddAmount] = useState("");
     const [withdrawAmount, setWithdrawAmount] = useState("");
@@ -26,8 +41,30 @@ export default function WalletPage() {
     // Saved cards
     const [savedCards, setSavedCards] = useState([{ type: "Visa", last4: "1234" }]);
 
+
+
+    // Get card type icon with unique symbols
+    const getCardIcon = (cardType: string) => {
+        switch (cardType) {
+            case "Visa":
+                return visa; // Visa symbol
+            case "Mastercard":
+                return mastercard; // Mastercard symbol
+            case "American Express":
+                return amex; // Amex symbol
+            case "Discover":
+                return discover; // Discover symbol
+            case "JCB":
+                return jcb; // JCB symbol
+            case "Diners Club":
+                return dinersclub; // Diners Club symbol
+            default:
+                return "💳"; // Default card icon
+        }
+    };
+
     // Detect card type
-    const getCardType = (cardNumber) => {
+    const getCardType = (cardNumber: string) => {
         const cleanCardNumber = cardNumber.replace(/\D/g, '');
 
         if (/^4/.test(cleanCardNumber)) {
@@ -49,7 +86,7 @@ export default function WalletPage() {
     const handleAddFunds = () => {
         const amount = parseFloat(addAmount);
         if (!isNaN(amount)) {
-            addFunds(amount);
+            addFunds(amount, selectedCurrency);
             setAddAmount("");
         }
     };
@@ -57,15 +94,24 @@ export default function WalletPage() {
     const handleWithdrawFunds = () => {
         const amount = parseFloat(withdrawAmount);
         if (!isNaN(amount)) {
-            withdrawFunds(amount);
+            withdrawFunds(amount, selectedCurrency);
             setWithdrawAmount("");
         }
     };
 
-    const handleCardNumberChange = (event) => {
+    const handleCardNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newCardNumber = event.target.value;
         setCardNumber(newCardNumber);
         setCardType(getCardType(newCardNumber));
+    };
+
+    const clearCardForm = () => {
+        setCardNumber("");
+        setCardName("");
+        setCardDate("");
+        setCardCvv("");
+        setCardType("Unknown");
+        setAddCard(false);
     };
 
     const handleSaveCard = () => {
@@ -74,12 +120,7 @@ export default function WalletPage() {
         } else {
             const last4 = cardNumber.slice(-4);
             setSavedCards([...savedCards, { type: cardType, last4 }]);
-            setAddCard(false);
-            setCardNumber("");
-            setCardName("");
-            setCardDate("");
-            setCardCvv("");
-            setCardType("Unknown");
+            clearCardForm();
         }
     };
 
@@ -95,7 +136,36 @@ export default function WalletPage() {
                     <CardContent>
                         <div className="text-center mb-6">
                             <div className="text-sm text-gray-600">Current Balance</div>
-                            <div className="text-3xl font-bold">${balance.toFixed(2)}</div>
+                            <div className="text-3xl font-bold">
+                                {formatAmount(getBalanceInCurrency(selectedCurrency), selectedCurrency)}
+                            </div>
+                            <div className="flex items-center justify-center gap-4 mt-2">
+                                <div className="text-sm text-gray-500">
+                                    Currency: {selectedCurrency}
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setCurrency('USD')}
+                                        className={`px-3 py-1 text-xs rounded-md ${
+                                            selectedCurrency === 'USD' 
+                                                ? 'bg-blue-600 text-white' 
+                                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                        }`}
+                                    >
+                                        USD
+                                    </button>
+                                    <button
+                                        onClick={() => setCurrency('PKR')}
+                                        className={`px-3 py-1 text-xs rounded-md ${
+                                            selectedCurrency === 'PKR' 
+                                                ? 'bg-blue-600 text-white' 
+                                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                        }`}
+                                    >
+                                        PKR
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Add / Withdraw Funds */}
@@ -161,13 +231,28 @@ export default function WalletPage() {
                                     />
                                 </div>
                                 <div>
-                                    <input
-                                        type="tel"
-                                        value={cardNumber}
-                                        onChange={handleCardNumberChange}
-                                        placeholder="Card Number"
-                                        className="w-80 mt-2 px-3 py-2 border border-gray-300 rounded-md"
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            type="tel"
+                                            value={cardNumber}
+                                            onChange={handleCardNumberChange}
+                                            placeholder="Card Number"
+                                            className="w-80 mt-2 pl-10 pr-3 py-2 border border-gray-300 rounded-md"
+                                        />
+                                        {cardNumber && (
+                                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center">
+                                                {typeof getCardIcon(cardType) === 'string' && getCardIcon(cardType) === "💳" ? (
+                                                    <span className="text-lg flex items-center justify-center">{getCardIcon(cardType)}</span>
+                                                ) : (
+                                                    <img
+                                                        src={getCardIcon(cardType) as string}
+                                                        alt={`${cardType} card`}
+                                                        className="w-6 h-4 object-contain flex items-center justify-center"
+                                                    />
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                     {cardNumber && (
                                         <p className="text-sm text-gray-500 mt-1">
                                             Detected: <span className="font-semibold">{cardType}</span>
@@ -190,13 +275,13 @@ export default function WalletPage() {
                                     />
                                 </div>
                                 <div>
-                                <Button className="mt-2 ml-44" variant="secondary" onClick={()=>setAddCard(false)}>
+                                    <Button className="mt-2 ml-44" variant="secondary" onClick={clearCardForm}>
                                         Cancel
                                     </Button>
                                     <Button className="mt-2 ml-2" variant="secondary" onClick={handleSaveCard}>
                                         Save
                                     </Button>
-                                    
+
                                 </div>
                             </div>
                         )}
@@ -224,8 +309,12 @@ export default function WalletPage() {
                                         <tr key={idx} className="border-b border-gray-100">
                                             <td className="py-2">{txn.date}</td>
                                             <td className="py-2">{txn.type}</td>
-                                            <td className="py-2">${txn.amount}</td>
-                                            <td className="py-2">${txn.fee}</td>
+                                            <td className="py-2">
+                                                {formatAmount(convertAmount(txn.amount, 'USD', selectedCurrency), selectedCurrency)}
+                                            </td>
+                                            <td className="py-2">
+                                                {formatAmount(convertAmount(txn.fee, 'USD', selectedCurrency), selectedCurrency)}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import supabase from "@/config/client";
 import { User } from "@supabase/supabase-js";
 import { PROTECTED_ROUTES } from "@/routes/constants";
+import { authApi } from "@/lib/api";
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -11,29 +12,26 @@ export function useAuth() {
   // Check for existing session on mount
   useEffect(() => {
     const getSession = async () => {
-      // Check for demo session first
-      const demoSession = localStorage.getItem('demoSession');
-      if (demoSession) {
-        try {
-          const sessionData = JSON.parse(demoSession);
-          const sessionAge = new Date().getTime() - new Date(sessionData.timestamp).getTime();
-          const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-          
-          if (sessionAge < maxAge) {
-            console.log("Demo session found, restoring authentication");
-            setIsAuthenticated(true);
-            setUser(null); // Will trigger fallback to demo user data
-            setIsLoading(false);
-            return;
-          } else {
-            console.log("Demo session expired, clearing");
-            localStorage.removeItem('demoSession');
-          }
-        } catch (error) {
-          console.error("Error parsing demo session:", error);
-          localStorage.removeItem('demoSession');
-        }
+      // Check for API authentication first
+      const isApiAuthenticated = localStorage.getItem('isAuthenticated');
+      const userEmail = localStorage.getItem('userEmail');
+      if (isApiAuthenticated === 'true' && userEmail) {
+        console.log("API authentication found, restoring session");
+        setIsAuthenticated(true);
+        // Create a user object for API authentication
+        const apiUser = {
+          id: 'api-user',
+          email: userEmail,
+          user_metadata: {
+            full_name: userEmail.split('@')[0],
+          },
+        };
+        setUser(apiUser as any);
+        setIsLoading(false);
+        return;
       }
+      
+
       
       // Check for Supabase session
       const { data: { session } } = await supabase.auth.getSession();
@@ -72,25 +70,16 @@ export function useAuth() {
     });
   }, [isAuthenticated, user, isLoading]);
 
-  // User data from Supabase or fallback to demo data
-  const userData = user || {
-    id: "1",
-    name: "Demo User",
-    email: "demo@example.com",
-    firstName: "Demo",
-    lastName: "User",
-    username: "demouser",
-    profileImageUrl: "",
-    rating: 4.5,
-    totalSales: 8,
-    kycVerified: true,
-    bio: "Experienced digital asset trader.",
-  };
+  // User data from Supabase or API
+  const userData = user || null;
 
   const logout = async () => {
     try {
-      // Clear demo session if it exists
-      localStorage.removeItem('demoSession');
+      // Clear API authentication
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('userEmail');
+      
+
       
       // Sign out from Supabase if there's a session
       await supabase.auth.signOut();
@@ -106,32 +95,23 @@ export function useAuth() {
     }
   };
 
-  const login = () => {
-    // This is now handled by Supabase OAuth
-    // The auth state will be updated automatically
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await authApi.login({ email, password });
+      if (response.success) {
+        setIsAuthenticated(true);
+        // You might want to store user data from the response here
+        return { success: true };
+      } else {
+        return { success: false, message: response.message };
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, message: 'Login failed' };
+    }
   };
 
-  const demoLogin = () => {
-   
-     // Set authentication state to true
-    setIsAuthenticated(true);
-    
-    // Set user to null to trigger the fallback to demo user data
-    // This provides a proper demo user with all the expected properties
-    setUser(null);
-    
-    // Store demo session in localStorage for persistence
-    localStorage.setItem('demoSession', JSON.stringify({
-      isAuthenticated: true,
-      timestamp: new Date().toISOString()
-    }));
-    
-    // Redirect to home page after successful demo login
-    setTimeout(() => {
-      console.log("Redirecting to home page...");
-      window.location.href = "/home";
-    }, 1000);
-  };
+
 
   return {
     user: userData,
@@ -139,6 +119,5 @@ export function useAuth() {
     isAuthenticated,
     logout,
     login,
-    demoLogin,
   };
 }
