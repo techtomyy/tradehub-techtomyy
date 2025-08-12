@@ -11,6 +11,8 @@ import { Shield, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { FcGoogle } from "react-icons/fc";
+import supabase from "@/config/client";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -22,7 +24,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const { toast } = useToast();
-  const { login } = useAuth();
+  const { demoLogin } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -34,28 +36,67 @@ export default function Login() {
       rememberMe: false,
     },
   });
-
+  async function signInWithGoogle() {
+    try {
+      setIsLoading(true);
+      
+      console.log("Starting Google OAuth...");
+      console.log("Redirect URL:", `${window.location.origin}/auth/callback`);
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      
+      if (error) {
+        console.error("Google sign-in error:", error.message);
+        toast({
+          title: "Google Sign-in Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        console.log("Google OAuth initiated successfully");
+        toast({
+          title: "Google Sign-in Initiated",
+          description: "Redirecting to Google for authentication...",
+        });
+      }
+    } catch (error) {
+      console.error("Unexpected error during Google sign-in:", error);
+      toast({
+        title: "Sign-in Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  
+  
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
-    
+
     // Simulate API call delay
     setTimeout(() => {
       setIsLoading(false);
-      
+
       // Static login logic - always succeed with demo credentials
       if (data.email === "demo@example.com" && data.password === "demo123") {
+        console.log("Demo credentials matched, calling demoLogin");
         // Set authentication state
-        login();
+        demoLogin();
+        console.log("demoLogin called successfully");
         
         toast({
-          title: "Login Successful",
-          description: "Welcome back! Redirecting to dashboard...",
+          title: "Demo Login Successful",
+          description: "Welcome back! Redirecting to home page...",
         });
-        
-        // Redirect to dashboard after successful login
-        setTimeout(() => {
-          window.location.href = "/home";
-        }, 1000);
+
+        // Redirect is handled by demoLogin method
       } else {
         toast({
           title: "Login Failed",
@@ -88,7 +129,7 @@ export default function Login() {
             <CardTitle className="text-2xl font-bold text-gray-900">Welcome Back</CardTitle>
             <p className="text-gray-600">Sign in to your AssetVault account</p>
           </CardHeader>
-          
+
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -175,6 +216,16 @@ export default function Login() {
                   disabled={isLoading}
                 >
                   {isLoading ? "Signing In..." : "Sign In"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full flex items-center justify-center space-x-2"
+                  onClick={signInWithGoogle}
+                  disabled={isLoading}
+                >
+                  <FcGoogle className="h-5 w-5" />
+                  <span>{isLoading ? "Signing in..." : "Sign in with Google"}</span>
                 </Button>
 
                 <div className="text-center">

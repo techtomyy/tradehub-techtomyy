@@ -10,7 +10,7 @@ import { Search } from "lucide-react";
 export default function Marketplace() {
   const [filters, setFilters] = useState({
     search: "",
-    category: "",
+    category: "all",
     minPrice: "",
     maxPrice: "",
     minFollowers: "",
@@ -47,7 +47,7 @@ export default function Marketplace() {
   // Filtering logic
   let filteredListings = staticListings.filter((listing) => {
     if (filters.search && !listing.title.toLowerCase().includes(filters.search.toLowerCase())) return false;
-    if (filters.category && listing.category !== filters.category) return false;
+    if (filters.category && filters.category !== "all" && listing.category.toLowerCase() !== filters.category.toLowerCase()) return false;
     if (filters.minPrice && listing.price < Number(filters.minPrice)) return false;
     if (filters.maxPrice && listing.price > Number(filters.maxPrice)) return false;
     if (filters.minFollowers && listing.followers < Number(filters.minFollowers)) return false;
@@ -123,14 +123,15 @@ export default function Marketplace() {
             </div>
             {/* Category Tags */}
             <div className="flex flex-wrap gap-2 mb-6">
-              {['', 'instagram', 'youtube', 'tiktok', 'twitter', 'website'].map((category) => (
+              {['all', 'instagram', 'youtube', 'tiktok', 'twitter', 'website'].map((category) => (
                 <Button
                   key={category}
                   variant={filters.category === category ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleFilterChange({ category })}
                 >
-                  {category || 'All Categories'}
+                 {category === 'all' ? 'All Categories' : category}
+                 
                 </Button>
               ))}
             </div>

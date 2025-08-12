@@ -11,6 +11,8 @@ import { Shield, Eye, EyeOff, ArrowLeft, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { FcGoogle } from "react-icons/fc";
+import supabase from "@/config/client";
 
 const signupSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -47,22 +49,38 @@ export default function Signup() {
     },
   });
 
+  async function signUpWithGoogle() {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) {
+      console.error("Signup error:", error.message);
+      toast({
+        title: "Google Sign-up Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  }
   const onSubmit = async (data: SignupForm) => {
     setIsLoading(true);
-    
+
     // Simulate API call delay
     setTimeout(() => {
       setIsLoading(false);
-      
+
       // Static signup logic - always succeed
       // Set authentication state
       login();
-      
+
       toast({
         title: "Account Created Successfully!",
         description: "Welcome to AssetVault! Redirecting to dashboard...",
       });
-      
+
       // Redirect to dashboard after successful signup
       setTimeout(() => {
         window.location.href = "/home";
@@ -92,7 +110,7 @@ export default function Signup() {
             <CardTitle className="text-2xl font-bold text-gray-900">Create Account</CardTitle>
             <p className="text-gray-600">Join AssetVault and start trading digital assets</p>
           </CardHeader>
-          
+
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -273,6 +291,15 @@ export default function Signup() {
                   disabled={isLoading}
                 >
                   {isLoading ? "Creating Account..." : "Create Account"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full flex items-center justify-center space-x-2"
+                  onClick={signUpWithGoogle}
+                >
+                  <FcGoogle className="h-5 w-5" />
+                  <span>Sign up with Google</span>
                 </Button>
 
                 <div className="text-center">
