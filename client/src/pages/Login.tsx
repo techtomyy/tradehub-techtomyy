@@ -57,6 +57,7 @@ export default function Login() {
           className: "bg-red-50 border-red-200 text-red-800",
         });
       } else {
+        // Show initiation message
         toast({
           title: "🔐 Google Sign-in Initiated",
           description: "Redirecting to Google for authentication...",
@@ -83,22 +84,11 @@ export default function Login() {
     setIsLoading(true);
     
     try {
-      console.log("Attempting login with:", { email: data.email });
-      
       // Make API call
       const response = await authApi.login({
         email: data.email,
         password: data.password,
       });
-      
-      console.log("API Response:", response);
-      console.log("Response type:", typeof response);
-      console.log("Response keys:", Object.keys(response || {}));
-      console.log("Response.success value:", response?.success);
-      console.log("Response.success type:", typeof response?.success);
-      console.log("Response.success === true:", response?.success === true);
-      console.log("Response.message:", response?.message);
-      console.log("Response.status:", (response as any)?.status);
       
       // Check if login was successful - handle different API response structures
       const isSuccess = response && (
@@ -108,11 +98,7 @@ export default function Login() {
         response.message?.includes("✅")
       );
       
-      console.log("Is success check:", isSuccess);
-      
       if (isSuccess) {
-        console.log("Login successful, setting auth state...");
-        
         // Set authentication state
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('userEmail', data.email);
@@ -124,44 +110,12 @@ export default function Login() {
           className: "bg-green-50 border-green-200 text-green-800",
         });
         
-        // Redirect to home page - try multiple methods
-        console.log("Starting redirect process...");
-        
-        // Method 1: Try wouter router first
-        try {
-          setLocation("/home");
-          console.log("setLocation called successfully");
-        } catch (error) {
-          console.error("setLocation failed:", error);
-        }
-        
-        // Method 2: Force redirect after delay
-        setTimeout(() => {
-          console.log("Checking if redirect worked...");
-          console.log("Current pathname:", window.location.pathname);
-          console.log("Target pathname: /home");
-          
-          if (window.location.pathname !== "/home") {
-            console.log("setLocation didn't work, using window.location.href");
-            window.location.href = "/home";
-          } else {
-            console.log("Redirect successful!");
-          }
-        }, 1000);
-        
-        // Method 3: Alternative redirect to dashboard
-        setTimeout(() => {
-          if (window.location.pathname !== "/home") {
-            console.log("Trying alternative redirect to dashboard...");
-            setLocation("/dashboard");
-          }
-        }, 2000);
+        // Redirect to home page
+        setLocation("/home");
         
       } else {
         // Login failed
         const errorMessage = response?.message || "Login failed. Please check your credentials.";
-        console.log("Login failed:", errorMessage);
-        console.log("Full response:", response);
         
         toast({
           title: "❌ Login Failed",
@@ -172,8 +126,6 @@ export default function Login() {
       }
       
     } catch (error) {
-      console.error("Login error:", error);
-      
       let errorMessage = "An unexpected error occurred. Please try again.";
       
       if (error instanceof ApiError) {

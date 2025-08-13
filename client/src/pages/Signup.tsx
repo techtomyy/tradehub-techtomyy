@@ -95,12 +95,6 @@ export default function Signup() {
     setIsLoading(true);
     
     try {
-      console.log("Attempting signup with:", { 
-        email: data.email, 
-        firstName: data.firstName, 
-        lastName: data.lastName 
-      });
-      
       // Make API call
       const response = await authApi.signup({
         firstName: data.firstName,
@@ -110,12 +104,17 @@ export default function Signup() {
         conditionagree: data.conditionagree,
       });
       
-      console.log("API Response:", response);
+      // Check if signup was successful - handle different API response structures
+      const isSuccess = response && (
+        response.success === true || 
+        (response as any).status === "success" || 
+        response.message?.includes("successful") ||
+        response.message?.includes("✅") ||
+        response.message?.includes("created") ||
+        response.message?.includes("registered")
+      );
       
-      // Check if signup was successful
-      if (response && response.success === true) {
-        console.log("Signup successful, setting auth state...");
-        
+      if (isSuccess) {
         // Set authentication state
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('userEmail', data.email);
@@ -134,8 +133,7 @@ export default function Signup() {
         
       } else {
         // Signup failed
-        const errorMessage = response?.message || "Signup failed. Please try again.";
-        console.log("Signup failed:", errorMessage);
+        const errorMessage = response?.message || response?.error || "Signup failed. Please try again.";
         
         toast({
           title: "❌ Signup Failed",
@@ -146,8 +144,6 @@ export default function Signup() {
       }
       
     } catch (error) {
-      console.error("Signup error:", error);
-      
       let errorMessage = "An unexpected error occurred. Please try again.";
       
       if (error instanceof ApiError) {

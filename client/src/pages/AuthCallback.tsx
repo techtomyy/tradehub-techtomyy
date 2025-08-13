@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 import supabase from "@/config/client";
 
 export default function AuthCallback() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
   useEffect(() => {
     async function getSession() {
@@ -27,12 +29,21 @@ export default function AuthCallback() {
           console.error("Backend verification failed:", error);
         }
         
+        // Show success toast for Google sign-in
+        toast({
+          title: "✅ Google Sign-in Successful!",
+          description: "Welcome back! Redirecting to home page...",
+          className: "bg-green-50 border-green-200 text-green-800",
+        });
+        
         // Navigate to Home after successful authentication
-        setLocation("/home");
+        setTimeout(() => {
+          setLocation("/home");
+        }, 1500);
       }
     }
     getSession();
-  }, [setLocation]);
+  }, [setLocation, toast]);
 
   return <h2>Logging in...</h2>;
 }
