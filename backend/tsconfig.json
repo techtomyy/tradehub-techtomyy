@@ -115,9 +115,9 @@
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
-    "outDir": "./js",
-     "typeRoots": ["./node_modules/@types", "./src/types"],
-    "rootDir": "./src",
+    "outDir": "backend/js",
+     "typeRoots": ["backend/node_modules/@types", "backend/src/types"],
+    "rootDir": "backend/src",
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
@@ -125,6 +125,6 @@
         "allowJs": true
 
   },
-  "include": ["src/**/*",   "src/types/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["backend/src/**/*",   "backend/src/types/**/*"],
+  "exclude": ["backend/node_modules"]
 }
