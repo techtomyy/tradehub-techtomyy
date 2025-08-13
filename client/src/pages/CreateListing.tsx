@@ -92,7 +92,7 @@ export default function CreateListing() {
           </div>
 
           {/* Sidebar */}
-          <div>
+                    <div>
             <CreateListingSidebar />
           </div>
         </div>

@@ -17,6 +17,7 @@ import NotFound from "@/pages/not-found";
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import Wallet from "@/pages/wallet";
 import Settings from "@/pages/settings";
+import EscrowManagement from "@/pages/EscrowManagement";
 
 // Types
 interface RouteConfig {
@@ -81,6 +82,7 @@ const PROTECTED_ROUTES_CONFIG: RouteConfig[] = [
   { path: PROTECTED_ROUTES.DISPUTE, component: Dispute },
   { path: PROTECTED_ROUTES.WALLET, component: Wallet },
   { path: PROTECTED_ROUTES.SETTINGS, component: Settings },
+  { path: PROTECTED_ROUTES.ESCROW_MANAGEMENT, component: EscrowManagement },
 ];
 
 /**

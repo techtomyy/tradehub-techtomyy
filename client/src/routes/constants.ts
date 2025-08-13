@@ -50,6 +50,8 @@ export const PROTECTED_ROUTES = {
   WALLET: "/wallet",
   /** User account settings and preferences */
   SETTINGS: "/settings",
+  /** Escrow management and transaction oversight */
+  ESCROW_MANAGEMENT: "/escrow-management",
 } as const;
 
 /**

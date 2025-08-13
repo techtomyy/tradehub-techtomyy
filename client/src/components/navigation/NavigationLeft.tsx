@@ -17,7 +17,8 @@ export function NavigationLeft({ user }: NavigationLeftProps) {
   const NAVIGATION_ITEMS = [
     { href: "/marketplace", label: "Marketplace" },
     { href: "/dashboard", label: "Dashboard" },
-    { href: "/create-listing", label: "Sell Asset" }
+    { href: "/create-listing", label: "Sell Asset" },
+    { href: "/escrow-management", label: "Escrow Management" }
   ] as const;
 
   return (
