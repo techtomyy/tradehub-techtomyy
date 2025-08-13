@@ -8,9 +8,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Shield, Eye, EyeOff, ArrowLeft, CheckCircle } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
+import { FcGoogle } from "react-icons/fc";
+import supabase from "@/config/client";
+import { authApi, ApiError } from "@/lib/api";
 
 const signupSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -18,7 +20,7 @@ const signupSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string(),
-  agreeToTerms: z.boolean().refine((val) => val === true, "You must agree to the terms"),
+  conditionagree: z.boolean().refine((val) => val === true, "You must agree to the terms"),
   marketingEmails: z.boolean().default(false),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
@@ -29,10 +31,10 @@ type SignupForm = z.infer<typeof signupSchema>;
 
 export default function Signup() {
   const { toast } = useToast();
-  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [, setLocation] = useLocation();
 
   const form = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
@@ -42,32 +44,124 @@ export default function Signup() {
       email: "",
       password: "",
       confirmPassword: "",
-      agreeToTerms: false,
+      conditionagree: false,
       marketingEmails: false,
     },
   });
 
-  const onSubmit = async (data: SignupForm) => {
-    setIsLoading(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      setIsLoading(false);
+  // Handle Google OAuth
+  const handleGoogleSignup = async () => {
+    try {
+      setIsLoading(true);
       
-      // Static signup logic - always succeed
-      // Set authentication state
-      login();
-      
-      toast({
-        title: "Account Created Successfully!",
-        description: "Welcome to AssetVault! Redirecting to dashboard...",
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
       
-      // Redirect to dashboard after successful signup
-      setTimeout(() => {
-        window.location.href = "/home";
-      }, 1500);
-    }, 2000);
+      if (error) {
+        toast({
+          title: "❌ Google Sign-up Failed",
+          description: error.message,
+          variant: "destructive",
+          className: "bg-red-50 border-red-200 text-red-800",
+        });
+      } else {
+        toast({
+          title: "🔐 Google Sign-up Initiated",
+          description: "Redirecting to Google for authentication...",
+          className: "bg-blue-50 border-blue-200 text-blue-800",
+        });
+      }
+    } catch (error) {
+      console.error("Google signup error:", error);
+      toast({
+        title: "❌ Sign-up Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+        className: "bg-red-50 border-red-200 text-red-800",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle form submission
+  const handleSubmit = async (data: SignupForm) => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    
+    try {
+      // Make API call
+      const response = await authApi.signup({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        conditionagree: data.conditionagree,
+      });
+      
+      // Check if signup was successful - handle different API response structures
+      const isSuccess = response && (
+        response.success === true || 
+        (response as any).status === "success" || 
+        response.message?.includes("successful") ||
+        response.message?.includes("✅") ||
+        response.message?.includes("created") ||
+        response.message?.includes("registered")
+      );
+      
+      if (isSuccess) {
+        // Set authentication state
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userEmail', data.email);
+        
+        // Show success message
+        toast({
+          title: "🎉 Account Created Successfully!",
+          description: "Welcome to AssetVault! Redirecting to home page...",
+          className: "bg-green-50 border-green-200 text-green-800",
+        });
+        
+        // Redirect to home page
+        setTimeout(() => {
+          setLocation("/home");
+        }, 1500);
+        
+      } else {
+        // Signup failed
+        const errorMessage = response?.message || response?.error || "Signup failed. Please try again.";
+        
+        toast({
+          title: "❌ Signup Failed",
+          description: errorMessage,
+          variant: "destructive",
+          className: "bg-red-50 border-red-200 text-red-800",
+        });
+      }
+      
+    } catch (error) {
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      
+      if (error instanceof ApiError) {
+        errorMessage = error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: "❌ Signup Failed",
+        description: errorMessage,
+        variant: "destructive",
+        className: "bg-red-50 border-red-200 text-red-800",
+      });
+      
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -92,10 +186,10 @@ export default function Signup() {
             <CardTitle className="text-2xl font-bold text-gray-900">Create Account</CardTitle>
             <p className="text-gray-600">Join AssetVault and start trading digital assets</p>
           </CardHeader>
-          
+
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                 {/* Name Fields */}
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
@@ -215,7 +309,7 @@ export default function Signup() {
                 <div className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="agreeToTerms"
+                    name="conditionagree"
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-start space-x-2 space-y-0">
                         <FormControl>
@@ -273,6 +367,17 @@ export default function Signup() {
                   disabled={isLoading}
                 >
                   {isLoading ? "Creating Account..." : "Create Account"}
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full flex items-center justify-center space-x-2"
+                  onClick={handleGoogleSignup}
+                  disabled={isLoading}
+                >
+                  <FcGoogle className="h-5 w-5" />
+                  <span>Sign up with Google</span>
                 </Button>
 
                 <div className="text-center">

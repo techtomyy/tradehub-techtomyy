@@ -1,0 +1,212 @@
+Create a secure web application for buying and selling digital assets (Instagram pages, YouTube channels, TikTok accounts, etc.) with escrow payment protection. The platform will:
+
+Act as a trusted intermediary holding funds during transactions
+
+Charge 2.5% fee from both buyer and seller
+
+Provide verification mechanisms before fund release
+
+Include a marketplace browsing interface
+
+Use MongoDB for all data storage
+
+Technical Requirements
+Backend (Node.js/Express with MongoDB)
+User Management System
+
+Registration with email verification
+
+Profile creation (username, bio, profile picture)
+
+KYC verification (ID upload for high-value transactions)
+
+Wallet system to track balances and transactions
+
+Digital Asset Listing System
+
+Create listings with title, description, category, price, screenshots
+
+Asset verification process (platform verifies ownership before listing)
+
+Search and filtering functionality
+
+Bidding system for premium accounts
+
+Escrow Transaction System
+
+Initiate transaction: Buyer sends payment to platform escrow
+
+Payment hold: Platform confirms receipt and notifies seller
+
+Credential transfer: Secure messaging for seller to send access details
+
+Buyer verification period (72 hours to verify assets)
+
+Dispute resolution system
+
+Final settlement: Platform releases funds after deductions
+
+Payment Processing
+
+Integration with Stripe/PayPal
+
+Platform wallet system
+
+Transaction history
+
+Fee calculation (2.5% from both parties)
+
+Messaging System
+
+Secure in-platform communication
+
+File sharing for credentials
+
+Transaction-specific chat threads
+
+Frontend (React.js)
+Marketplace Interface
+
+Browse listings with filters
+
+Listing detail pages
+
+Responsive design
+
+User Dashboard
+
+Active transactions
+
+Listings management
+
+Wallet overview
+
+Transaction history
+
+Transaction Flow UI
+
+Step-by-step guidance
+
+Status indicators
+
+Action buttons (release funds, open dispute, etc.)
+
+Database Schema (MongoDB)
+Users Collection
+
+javascript
+{
+  _id: ObjectId,
+  email: String,
+  passwordHash: String,
+  username: String,
+  profile: {
+    bio: String,
+    avatar: String,
+    rating: Number,
+    kycVerified: Boolean
+  },
+  wallet: {
+    balance: Number,
+    currency: String
+  },
+  createdAt: Date,
+  lastLogin: Date
+}
+Listings Collection
+
+javascript
+{
+  _id: ObjectId,
+  sellerId: ObjectId,
+  title: String,
+  description: String,
+  category: String,
+  price: Number,
+  media: [String],
+  verificationStatus: String,
+  createdAt: Date,
+  updatedAt: Date,
+  status: String // active, sold, expired
+}
+Transactions Collection
+
+javascript
+{
+  _id: ObjectId,
+  buyerId: ObjectId,
+  sellerId: ObjectId,
+  listingId: ObjectId,
+  amount: Number,
+  platformFee: Number,
+  status: String, // initiated, payment_received, credentials_sent, verified, completed, disputed
+  escrowReleaseDate: Date,
+  messages: [{
+    sender: ObjectId,
+    content: String,
+    attachments: [String],
+    timestamp: Date
+  }],
+  dispute: {
+    openedBy: ObjectId,
+    reason: String,
+    resolution: String
+  },
+  createdAt: Date,
+  updatedAt: Date
+}
+Key Functions to Implement
+createListing() - Handle new digital asset listings
+
+initiateTransaction() - Start escrow process
+
+processPayment() - Handle buyer payment to escrow
+
+submitCredentials() - Seller provides access details
+
+verifyAsset() - Buyer confirms receipt/validity
+
+releaseFunds() - Platform sends payment to seller after fees
+
+openDispute() - Handle transaction conflicts
+
+calculateFees() - Compute 2.5% from both parties
+
+Security Requirements
+End-to-end encryption for credential transfers
+
+Two-factor authentication for high-value transactions
+
+Rate limiting on API endpoints
+
+Input sanitization against XSS and injection attacks
+
+Regular database backups
+
+Additional Features
+Rating system for users after transactions
+
+Premium listings for featured placement
+
+Email notifications for transaction updates
+
+Admin dashboard for dispute resolution
+
+Analytics for platform performance
+
+Implementation Guidance Request
+Provide complete code implementation for:
+
+MongoDB connection setup and models
+
+Core transaction flow API endpoints
+
+Sample React components for marketplace UI
+
+Payment processing integration
+
+Secure credential transfer mechanism
+
+Automated fee calculation
+
+Testing recommendations
