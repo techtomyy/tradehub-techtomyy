@@ -1,20 +1,17 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/lib/context/CurrencyContext";
-import { Bell, User, Wallet, Settings, LogOut, Shield, Globe } from "lucide-react";
-import { Link } from "wouter";
 import { useWalletStore } from "@/lib/store/walletStore";
-import { formatDistanceToNow } from "date-fns";
+import { NavigationLeft } from "./navigation/NavigationLeft";
+import { NavigationRight } from "./navigation/NavigationRight";
+import { User, Notification } from "@/types/navigation";
+
+// Static data
+const DEMO_NOTIFICATIONS: Notification[] = [
+  { id: 1, text: "New transaction received", time: new Date(Date.now() - 60 * 60 * 1000) },
+  { id: 2, text: "Your withdrawal was approved", time: new Date(Date.now() - 3 * 60 * 60 * 1000) },
+  { id: 3, text: "Password changed successfully", time: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+];
 
 export default function Navigation() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -22,11 +19,7 @@ export default function Navigation() {
   const { selectedCurrency, formatAmount, convertAmount, setCurrency } = useCurrency();
 
   // Static notifications for demo
-  const [notifications] = useState([
-    { id: 1, text: "New transaction received", time: new Date(Date.now() - 60 * 60 * 1000) },
-    { id: 2, text: "Your withdrawal was approved", time: new Date(Date.now() - 3 * 60 * 60 * 1000) },
-    { id: 3, text: "Password changed successfully", time: new Date(Date.now() - 24 * 60 * 60 * 1000) },
-  ]);
+  const [notifications] = useState<Notification[]>(DEMO_NOTIFICATIONS);
 
   if (!isAuthenticated || !user) {
     return null;
@@ -37,153 +30,19 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Main Navigation */}
-          <div className="flex items-center space-x-8">
-            <Link href="/home">
-              <div className="flex items-center space-x-2 cursor-pointer">
-                <Shield className="h-8 w-8 text-primary" />
-                <span className="text-xl font-bold text-gray-900">AssetVault</span>
-              </div>
-            </Link>
-
-            <div className="hidden md:flex space-x-6">
-              <Link href="/marketplace">
-                <Button variant="ghost" className="text-gray-600 hover:text-gray-900">
-                  Marketplace
-                </Button>
-              </Link>
-              <Link href="/dashboard">
-                <Button variant="ghost" className="text-gray-600 hover:text-gray-900">
-                  Dashboard
-                </Button>
-              </Link>
-              <Link href="/create-listing">
-                <Button variant="ghost" className="text-gray-600 hover:text-gray-900">
-                  Sell Asset
-                </Button>
-              </Link>
-            </div>
-          </div>
-
+          <NavigationLeft user={user} />
+          
           {/* Right Side */}
-          <div className="flex items-center space-x-4">
-            {/* Currency Selector */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                  <Globe className="h-4 w-4" />
-                  <span className="text-sm font-medium">{selectedCurrency}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setCurrency('USD')}>
-                  USD - US Dollar
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setCurrency('PKR')}>
-                  PKR - Pakistani Rupee
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Wallet Balance */}
-            <div className="hidden md:flex items-center space-x-2 bg-gray-100 rounded-lg px-3 py-2">
-              <Wallet className="h-4 w-4 text-emerald-600" />
-              <span className="text-sm font-medium">
-                {formatAmount(convertAmount(walletBalance, 'USD', selectedCurrency), selectedCurrency)}
-              </span>
-            </div>
-
-            {/* Notifications */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="relative">
-                  <Bell className="h-5 w-5" />
-                  {notifications.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {notifications.length}
-                    </span>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end" className="w-72">
-                {notifications.map((n) => (
-                  <DropdownMenuItem
-                    key={n.id}
-                    className="flex flex-col items-start py-2 cursor-pointer hover:bg-gray-50"
-                  >
-                    <span className="text-sm">{n.text}</span>
-                    <span className="text-xs text-gray-500">
-                      {formatDistanceToNow(n.time, { addSuffix: true })}
-                    </span>
-                  </DropdownMenuItem>
-                ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="justify-center text-primary hover:bg-gray-50">
-                  View All Notifications
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* User Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage
-                      src={user.profileImageUrl}
-                      alt={user.firstName || user.email || 'User'}
-                    />
-                    <AvatarFallback>
-                      {user.firstName?.[0] || user.email?.[0] || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">
-                      {user.firstName} {user.lastName}
-                    </p>
-                    <p className="w-[200px] truncate text-sm text-muted-foreground">
-                      {user.email}
-                    </p>
-                    {user.kycVerified && (
-                      <Badge variant="outline" className="w-fit">
-                        <Shield className="h-3 w-3 mr-1" />
-                        KYC Verified
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard" className="w-full">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Dashboard</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/wallet" className="w-full">
-                    <Wallet className="mr-2 h-4 w-4" />
-                    <span>Wallet</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/settings" className="w-full">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <NavigationRight 
+            user={user}
+            walletBalance={walletBalance}
+            selectedCurrency={selectedCurrency}
+            formatAmount={formatAmount}
+            convertAmount={convertAmount}
+            setCurrency={setCurrency}
+            notifications={notifications}
+            logout={logout}
+          />
         </div>
       </div>
     </nav>
