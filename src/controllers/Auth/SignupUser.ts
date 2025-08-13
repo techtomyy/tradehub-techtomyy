@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ERROR_MESSAGES, ERROR_CODES } from "../../constants/errorMessages";
+import { ERROR_MESSAGES, STATUS_CODES } from "../../constants/errorMessages";
 import supabase from "../../config/client";
 import { generateToken } from "../../utils/generateToken";
 import bcrypt from "bcrypt";
@@ -30,13 +30,13 @@ export async function SignupUser(
     if (checkError) {
       console.error("❌ Error checking existing user:", checkError.message);
       return res
-        .status(ERROR_CODES.SERVER_ERROR)
+        .status(STATUS_CODES.SERVER_ERROR)
         .json({ error: ERROR_MESSAGES.DB.USERS_TABLE_ERROR });
     }
 
     if (existingUser) {
       return res
-        .status(ERROR_CODES.BAD_REQUEST)
+        .status(STATUS_CODES.BAD_REQUEST)
         .json({ error: ERROR_MESSAGES.GENERAL.USER_ALREADY_EXISTS });
     }
 
@@ -60,7 +60,7 @@ export async function SignupUser(
     if (userError || !userInsert) {
       console.error("❌ Error inserting user:", userError?.message);
       return res
-        .status(ERROR_CODES.SERVER_ERROR)
+        .status(STATUS_CODES.SERVER_ERROR)
         .json({ error: ERROR_MESSAGES.DB.USERS_INSERT_ERROR });
     }
 
@@ -79,7 +79,7 @@ export async function SignupUser(
     if (authError) {
       console.error("❌ Error inserting auth:", authError.message);
       return res
-        .status(ERROR_CODES.SERVER_ERROR)
+        .status(STATUS_CODES.SERVER_ERROR)
         .json({ error: ERROR_MESSAGES.DB.AUTH_TABLE_ERROR });
     }
 
@@ -98,7 +98,7 @@ export async function SignupUser(
     if (roleError || !roleAdd) {
       console.error("❌ Error inserting role:", roleError?.message);
       return res
-        .status(ERROR_CODES.SERVER_ERROR)
+        .status(STATUS_CODES.SERVER_ERROR)
         .json({ error: ERROR_MESSAGES.DB.ROLES_TABLE_ERROR });
     }
 
@@ -125,7 +125,7 @@ export async function SignupUser(
   } catch (error) {
     console.error("❌ Unexpected error:", error);
     return res
-      .status(ERROR_CODES.SERVER_ERROR)
+      .status(STATUS_CODES.SERVER_ERROR)
       .json({ error: ERROR_MESSAGES.AUTH.SERVER_ERROR });
   }
 }

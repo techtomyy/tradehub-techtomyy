@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { ERROR_MESSAGES } from '../constants/errorMessages';
+import dotenv from "dotenv";
 const { sign } = jwt;
+dotenv.config();
 
-// Define the user data type
 interface UserData {
     id: string;
     email: string;

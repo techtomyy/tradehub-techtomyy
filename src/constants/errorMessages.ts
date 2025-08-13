@@ -1,4 +1,4 @@
-export const ERROR_CODES = {
+export const STATUS_CODES = {
   UNAUTHORIZED: 401,
   BAD_REQUEST: 400,
   SERVER_ERROR: 500,
@@ -45,6 +45,8 @@ export const ASSETS_ERROR_MESSAGES={
   ONLY_ALLOWED:"Only JPG, PNG, WebP, and GIF are allowed.",
   BAD_REQUEST:"Missing required fields",
   UPLOAD_FAILED:"File Save in Storage Failed",
-  MESSAGE:"✅ Asset saved successfully"
+  MESSAGE:"✅ Asset saved successfully",
+  NOT_USER_INFO:"User Infromation is missing?Please Login",
+  ASSETS_FETCH: "User assets fetched successfully",
 
 }

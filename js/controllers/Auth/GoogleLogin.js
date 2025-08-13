@@ -22,12 +22,12 @@ function LoginWithGoogle(req, res) {
         try {
             const tokenHeader = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.replace("Bearer ", "");
             if (!tokenHeader) {
-                return res.status(errorMessages_1.ERROR_CODES.UNAUTHORIZED).json({ error: errorMessages_1.ERROR_MESSAGES.GOOGLE.TOKEN_MISSING });
+                return res.status(errorMessages_1.STATUS_CODES.UNAUTHORIZED).json({ error: errorMessages_1.ERROR_MESSAGES.GOOGLE.TOKEN_MISSING });
             }
             // 1. Get user from Supabase
             const { data, error } = yield client_1.default.auth.getUser(tokenHeader);
             if (error || !(data === null || data === void 0 ? void 0 : data.user)) {
-                return res.status(errorMessages_1.ERROR_CODES.UNAUTHORIZED).json({ error: errorMessages_1.ERROR_MESSAGES.GOOGLE.INVALID_TOKEN });
+                return res.status(errorMessages_1.STATUS_CODES.UNAUTHORIZED).json({ error: errorMessages_1.ERROR_MESSAGES.GOOGLE.INVALID_TOKEN });
             }
             const { id, email, user_metadata } = data.user;
             const fullName = (user_metadata === null || user_metadata === void 0 ? void 0 : user_metadata.full_name) || "Unknown User";
@@ -40,7 +40,7 @@ function LoginWithGoogle(req, res) {
                 .eq("email", email)
                 .maybeSingle();
             if (userError) {
-                return res.status(errorMessages_1.ERROR_CODES.SERVER_ERROR).json({ error: `${errorMessages_1.ERROR_MESSAGES.DB.USERS_TABLE_ERROR}: ${userError.message}` });
+                return res.status(errorMessages_1.STATUS_CODES.SERVER_ERROR).json({ error: `${errorMessages_1.ERROR_MESSAGES.DB.USERS_TABLE_ERROR}: ${userError.message}` });
             }
             let userId;
             if (!existingUser) {
@@ -50,7 +50,7 @@ function LoginWithGoogle(req, res) {
                     .select("id")
                     .single();
                 if (insertError) {
-                    return res.status(errorMessages_1.ERROR_CODES.SERVER_ERROR).json({ error: `${errorMessages_1.ERROR_MESSAGES.DB.USERS_INSERT_ERROR}: ${insertError.message}` });
+                    return res.status(errorMessages_1.STATUS_CODES.SERVER_ERROR).json({ error: `${errorMessages_1.ERROR_MESSAGES.DB.USERS_INSERT_ERROR}: ${insertError.message}` });
                 }
                 userId = newUser.id;
             }
@@ -62,7 +62,7 @@ function LoginWithGoogle(req, res) {
                 .from("auth")
                 .upsert([{ user_id: userId, googleid: id, isPasswordset: false }], { onConflict: "user_id" });
             if (authError) {
-                return res.status(errorMessages_1.ERROR_CODES.SERVER_ERROR).json({ error: `${errorMessages_1.ERROR_MESSAGES.DB.AUTH_TABLE_ERROR}: ${authError.message}` });
+                return res.status(errorMessages_1.STATUS_CODES.SERVER_ERROR).json({ error: `${errorMessages_1.ERROR_MESSAGES.DB.AUTH_TABLE_ERROR}: ${authError.message}` });
             }
             // 4. Roles table update
             const { data: roleExists } = yield client_1.default
@@ -75,7 +75,7 @@ function LoginWithGoogle(req, res) {
                     .from("roles")
                     .insert([{ user_id: userId, role: "User" }]);
                 if (roleError) {
-                    return res.status(errorMessages_1.ERROR_CODES.SERVER_ERROR).json({ error: `${errorMessages_1.ERROR_MESSAGES.DB.ROLES_TABLE_ERROR}: ${roleError.message}` });
+                    return res.status(errorMessages_1.STATUS_CODES.SERVER_ERROR).json({ error: `${errorMessages_1.ERROR_MESSAGES.DB.ROLES_TABLE_ERROR}: ${roleError.message}` });
                 }
             }
             // 5. Fetch role
@@ -85,7 +85,7 @@ function LoginWithGoogle(req, res) {
                 .eq("user_id", userId)
                 .maybeSingle();
             if (fetchRoleError || !roleData) {
-                return res.status(errorMessages_1.ERROR_CODES.SERVER_ERROR).json({ error: errorMessages_1.ERROR_MESSAGES.DB.ROLES_FETCH_ERROR });
+                return res.status(errorMessages_1.STATUS_CODES.SERVER_ERROR).json({ error: errorMessages_1.ERROR_MESSAGES.DB.ROLES_FETCH_ERROR });
             }
             // 6. Generate JWT
             const jwtToken = (0, generateToken_1.generateToken)({
@@ -106,7 +106,7 @@ function LoginWithGoogle(req, res) {
         }
         catch (err) {
             console.error("Google login error:", err);
-            return res.status(errorMessages_1.ERROR_CODES.SERVER_ERROR).json({ error: errorMessages_1.ERROR_MESSAGES.AUTH.SERVER_ERROR });
+            return res.status(errorMessages_1.STATUS_CODES.SERVER_ERROR).json({ error: errorMessages_1.ERROR_MESSAGES.AUTH.SERVER_ERROR });
         }
     });
 }

@@ -4,7 +4,8 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import authRoute from "./routes/auth";
 import {createAssestsTable} from "./models/ListingTable";
-import assestRoute from "./routes/assests"
+import assestRoute from "./routes/assests";
+
 dotenv.config(); // Load environment variables
 
 const app = express();

@@ -31,12 +31,12 @@ function SignupUser(req, res) {
             if (checkError) {
                 console.error("❌ Error checking existing user:", checkError.message);
                 return res
-                    .status(errorMessages_1.ERROR_CODES.SERVER_ERROR)
+                    .status(errorMessages_1.STATUS_CODES.SERVER_ERROR)
                     .json({ error: errorMessages_1.ERROR_MESSAGES.DB.USERS_TABLE_ERROR });
             }
             if (existingUser) {
                 return res
-                    .status(errorMessages_1.ERROR_CODES.BAD_REQUEST)
+                    .status(errorMessages_1.STATUS_CODES.BAD_REQUEST)
                     .json({ error: errorMessages_1.ERROR_MESSAGES.GENERAL.USER_ALREADY_EXISTS });
             }
             // 2. Hash password
@@ -57,7 +57,7 @@ function SignupUser(req, res) {
             if (userError || !userInsert) {
                 console.error("❌ Error inserting user:", userError === null || userError === void 0 ? void 0 : userError.message);
                 return res
-                    .status(errorMessages_1.ERROR_CODES.SERVER_ERROR)
+                    .status(errorMessages_1.STATUS_CODES.SERVER_ERROR)
                     .json({ error: errorMessages_1.ERROR_MESSAGES.DB.USERS_INSERT_ERROR });
             }
             const userId = userInsert.id;
@@ -73,7 +73,7 @@ function SignupUser(req, res) {
             if (authError) {
                 console.error("❌ Error inserting auth:", authError.message);
                 return res
-                    .status(errorMessages_1.ERROR_CODES.SERVER_ERROR)
+                    .status(errorMessages_1.STATUS_CODES.SERVER_ERROR)
                     .json({ error: errorMessages_1.ERROR_MESSAGES.DB.AUTH_TABLE_ERROR });
             }
             // 5. Insert into `roles` table
@@ -90,7 +90,7 @@ function SignupUser(req, res) {
             if (roleError || !roleAdd) {
                 console.error("❌ Error inserting role:", roleError === null || roleError === void 0 ? void 0 : roleError.message);
                 return res
-                    .status(errorMessages_1.ERROR_CODES.SERVER_ERROR)
+                    .status(errorMessages_1.STATUS_CODES.SERVER_ERROR)
                     .json({ error: errorMessages_1.ERROR_MESSAGES.DB.ROLES_TABLE_ERROR });
             }
             // 6. Generate Token
@@ -114,7 +114,7 @@ function SignupUser(req, res) {
         catch (error) {
             console.error("❌ Unexpected error:", error);
             return res
-                .status(errorMessages_1.ERROR_CODES.SERVER_ERROR)
+                .status(errorMessages_1.STATUS_CODES.SERVER_ERROR)
                 .json({ error: errorMessages_1.ERROR_MESSAGES.AUTH.SERVER_ERROR });
         }
     });

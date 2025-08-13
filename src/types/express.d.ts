@@ -1,9 +1,15 @@
-import express from "express";
+// src/types/express/index.d.ts
+
+import * as express from "express";
 
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
+      user?: {
+        id: string;
+        email: string;
+        role: string;
+      };
     }
   }
 }

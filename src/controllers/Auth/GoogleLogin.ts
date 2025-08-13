@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import supabase from "../../config/client";
-import { ERROR_MESSAGES, ERROR_CODES } from "../../constants/errorMessages";
+import { ERROR_MESSAGES, STATUS_CODES } from "../../constants/errorMessages";
 import { generateToken } from "../../utils/generateToken";
 
 export async function LoginWithGoogle(req: Request, res: Response): Promise<Response> {
@@ -8,13 +8,13 @@ export async function LoginWithGoogle(req: Request, res: Response): Promise<Resp
     const tokenHeader = req.headers.authorization?.replace("Bearer ", "");
 
     if (!tokenHeader) {
-      return res.status(ERROR_CODES.UNAUTHORIZED).json({ error: ERROR_MESSAGES.GOOGLE.TOKEN_MISSING });
+      return res.status(STATUS_CODES.UNAUTHORIZED).json({ error: ERROR_MESSAGES.GOOGLE.TOKEN_MISSING });
     }
 
     // 1. Get user from Supabase
     const { data, error } = await supabase.auth.getUser(tokenHeader);
     if (error || !data?.user) {
-      return res.status(ERROR_CODES.UNAUTHORIZED).json({ error: ERROR_MESSAGES.GOOGLE.INVALID_TOKEN });
+      return res.status(STATUS_CODES.UNAUTHORIZED).json({ error: ERROR_MESSAGES.GOOGLE.INVALID_TOKEN });
     }
 
     const { id, email, user_metadata } = data.user;
@@ -30,7 +30,7 @@ export async function LoginWithGoogle(req: Request, res: Response): Promise<Resp
       .maybeSingle();
 
     if (userError) {
-      return res.status(ERROR_CODES.SERVER_ERROR).json({ error: `${ERROR_MESSAGES.DB.USERS_TABLE_ERROR}: ${userError.message}` });
+      return res.status(STATUS_CODES.SERVER_ERROR).json({ error: `${ERROR_MESSAGES.DB.USERS_TABLE_ERROR}: ${userError.message}` });
     }
 
     let userId;
@@ -42,7 +42,7 @@ export async function LoginWithGoogle(req: Request, res: Response): Promise<Resp
         .single();
 
       if (insertError) {
-        return res.status(ERROR_CODES.SERVER_ERROR).json({ error: `${ERROR_MESSAGES.DB.USERS_INSERT_ERROR}: ${insertError.message}` });
+        return res.status(STATUS_CODES.SERVER_ERROR).json({ error: `${ERROR_MESSAGES.DB.USERS_INSERT_ERROR}: ${insertError.message}` });
       }
       userId = newUser.id;
     } else {
@@ -55,7 +55,7 @@ export async function LoginWithGoogle(req: Request, res: Response): Promise<Resp
       .upsert([{ user_id: userId, googleid: id, isPasswordset: false }], { onConflict: "user_id" });
 
     if (authError) {
-      return res.status(ERROR_CODES.SERVER_ERROR).json({ error: `${ERROR_MESSAGES.DB.AUTH_TABLE_ERROR}: ${authError.message}` });
+      return res.status(STATUS_CODES.SERVER_ERROR).json({ error: `${ERROR_MESSAGES.DB.AUTH_TABLE_ERROR}: ${authError.message}` });
     }
 
     // 4. Roles table update
@@ -71,7 +71,7 @@ export async function LoginWithGoogle(req: Request, res: Response): Promise<Resp
         .insert([{ user_id: userId, role: "User" }]);
 
       if (roleError) {
-        return res.status(ERROR_CODES.SERVER_ERROR).json({ error: `${ERROR_MESSAGES.DB.ROLES_TABLE_ERROR}: ${roleError.message}` });
+        return res.status(STATUS_CODES.SERVER_ERROR).json({ error: `${ERROR_MESSAGES.DB.ROLES_TABLE_ERROR}: ${roleError.message}` });
       }
     }
 
@@ -83,7 +83,7 @@ export async function LoginWithGoogle(req: Request, res: Response): Promise<Resp
       .maybeSingle();
 
     if (fetchRoleError || !roleData) {
-      return res.status(ERROR_CODES.SERVER_ERROR).json({ error: ERROR_MESSAGES.DB.ROLES_FETCH_ERROR });
+      return res.status(STATUS_CODES.SERVER_ERROR).json({ error: ERROR_MESSAGES.DB.ROLES_FETCH_ERROR });
     }
 
     // 6. Generate JWT
@@ -108,6 +108,6 @@ export async function LoginWithGoogle(req: Request, res: Response): Promise<Resp
 
   } catch (err) {
     console.error("Google login error:", err);
-    return res.status(ERROR_CODES.SERVER_ERROR).json({ error: ERROR_MESSAGES.AUTH.SERVER_ERROR });
+    return res.status(STATUS_CODES.SERVER_ERROR).json({ error: ERROR_MESSAGES.AUTH.SERVER_ERROR });
   }
 }

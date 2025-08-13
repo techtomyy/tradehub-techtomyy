@@ -33,7 +33,7 @@ function LoginUser(req, res) {
             }
             if (!user) {
                 return res
-                    .status(errorMessages_1.ERROR_CODES.NOT_FOUND)
+                    .status(errorMessages_1.STATUS_CODES.NOT_FOUND)
                     .json({ error: errorMessages_1.ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS_EMAIL });
             }
             // 2. Get hashed password from auth table
@@ -44,7 +44,7 @@ function LoginUser(req, res) {
                 .maybeSingle();
             if (authError || !authData) {
                 console.error("❌ Error fetching password:", authError === null || authError === void 0 ? void 0 : authError.message);
-                return res.status(errorMessages_1.ERROR_CODES.UNAUTHORIZED).json({ error: errorMessages_1.ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS });
+                return res.status(errorMessages_1.STATUS_CODES.UNAUTHORIZED).json({ error: errorMessages_1.ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS });
             }
             // 3. Compare password
             const isMatch = yield bcrypt_1.default.compare(password, authData.password);
@@ -61,7 +61,7 @@ function LoginUser(req, res) {
                 .maybeSingle();
             if (roleError || !roleData) {
                 console.error("❌ Error fetching role:", roleError === null || roleError === void 0 ? void 0 : roleError.message);
-                return res.status(errorMessages_1.ERROR_CODES.SERVER_ERROR).json({ error: errorMessages_1.ERROR_MESSAGES.AUTH.SERVER_ERROR });
+                return res.status(errorMessages_1.STATUS_CODES.SERVER_ERROR).json({ error: errorMessages_1.ERROR_MESSAGES.AUTH.SERVER_ERROR });
             }
             // 5. Generate Token
             const tokenPayload = {
@@ -78,7 +78,7 @@ function LoginUser(req, res) {
                 maxAge: 24 * 60 * 60 * 1000, // 24 hours
             });
             // 7. Return success
-            return res.status(errorMessages_1.ERROR_CODES.SUCCESS).json({ message: "✅ Login successful!" });
+            return res.status(errorMessages_1.STATUS_CODES.SUCCESS).json({ message: "✅ Login successful!" });
         }
         catch (error) {
             console.error("❌ Login Error:", error);

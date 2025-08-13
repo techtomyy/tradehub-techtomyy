@@ -1,41 +1,31 @@
 import { Request, Response } from "express";
-import { ASSETS_ERROR_MESSAGES, ERROR_CODES, ERROR_MESSAGES } from "../../constants/errorMessages";
+import { ASSETS_ERROR_MESSAGES, STATUS_CODES } from "../../constants/errorMessages";
 import supabase from "../../config/client";
-import { randomUUID } from "crypto";
+import { uploadImageToBucket, validateImage } from "./SaveImageBucket";
 
-const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
-
-function validateImage(file: Express.Multer.File) {
-  if (!allowedTypes.includes(file.mimetype as typeof allowedTypes[number])) {
-    throw new Error(ASSETS_ERROR_MESSAGES.ONLY_ALLOWED);
-  }
+interface UserPayload {
+  id?: string;
+  name: string;
+  email?: string;
+  role?: string;
 }
 
-async function uploadImageToBucket(file: Express.Multer.File): Promise<{ url: string, name: string }> {
-  const fileExt = file.originalname.split(".").pop();
-  const fileName = `${randomUUID()}.${fileExt}`;
-  const filePath = `assets/${fileName}`;
-
-  const { error } = await supabase.storage
-    .from("assets-bucket")
-    .upload(filePath, file.buffer, {
-      contentType: file.mimetype,
-      upsert: false,
-    });
-
-  if (error) {
-    throw new Error(ASSETS_ERROR_MESSAGES.UPLOAD_FAILED);
-  }
-
-  const { data } = supabase.storage.from("assets-bucket").getPublicUrl(filePath);
-  return { url: data.publicUrl, name: fileName };
+interface Assets {
+  title: string;
+  category_name: string;
+  description: string;
+  price: number;
+  followers: number;
+  engagement_rate: number;
+  monthly_view: number;
+  monthly_revenue: number;
 }
 
-export async function AssetsSave(req: Request, res: Response) {
+export async function AssetsSave(req: Request<{}, {}, Assets>, res: Response): Promise<Response> {
   try {
     const {
       title,
-      category_id,
+      category_name,
       description,
       price,
       followers,
@@ -44,58 +34,92 @@ export async function AssetsSave(req: Request, res: Response) {
       monthly_revenue,
     } = req.body;
 
-    const user_id = req.user?.id;
+    // User payload from request
+    const user = (req as Request & { user?: UserPayload }).user;
+    if (!user) {
+      return res.status(STATUS_CODES.UNAUTHORIZED).json({ error: ASSETS_ERROR_MESSAGES.BAD_REQUEST });
+    }
+    const { id: user_id, name, email } = user;
+
     const imageFile = req.file as Express.Multer.File;
 
-    if (!title || !category_id || !price || !imageFile || !user_id) {
-      return res.status(ERROR_CODES.BAD_REQUEST).json({ error: ASSETS_ERROR_MESSAGES.BAD_REQUEST });
+    // Validate required fields
+    if (!title || !category_name || !price || !imageFile || !user_id) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json({ error: ASSETS_ERROR_MESSAGES.BAD_REQUEST });
     }
 
+    // Validate image
     validateImage(imageFile);
 
-    // Step 1: Insert asset
+    // Insert into userdetails (if needed)
+    const { error: userDetailsErr } = await supabase
+      .from("usersdetail")
+      .insert([{ id:user_id, name:category_name, email }])
+      .select()
+      .single();
+
+    if (userDetailsErr) {
+      console.error("Userdetails insert error:", userDetailsErr);
+      // You can decide to throw or handle gracefully
+    }
+
+    const { error: categoriesDetailsErr } = await supabase
+      .from("categories")
+      .insert([{ id:user_id,category_name:category_name }])
+      .select()
+      .single();
+
+    if (categoriesDetailsErr) {
+      console.error("Userdetails insert error:", userDetailsErr);
+      // You can decide to throw or handle gracefully
+    }
+
+    // Insert asset
     const { data: asset, error: assetErr } = await supabase
       .from("assets")
-      .insert([{
-        user_id:user_id,
-        asset_title: title,
-        category_id: Number(category_id),
-        description,
-        price,
-        followers_subscribers: followers.toString(),
-        engagement_rate: engagement_rate.toString(),
-        monthly_view,
-        monthly_revenue
-      }])
+      .insert([
+        {
+          user_id,
+          asset_title: title,
+          category_name:category_name,
+          description,
+          price,
+          followers_subscribers: followers.toString(),
+          engagement_rate: engagement_rate.toString(),
+          monthly_view,
+          monthly_revenue,
+        },
+      ])
       .select()
       .single();
 
     if (assetErr) throw assetErr;
 
-    // Step 2: Upload image to bucket
-    const { url, name } = await uploadImageToBucket(imageFile);
+    // Upload image to bucket
+    const { url, name: fileName } = await uploadImageToBucket(imageFile);
 
-    // Step 3: Insert into asset_images
+    // Insert into asset_images
     const { error: imgErr } = await supabase
       .from("asset_images")
-      .insert([{
-        asset_id: asset.id,
-        user_id,
-        file_name: name,
-        file_url: url,
-        mime_type: imageFile.mimetype
-      }]);
+      .insert([
+        {
+          asset_id: asset.id,
+          user_id,
+          file_name: fileName,
+          file_url: url,
+          mime_type: imageFile.mimetype,
+        },
+      ]);
 
     if (imgErr) throw imgErr;
 
-    return res.status(ERROR_CODES.SUCCESS).json({
+    return res.status(STATUS_CODES.SUCCESS).json({
       message: ASSETS_ERROR_MESSAGES.MESSAGE,
-      asset
+      asset,
     });
-
   } catch (err) {
     console.error("❌ Exception:", err);
-    return res.status(ERROR_CODES.SERVER_ERROR).json({
+    return res.status(STATUS_CODES.SERVER_ERROR).json({
       error: err instanceof Error ? err.message : "Unknown error",
     });
   }

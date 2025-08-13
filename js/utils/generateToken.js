@@ -6,7 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const errorMessages_1 = require("../constants/errorMessages");
+const dotenv_1 = __importDefault(require("dotenv"));
 const { sign } = jsonwebtoken_1.default;
+dotenv_1.default.config();
 // ---------------- Generate Token JWT(json web Token) ----------------
 const generateToken = (userData) => {
     let secretKey;

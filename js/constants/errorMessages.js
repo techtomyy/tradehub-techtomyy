@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ASSETS_ERROR_MESSAGES = exports.ERROR_MESSAGES = exports.ERROR_CODES = void 0;
-exports.ERROR_CODES = {
+exports.ASSETS_ERROR_MESSAGES = exports.ERROR_MESSAGES = exports.STATUS_CODES = void 0;
+exports.STATUS_CODES = {
     UNAUTHORIZED: 401,
     BAD_REQUEST: 400,
     SERVER_ERROR: 500,
@@ -45,5 +45,7 @@ exports.ASSETS_ERROR_MESSAGES = {
     ONLY_ALLOWED: "Only JPG, PNG, WebP, and GIF are allowed.",
     BAD_REQUEST: "Missing required fields",
     UPLOAD_FAILED: "File Save in Storage Failed",
-    MESSAGE: "✅ Asset saved successfully"
+    MESSAGE: "✅ Asset saved successfully",
+    NOT_USER_INFO: "User Infromation is missing?Please Login",
+    ASSETS_FETCH: "User assets fetched successfully",
 };

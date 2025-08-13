@@ -25,14 +25,14 @@ function createAssestsTable() {
         const categoriesTableSql = `CREATE TABLE IF NOT EXISTS public.categories (
     id SERIAL PRIMARY KEY,
     user_id UUID REFERENCES usersdetail(id) ON DELETE CASCADE,
-    category_name TEXT UNIQUE NOT NULL
+    category_name TEXT NOT NULL
 );
 `;
         const assestsTableSql = `CREATE TABLE IF NOT EXISTS public.assets (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES usersdetail(id) ON DELETE CASCADE,
     asset_title TEXT NOT NULL,
-    category_id INT REFERENCES categories(id),
+    category_name TEXT NOT NULL,
     description TEXT NOT NULL,
     price NUMERIC NOT NULL,
     followers_subscribers TEXT NOT NULL,
