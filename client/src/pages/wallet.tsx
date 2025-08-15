@@ -1,10 +1,16 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import Navigation from "@/components/Navigation";
 import { useWalletStore } from "@/lib/store/walletStore";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/lib/context/CurrencyContext";
+import { 
+  WalletHeader,
+  AddWithdrawFunds,
+  PaymentMethods,
+  AddCardForm,
+  TransactionHistory
+} from "@/components/wallet";
+import { SavedCard } from "@/types/wallet";
 import visa from "../attached_assets/debit_payment_visa_icon.svg";
 import mastercard from "../attached_assets/mastercard_payment_icon.svg";
 import amex from "../attached_assets/amex_charge_credit card_payment_icon.svg";
@@ -39,9 +45,7 @@ export default function WalletPage() {
     const [cardType, setCardType] = useState("Unknown");
 
     // Saved cards
-    const [savedCards, setSavedCards] = useState([{ type: "Visa", last4: "1234" }]);
-
-
+    const [savedCards, setSavedCards] = useState<SavedCard[]>([{ type: "Visa", last4: "1234" }]);
 
     // Get card type icon with unique symbols
     const getCardIcon = (cardType: string) => {
@@ -129,199 +133,57 @@ export default function WalletPage() {
             <Navigation />
 
             <div className="max-w-4xl mx-auto py-12 px-4">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Wallet & Payments</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-center mb-6">
-                            <div className="text-sm text-gray-600">Current Balance</div>
-                            <div className="text-3xl font-bold">
-                                {formatAmount(getBalanceInCurrency(selectedCurrency), selectedCurrency)}
-                            </div>
-                            <div className="flex items-center justify-center gap-4 mt-2">
-                                <div className="text-sm text-gray-500">
-                                    Currency: {selectedCurrency}
-                                </div>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => setCurrency('USD')}
-                                        className={`px-3 py-1 text-xs rounded-md ${
-                                            selectedCurrency === 'USD' 
-                                                ? 'bg-blue-600 text-white' 
-                                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                        }`}
-                                    >
-                                        USD
-                                    </button>
-                                    <button
-                                        onClick={() => setCurrency('PKR')}
-                                        className={`px-3 py-1 text-xs rounded-md ${
-                                            selectedCurrency === 'PKR' 
-                                                ? 'bg-blue-600 text-white' 
-                                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                        }`}
-                                    >
-                                        PKR
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                {/* Wallet Header */}
+                <WalletHeader 
+                    balance={balance}
+                    selectedCurrency={selectedCurrency}
+                    formatAmount={formatAmount}
+                    getBalanceInCurrency={getBalanceInCurrency}
+                    setCurrency={setCurrency}
+                />
 
-                        {/* Add / Withdraw Funds */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <input
-                                    type="number"
-                                    value={addAmount}
-                                    onChange={(e) => setAddAmount(e.target.value)}
-                                    placeholder="Enter amount"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                />
-                                <Button onClick={handleAddFunds} className="mt-2 w-full">
-                                    Add
-                                </Button>
-                            </div>
-                            <div>
-                                <input
-                                    type="number"
-                                    value={withdrawAmount}
-                                    onChange={(e) => setWithdrawAmount(e.target.value)}
-                                    placeholder="Enter amount"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                />
-                                <Button onClick={handleWithdrawFunds} className="mt-2 w-full">
-                                    Withdraw
-                                </Button>
-                            </div>
-                        </div>
+                {/* Add / Withdraw Funds */}
+                <AddWithdrawFunds 
+                    addAmount={addAmount}
+                    setAddAmount={setAddAmount}
+                    withdrawAmount={withdrawAmount}
+                    setWithdrawAmount={setWithdrawAmount}
+                    handleAddFunds={handleAddFunds}
+                    handleWithdrawFunds={handleWithdrawFunds}
+                />
 
-                        {/* Linked Payment Method */}
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Linked Payment Method
-                            </label>
-                            <select className="w-full border border-gray-300 rounded-md px-3 py-2">
-                                {savedCards.map((card, idx) => (
-                                    <option key={idx}>
-                                        {card.type} **** {card.last4}
-                                    </option>
-                                ))}
-                            </select>
-                            <div className="flex gap-4 mt-3">
-                                <Button variant="secondary" onClick={() => setAddCard(true)}>
-                                    Add New Card
-                                </Button>
-                                <Button variant="default" className="bg-green-600 hover:bg-green-700">
-                                    Link Bank Account
-                                </Button>
-                            </div>
-                        </div>
+                {/* Linked Payment Method */}
+                <PaymentMethods 
+                    savedCards={savedCards}
+                    setAddCard={setAddCard}
+                />
 
-                        {/* Add Card Form */}
-                        {addCard && (
-                            <div className="p-4 border border-gray-300 rounded-md">
-                                <div>
-                                    <input
-                                        type="text"
-                                        value={cardName}
-                                        onChange={(e) => setCardName(e.target.value)}
-                                        placeholder="Name on Card"
-                                        className="w-80 px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                </div>
-                                <div>
-                                    <div className="relative">
-                                        <input
-                                            type="tel"
-                                            value={cardNumber}
-                                            onChange={handleCardNumberChange}
-                                            placeholder="Card Number"
-                                            className="w-80 mt-2 pl-10 pr-3 py-2 border border-gray-300 rounded-md"
-                                        />
-                                        {cardNumber && (
-                                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center">
-                                                {typeof getCardIcon(cardType) === 'string' && getCardIcon(cardType) === "💳" ? (
-                                                    <span className="text-lg flex items-center justify-center">{getCardIcon(cardType)}</span>
-                                                ) : (
-                                                    <img
-                                                        src={getCardIcon(cardType) as string}
-                                                        alt={`${cardType} card`}
-                                                        className="w-6 h-4 object-contain flex items-center justify-center"
-                                                    />
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                    {cardNumber && (
-                                        <p className="text-sm text-gray-500 mt-1">
-                                            Detected: <span className="font-semibold">{cardType}</span>
-                                        </p>
-                                    )}
-                                </div>
-                                <div>
-                                    <input
-                                        type="month"
-                                        value={cardDate}
-                                        onChange={(e) => setCardDate(e.target.value)}
-                                        className="w-44 mt-2 px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                    <input
-                                        type="number"
-                                        value={cardCvv}
-                                        onChange={(e) => setCardCvv(e.target.value)}
-                                        placeholder="CVV/CVC"
-                                        className="w-36 ml-2 mt-2 px-3 py-2 border border-gray-300 rounded-md"
-                                    />
-                                </div>
-                                <div>
-                                    <Button className="mt-2 ml-44" variant="secondary" onClick={clearCardForm}>
-                                        Cancel
-                                    </Button>
-                                    <Button className="mt-2 ml-2" variant="secondary" onClick={handleSaveCard}>
-                                        Save
-                                    </Button>
-
-                                </div>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                {/* Add Card Form */}
+                {addCard && (
+                    <AddCardForm 
+                        cardNumber={cardNumber}
+                        setCardNumber={setCardNumber}
+                        cardName={cardName}
+                        setCardName={setCardName}
+                        cardDate={cardDate}
+                        setCardDate={setCardDate}
+                        cardCvv={cardCvv}
+                        setCardCvv={setCardCvv}
+                        cardType={cardType}
+                        getCardIcon={getCardIcon}
+                        handleCardNumberChange={handleCardNumberChange}
+                        clearCardForm={clearCardForm}
+                        handleSaveCard={handleSaveCard}
+                    />
+                )}
 
                 {/* Transaction History */}
-                <div className="mt-8">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Transaction History</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <table className="min-w-full text-sm">
-                                <thead>
-                                    <tr className="text-left border-b border-gray-200">
-                                        <th className="py-2">Date</th>
-                                        <th className="py-2">Type</th>
-                                        <th className="py-2">Amount</th>
-                                        <th className="py-2">Fee</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {transactions.map((txn, idx) => (
-                                        <tr key={idx} className="border-b border-gray-100">
-                                            <td className="py-2">{txn.date}</td>
-                                            <td className="py-2">{txn.type}</td>
-                                            <td className="py-2">
-                                                {formatAmount(convertAmount(txn.amount, 'USD', selectedCurrency), selectedCurrency)}
-                                            </td>
-                                            <td className="py-2">
-                                                {formatAmount(convertAmount(txn.fee, 'USD', selectedCurrency), selectedCurrency)}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </CardContent>
-                    </Card>
-                </div>
+                <TransactionHistory 
+                    transactions={transactions}
+                    selectedCurrency={selectedCurrency}
+                    formatAmount={formatAmount}
+                    convertAmount={convertAmount}
+                />
             </div>
         </div>
     );

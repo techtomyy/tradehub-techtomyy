@@ -11,11 +11,11 @@ interface ListingCardProps {
     title: string;
     description: string;
     category: string;
-    price: string;
+    price: number; // Changed from string to number since we're now passing converted prices
     followers?: number;
     engagement?: string;
     monthlyViews?: number;
-    monthlyRevenue?: string;
+    monthlyRevenue?: number; // Changed from string to number for consistency
     media?: string[];
     verificationStatus: string;
     status: string;
@@ -29,7 +29,7 @@ interface ListingCardProps {
 }
 
 export default function ListingCard({ listing }: ListingCardProps) {
-  const { selectedCurrency, formatAmount, convertAmount } = useCurrency();
+  const { selectedCurrency, formatAmount } = useCurrency();
   
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -53,8 +53,8 @@ export default function ListingCard({ listing }: ListingCardProps) {
     }
   };
 
-  const price = parseFloat(listing.price);
-  const priceInSelectedCurrency = convertAmount(price, 'USD', selectedCurrency);
+  // Price is already converted to the selected currency from the parent component
+  const price = listing.price;
 
   return (
     <Card className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
@@ -132,7 +132,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
             {listing.monthlyRevenue && (
               <span className="flex items-center">
                 <DollarSign className="h-4 w-4 mr-1" />
-                ${listing.monthlyRevenue}
+                {formatAmount(typeof listing.monthlyRevenue === 'number' ? listing.monthlyRevenue : 0, selectedCurrency)}
               </span>
             )}
           </div>
@@ -141,7 +141,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
         <div className="flex items-center justify-between">
           <div>
             <span className="text-2xl font-bold text-gray-900">
-              {formatAmount(priceInSelectedCurrency, selectedCurrency)}
+              {formatAmount(typeof price === 'number' && !isNaN(price) ? price : 0, selectedCurrency)}
             </span>
             <span className="text-sm text-gray-500 ml-1">+ fees</span>
           </div>

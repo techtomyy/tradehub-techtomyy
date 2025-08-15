@@ -1,50 +1,115 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useWalletStore, Currency } from '@/lib/store/walletStore';
 
+/**
+ * Currency Context Type Definition
+ * 
+ * Provides currency-related functionality including:
+ * - Selected currency state
+ * - Currency conversion utilities
+ * - Amount formatting
+ * - Currency symbol retrieval
+ */
 interface CurrencyContextType {
   selectedCurrency: Currency;
   setCurrency: (currency: Currency) => void;
   getBalanceInCurrency: (currency: Currency) => number;
   convertAmount: (amount: number, fromCurrency: Currency, toCurrency: Currency) => number;
-  formatAmount: (amount: number, currency: Currency) => string;
+  formatAmount: (amount: number | string, currency: Currency) => string;
   getCurrencySymbol: (currency: Currency) => string;
   conversionRate: number;
 }
 
+// Create the context with undefined as initial value
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
-export const useCurrency = () => {
+/**
+ * Custom hook to use the currency context
+ * 
+ * @throws {Error} When used outside of CurrencyProvider
+ * @returns {CurrencyContextType} The currency context value
+ */
+export const useCurrency = (): CurrencyContextType => {
   const context = useContext(CurrencyContext);
+  
   if (context === undefined) {
     throw new Error('useCurrency must be used within a CurrencyProvider');
   }
+  
   return context;
 };
 
+// Provider props interface
 interface CurrencyProviderProps {
   children: ReactNode;
 }
 
+/**
+ * Currency Provider Component
+ * 
+ * Provides currency context to the application tree.
+ * Integrates with the wallet store for currency management.
+ */
 export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) => {
+  // Get currency-related state and functions from wallet store
   const selectedCurrency = useWalletStore((state) => state.selectedCurrency);
   const setCurrency = useWalletStore((state) => state.setCurrency);
   const getBalanceInCurrency = useWalletStore((state) => state.getBalanceInCurrency);
   const convertAmount = useWalletStore((state) => state.convertAmount);
   const conversionRate = useWalletStore((state) => state.conversionRate);
 
-  const getCurrencySymbol = (currency: Currency) => {
+  /**
+   * Get the currency symbol for a given currency
+   * 
+   * @param currency - The currency to get the symbol for
+   * @returns {string} The currency symbol
+   */
+  const getCurrencySymbol = (currency: Currency): string => {
     return currency === 'USD' ? '$' : '₨';
   };
 
-  const formatAmount = (amount: number, currency: Currency) => {
-    const symbol = getCurrencySymbol(currency);
-    if (currency === 'PKR') {
-      return `${symbol}${Math.round(amount).toLocaleString()}`;
+  /**
+   * Format an amount with the appropriate currency symbol and formatting
+   * 
+   * @param amount - The amount to format (can be number or string)
+   * @param currency - The currency to format in
+   * @returns {string} The formatted amount string
+   */
+  const formatAmount = (amount: number | string, currency: Currency): string => {
+    // Handle edge cases
+    if (amount === null || amount === undefined) {
+      return getCurrencySymbol(currency) + '0';
+    }
+    
+    // Ensure amount is a number
+    let numericAmount: number;
+    if (typeof amount === 'string') {
+      numericAmount = parseFloat(amount);
+      if (isNaN(numericAmount)) {
+        numericAmount = 0;
+      }
+    } else if (typeof amount === 'number') {
+      numericAmount = amount;
+      if (isNaN(numericAmount)) {
+        numericAmount = 0;
+      }
     } else {
-      return `${symbol}${amount.toFixed(2)}`;
+      // Handle other types (objects, arrays, etc.)
+      numericAmount = 0;
+    }
+    
+    const symbol = getCurrencySymbol(currency);
+    
+    if (currency === 'PKR') {
+      // PKR amounts are rounded to whole numbers
+      return `${symbol}${Math.round(numericAmount).toLocaleString()}`;
+    } else {
+      // USD amounts show 2 decimal places
+      return `${symbol}${numericAmount.toFixed(2)}`;
     }
   };
 
+  // Create the context value object
   const value: CurrencyContextType = {
     selectedCurrency,
     setCurrency,

@@ -4,7 +4,7 @@ import { PUBLIC_ROUTES, PROTECTED_ROUTES } from "./constants";
 import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
-import Home from "@/pages/Home"; // Added import for Home page
+import Home from "@/pages/Home";
 import Dashboard from "@/pages/Dashboard";
 import Marketplace from "@/pages/Marketplace";
 import CreateListing from "@/pages/CreateListing";
@@ -17,24 +17,52 @@ import NotFound from "@/pages/not-found";
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
 import Wallet from "@/pages/wallet";
 import Settings from "@/pages/settings";
+import EscrowManagement from "@/pages/EscrowManagement";
 
-// Protected Route Component
-function ProtectedRoute({ component: Component, ...rest }: { component: React.ComponentType<any>; [key: string]: any }) {
+// Types
+interface RouteConfig {
+  path: string;
+  component: React.ComponentType<any>;
+}
+
+/**
+ * Protected Route Component
+ * 
+ * Wraps components that require authentication.
+ * Redirects to login if user is not authenticated.
+ */
+function ProtectedRoute({ 
+  component: Component, 
+  ...rest 
+}: { 
+  component: React.ComponentType<any>; 
+  [key: string]: any; 
+}) {
   const { isAuthenticated, isLoading } = useAuth();
 
+  // Show loading state while checking authentication
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return <Login />;
   }
 
+  // Render protected component if authenticated
   return <Component {...rest} />;
 }
 
-// Public Routes Configuration
-const publicRoutes = [
+// Route configurations
+const PUBLIC_ROUTES_CONFIG: RouteConfig[] = [
   { path: PUBLIC_ROUTES.HOME, component: Landing },
   { path: PUBLIC_ROUTES.LOGIN, component: Login },
   { path: PUBLIC_ROUTES.SIGNUP, component: Signup },
@@ -43,8 +71,7 @@ const publicRoutes = [
   { path: PROTECTED_ROUTES.HOME_PAGE, component: Home },
 ];
 
-// Protected Routes Configuration
-const protectedRoutes = [
+const PROTECTED_ROUTES_CONFIG: RouteConfig[] = [
   // { path: PROTECTED_ROUTES.HOME_PAGE, component: Home }, // Temporarily moved to public
   { path: PROTECTED_ROUTES.DASHBOARD, component: Dashboard },
   { path: PROTECTED_ROUTES.MARKETPLACE, component: Marketplace },
@@ -55,13 +82,20 @@ const protectedRoutes = [
   { path: PROTECTED_ROUTES.DISPUTE, component: Dispute },
   { path: PROTECTED_ROUTES.WALLET, component: Wallet },
   { path: PROTECTED_ROUTES.SETTINGS, component: Settings },
+  { path: PROTECTED_ROUTES.ESCROW_MANAGEMENT, component: EscrowManagement },
 ];
 
+/**
+ * App Routes Component
+ * 
+ * Main routing component that handles all application routes.
+ * Includes public routes, protected routes, and a 404 fallback.
+ */
 export default function AppRoutes() {
   return (
     <Switch>
-      {/* Public Routes */}
-      {publicRoutes.map(({ path, component: Component }) => (
+      {/* Public Routes - Accessible to all users */}
+      {PUBLIC_ROUTES_CONFIG.map(({ path, component: Component }) => (
         <Route key={path} path={path}>
           <RouteErrorBoundary>
             <Component />
@@ -69,8 +103,8 @@ export default function AppRoutes() {
         </Route>
       ))}
 
-      {/* Protected Routes */}
-      {protectedRoutes.map(({ path, component: Component }) => (
+      {/* Protected Routes - Require authentication */}
+      {PROTECTED_ROUTES_CONFIG.map(({ path, component: Component }) => (
         <Route key={path} path={path}>
           <RouteErrorBoundary>
             <ProtectedRoute component={Component} />
@@ -78,7 +112,7 @@ export default function AppRoutes() {
         </Route>
       ))}
 
-      {/* 404 Route */}
+      {/* 404 Route - Catch all unmatched routes */}
       <Route path="*">
         <RouteErrorBoundary>
           <NotFound />
