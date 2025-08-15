@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useCurrency } from "@/lib/context/CurrencyContext";
 import { Upload, AlertCircle } from "lucide-react";
 import { Currency } from "@/lib/store/walletStore";
+import { formatFileSize, isValidFileSize } from "@/lib/utils";
 
 const createListingSchema = z.object({
   title: z.string().min(1, "Title is required").max(255, "Title too long"),
@@ -19,7 +20,8 @@ const createListingSchema = z.object({
   }),
   price: z.string().min(1, "Price is required").refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Price must be a positive number"),
   assetUrl: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
-  assetProofImage: z.instanceof(File, { message: "Asset proof screenshot is required" }),
+  assetProofImage: z.instanceof(File, { message: "Asset proof screenshot is required" })
+    .refine((file) => file.size <= 2 * 1024 * 1024, "File size must be less than 2MB"),
   followers: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), "Followers must be a non-negative number"),
   engagement: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0 && Number(val) <= 100), "Engagement must be between 0-100%"),
   monthlyViews: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), "Monthly views must be a non-negative number"),
@@ -196,18 +198,37 @@ export function CreateListingForm({
                         <p className="text-sm text-gray-600 mb-2">
                           Upload a screenshot proving ownership
                         </p>
+                        <p className="text-xs text-gray-500 mb-3">
+                          Maximum file size: 2MB
+                        </p>
                         <Input
                           type="file"
                           accept="image/*"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file) field.onChange(file);
+                            if (file) {
+                              // Check file size before setting
+                              if (!isValidFileSize(file, 2)) {
+                                // Clear the file input
+                                e.target.value = '';
+                                // Show error toast or handle validation
+                                return;
+                              }
+                              field.onChange(file);
+                            }
                           }}
                         />
+                        {field.value && (
+                          <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded-md">
+                            <p className="text-sm text-green-700">
+                              ✓ {field.value.name} ({formatFileSize(field.value.size)})
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </FormControl>
                     <FormDescription>
-                      Screenshot showing you own this asset (required)
+                      Screenshot showing you own this asset (required, max 2MB)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

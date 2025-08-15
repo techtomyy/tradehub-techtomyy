@@ -6,9 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
+import { useCurrency } from "@/lib/context/CurrencyContext";
 
 export default function Marketplace() {
-  const [filters, setFilters] = useState({
+  const { selectedCurrency, convertAmount, formatAmount } = useCurrency();
+  
+  const [filters, setFilters] = useState<{
+    search: string;
+    category: string;
+    minPrice: string;
+    maxPrice: string;
+    minFollowers: string;
+    maxFollowers: string;
+    verified: boolean;
+    sort: string;
+  }>({
     search: "",
     category: "all",
     minPrice: "",
@@ -21,38 +33,84 @@ export default function Marketplace() {
   const [currentPage, setCurrentPage] = useState(0);
   const limit = 12;
 
-  // Static listings data
+  // Static listings data (prices are stored in USD)
   const staticListings = [
     {
       id: 1,
       title: "Demo Asset 1",
-      price: 100,
+      price: 100, // Price in USD
       category: "instagram",
       followers: 12000,
-      verified: true,
       createdAt: new Date("2024-01-01").getTime(),
+      description: "High-engagement Instagram account with active community",
+      media: [],
+      verificationStatus: "verified",
+      status: "active",
+      featured: true,
+      sellerId: "seller1",
+      seller: {
+        rating: "4.8",
+        totalSales: 25
+      },
+      engagement: "5.2",
+      monthlyViews: 45000,
+      monthlyRevenue: 1200
     },
     {
       id: 2,
       title: "Demo Asset 2",
-      price: 200,
+      price: 200, // Price in USD
       category: "youtube",
       followers: 8000,
-      verified: false,
       createdAt: new Date("2024-02-01").getTime(),
+      description: "Growing YouTube channel with monetization potential",
+      media: [],
+      verificationStatus: "unverified",
+      status: "active",
+      featured: false,
+      sellerId: "seller2",
+      seller: {
+        rating: "4.5",
+        totalSales: 12
+      },
+      engagement: "3.8",
+      monthlyViews: 28000,
+      monthlyRevenue: 800
     },
     // ...add more demo listings
   ];
 
-  // Filtering logic
+  // Convert listing prices to selected currency for display
+  const getListingPriceInCurrency = (priceInUSD: number) => {
+    if (typeof priceInUSD !== 'number' || isNaN(priceInUSD)) {
+      return 0;
+    }
+    return convertAmount(priceInUSD, 'USD', selectedCurrency);
+  };
+
+  // Filtering logic with currency conversion
   let filteredListings = staticListings.filter((listing) => {
     if (filters.search && !listing.title.toLowerCase().includes(filters.search.toLowerCase())) return false;
     if (filters.category && filters.category !== "all" && listing.category.toLowerCase() !== filters.category.toLowerCase()) return false;
-    if (filters.minPrice && listing.price < Number(filters.minPrice)) return false;
-    if (filters.maxPrice && listing.price > Number(filters.maxPrice)) return false;
+    
+    // Convert filter prices to USD for comparison with listing prices (which are stored in USD)
+    const minPriceNum = filters.minPrice ? Number(filters.minPrice) : null;
+    const maxPriceNum = filters.maxPrice ? Number(filters.maxPrice) : null;
+    
+    // Only apply price filters if they are valid numbers
+    if (minPriceNum !== null && !isNaN(minPriceNum)) {
+      const minPriceUSD = convertAmount(minPriceNum, selectedCurrency, 'USD');
+      if (listing.price < minPriceUSD) return false;
+    }
+    
+    if (maxPriceNum !== null && !isNaN(maxPriceNum)) {
+      const maxPriceUSD = convertAmount(maxPriceNum, selectedCurrency, 'USD');
+      if (listing.price > maxPriceUSD) return false;
+    }
+    
     if (filters.minFollowers && listing.followers < Number(filters.minFollowers)) return false;
     if (filters.maxFollowers && listing.followers > Number(filters.maxFollowers)) return false;
-    if (filters.verified && !listing.verified) return false;
+    if (filters.verified && listing.verificationStatus !== 'verified') return false;
     return true;
   });
 
@@ -71,7 +129,7 @@ export default function Marketplace() {
   const paginatedListings = filteredListings.slice(currentPage * limit, (currentPage + 1) * limit);
   const isLoading = false;
 
-  const handleFilterChange = (newFilters: any) => {
+  const handleFilterChange = (newFilters: Partial<typeof filters>) => {
     setFilters({ ...filters, ...newFilters });
     setCurrentPage(0);
   };
@@ -88,7 +146,11 @@ export default function Marketplace() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Filters */}
           <div className="lg:col-span-1">
-            <SearchFilters filters={filters} onFilterChange={handleFilterChange} />
+            <SearchFilters 
+              filters={filters} 
+              onFilterChange={handleFilterChange}
+              selectedCurrency={selectedCurrency}
+            />
           </div>
           {/* Main Content */}
           <div className="lg:col-span-3">
@@ -152,7 +214,14 @@ export default function Marketplace() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {paginatedListings?.map((listing: any) => (
-                  <ListingCard key={listing.id} listing={listing} />
+                  <ListingCard 
+                    key={listing.id} 
+                    listing={{
+                      ...listing,
+                      // Convert price to selected currency for display
+                      price: getListingPriceInCurrency(listing.price)
+                    }} 
+                  />
                 ))}
                 {(!paginatedListings || paginatedListings.length === 0) && (
                   <div className="col-span-full text-center py-12">

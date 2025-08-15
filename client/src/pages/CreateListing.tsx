@@ -19,7 +19,8 @@ const createListingSchema = z.object({
   }),
   price: z.string().min(1, "Price is required").refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Price must be a positive number"),
   assetUrl: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
-  assetProofImage: z.instanceof(File, { message: "Asset proof screenshot is required" }),
+  assetProofImage: z.instanceof(File, { message: "Asset proof screenshot is required" })
+    .refine((file) => file.size <= 2 * 1024 * 1024, "File size must be less than 2MB"),
   followers: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), "Followers must be a non-negative number"),
   engagement: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0 && Number(val) <= 100), "Engagement must be between 0-100%"),
   monthlyViews: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), "Monthly views must be a non-negative number"),

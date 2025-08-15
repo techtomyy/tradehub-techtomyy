@@ -1,7 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Users, TrendingUp, Eye, DollarSign } from "lucide-react";
 import { Listing } from "@/types/listing";
+import { useCurrency } from "@/lib/context/CurrencyContext";
 
 interface AssetCardProps {
   listing: Listing;
@@ -69,7 +70,7 @@ export function AssetCard({ listing, getCategoryIcon }: AssetCardProps) {
 
 // Component: Stats Grid
 function StatsGrid({ listing }: { listing: Listing }) {
-  const { Users, TrendingUp, Eye, DollarSign } = require("lucide-react");
+  const { selectedCurrency, formatAmount } = useCurrency();
   
   const stats = [
     {
@@ -92,7 +93,7 @@ function StatsGrid({ listing }: { listing: Listing }) {
     },
     {
       icon: DollarSign,
-      value: `$${listing.monthlyRevenue}`,
+      value: formatAmount(listing.monthlyRevenue || 0, selectedCurrency),
       label: "Monthly Revenue",
       show: !!listing.monthlyRevenue
     }

@@ -8,6 +8,10 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { X, Wallet } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useCurrency } from "@/lib/context/CurrencyContext";
+import { Currency } from "@/lib/store/walletStore";
+import { useWalletStore } from "@/lib/store/walletStore";
+import { Link } from "wouter";
 
 interface SearchFiltersProps {
   filters: {
@@ -21,15 +25,28 @@ interface SearchFiltersProps {
     sort: string;
   };
   onFilterChange: (filters: any) => void;
+  selectedCurrency: Currency;
 }
 
-export default function SearchFilters({ filters, onFilterChange }: SearchFiltersProps) {
+export default function SearchFilters({ filters, onFilterChange, selectedCurrency }: SearchFiltersProps) {
   const { user } = useAuth();
+  const { convertAmount, formatAmount, getCurrencySymbol } = useCurrency();
+  
+  // Get actual wallet data from the store
+  const walletBalance = useWalletStore((state) => state.balance);
 
-  // Static dashboard stats
-  const dashboardStats = {
-    walletBalance: "1250.00",
-    escrowBalance: "500.00",
+  // Convert wallet balance to selected currency
+  const getWalletBalanceInCurrency = () => {
+    return convertAmount(walletBalance, 'USD', selectedCurrency);
+  };
+
+  // Get escrow balance (for demo purposes, using a percentage of wallet balance)
+  // In a real app, this would come from the escrow store
+  const getEscrowBalanceInCurrency = () => {
+    const escrowPercentage = 0.2; // 20% of wallet balance for demo
+    const escrowBalanceUSD = walletBalance * escrowPercentage;
+    
+    return convertAmount(escrowBalanceUSD, 'USD', selectedCurrency);
   };
 
   const handleInputChange = (field: string, value: string | boolean) => {
@@ -54,14 +71,52 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
            filters.minFollowers || filters.maxFollowers || filters.verified;
   };
 
-  const priceRanges = [
-    { label: "Under $100", min: "", max: "100" },
-    { label: "$100 - $500", min: "100", max: "500" },
-    { label: "$500 - $1,000", min: "500", max: "1000" },
-    { label: "$1,000 - $5,000", min: "1000", max: "5000" },
-    { label: "$5,000 - $10,000", min: "5000", max: "10000" },
-    { label: "Over $10,000", min: "10000", max: "" },
-  ];
+  // Dynamic price ranges based on selected currency
+  const getPriceRanges = () => {
+    const symbol = getCurrencySymbol(selectedCurrency);
+    
+    if (selectedCurrency === 'USD') {
+      return [
+        { label: `Under ${symbol}100`, min: "", max: "100" },
+        { label: `${symbol}100 - ${symbol}500`, min: "100", max: "500" },
+        { label: `${symbol}500 - ${symbol}1,000`, min: "500", max: "1000" },
+        { label: `${symbol}1,000 - ${symbol}5,000`, min: "1000", max: "5000" },
+        { label: `${symbol}5,000 - ${symbol}10,000`, min: "5000", max: "10000" },
+        { label: `Over ${symbol}10,000`, min: "10000", max: "" },
+      ];
+    } else {
+      // PKR ranges (converted from USD ranges)
+      const ranges = [
+        { minUSD: 0, maxUSD: 100 },
+        { minUSD: 100, maxUSD: 500 },
+        { minUSD: 500, maxUSD: 1000 },
+        { minUSD: 1000, maxUSD: 5000 },
+        { minUSD: 5000, maxUSD: 10000 },
+        { minUSD: 10000, maxUSD: null },
+      ];
+      
+      return ranges.map(({ minUSD, maxUSD }) => {
+        if (minUSD === 0 && maxUSD !== null) {
+          // "Under X" case
+          const convertedMax = convertAmount(maxUSD, 'USD', 'PKR');
+          const maxPKR = isNaN(convertedMax) ? "0" : Math.round(convertedMax).toString();
+          return { label: `Under ${symbol}${maxPKR}`, min: "", max: maxPKR };
+        } else if (maxUSD === null) {
+          // "Over X" case
+          const convertedMin = convertAmount(minUSD, 'USD', 'PKR');
+          const minPKR = isNaN(convertedMin) ? "0" : Math.round(convertedMin).toString();
+          return { label: `Over ${symbol}${minPKR}`, min: minPKR, max: "" };
+        } else {
+          // "X - Y" case
+          const convertedMin = convertAmount(minUSD, 'USD', 'PKR');
+          const convertedMax = convertAmount(maxUSD, 'USD', 'PKR');
+          const minPKR = isNaN(convertedMin) ? "0" : Math.round(convertedMin).toString();
+          const maxPKR = isNaN(convertedMax) ? "0" : Math.round(convertedMax).toString();
+          return { label: `${symbol}${minPKR} - ${symbol}${maxPKR}`, min: minPKR, max: maxPKR };
+        }
+      });
+    }
+  };
 
   const followerRanges = [
     { label: "1K - 10K", min: "1000", max: "10000" },
@@ -71,6 +126,8 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
     { label: "500K - 1M", min: "500000", max: "1000000" },
     { label: "1M+", min: "1000000", max: "" },
   ];
+
+  const priceRanges = getPriceRanges();
 
   return (
     <div className="space-y-6">
@@ -86,19 +143,21 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Available Balance</span>
             <span className="text-lg font-semibold text-gray-900">
-              ${dashboardStats.walletBalance}
+              {formatAmount(getWalletBalanceInCurrency(), selectedCurrency)}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">In Escrow</span>
             <span className="text-sm font-medium text-amber-600">
-              ${dashboardStats.escrowBalance}
+              {formatAmount(getEscrowBalanceInCurrency(), selectedCurrency)}
             </span>
           </div>
           <Separator />
-          <Button variant="outline" size="sm" className="w-full">
-            Add Funds
-          </Button>
+          <Link href="/wallet">
+            <Button variant="outline" size="sm" className="w-full">
+              Add Funds
+            </Button>
+          </Link>
         </CardContent>
       </Card>
 
@@ -141,21 +200,39 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
 
           {/* Price Range */}
           <div>
-            <Label className="text-sm font-medium text-gray-700 mb-2">Price Range</Label>
+            <Label className="text-sm font-medium text-gray-700 mb-2">
+              Price Range ({selectedCurrency})
+            </Label>
             <div className="grid grid-cols-2 gap-2 mb-3">
               <Input
                 type="number"
                 placeholder="Min"
                 value={filters.minPrice}
-                onChange={(e) => handleInputChange('minPrice', e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Only allow positive numbers or empty string
+                  if (value === '' || (!isNaN(Number(value)) && Number(value) >= 0)) {
+                    handleInputChange('minPrice', value);
+                  }
+                }}
                 className="text-sm"
+                min="0"
+                step="any"
               />
               <Input
                 type="number"
                 placeholder="Max"
                 value={filters.maxPrice}
-                onChange={(e) => handleInputChange('maxPrice', e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Only allow positive numbers or empty string
+                  if (value === '' || (!isNaN(Number(value)) && Number(value) >= 0)) {
+                    handleInputChange('maxPrice', value);
+                  }
+                }}
                 className="text-sm"
+                min="0"
+                step="any"
               />
             </div>
             <div className="space-y-1">
@@ -184,15 +261,31 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
                 type="number"
                 placeholder="Min"
                 value={filters.minFollowers}
-                onChange={(e) => handleInputChange('minFollowers', e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Only allow positive numbers or empty string
+                  if (value === '' || (!isNaN(Number(value)) && Number(value) >= 0)) {
+                    handleInputChange('minFollowers', value);
+                  }
+                }}
                 className="text-sm"
+                min="0"
+                step="any"
               />
               <Input
                 type="number"
                 placeholder="Max"
                 value={filters.maxFollowers}
-                onChange={(e) => handleInputChange('maxFollowers', e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Only allow positive numbers or empty string
+                  if (value === '' || (!isNaN(Number(value)) && Number(value) >= 0)) {
+                    handleInputChange('maxFollowers', value);
+                  }
+                }}
                 className="text-sm"
+                min="0"
+                step="any"
               />
             </div>
             <div className="space-y-1">
@@ -248,7 +341,7 @@ export default function SearchFilters({ filters, onFilterChange }: SearchFilters
                 )}
                 {(filters.minPrice || filters.maxPrice) && (
                   <Badge variant="secondary" className="text-xs">
-                    ${filters.minPrice || '0'} - ${filters.maxPrice || '∞'}
+                    {getCurrencySymbol(selectedCurrency)}{filters.minPrice || '0'} - {getCurrencySymbol(selectedCurrency)}{filters.maxPrice || '∞'}
                     <button
                       onClick={() => {
                         handleInputChange('minPrice', '');

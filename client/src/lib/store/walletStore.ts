@@ -89,6 +89,12 @@ export const useWalletStore = create<WalletState>((set, get) => ({
    */
   addFunds: (amount, currency = 'USD') => {
     const state = get();
+    
+    // Handle invalid inputs
+    if (typeof amount !== 'number' || isNaN(amount) || amount < 0) {
+      return;
+    }
+    
     const amountInUSD = currency === 'PKR' ? amount / state.conversionRate : amount;
     
     set((state) => ({
@@ -114,7 +120,18 @@ export const useWalletStore = create<WalletState>((set, get) => ({
    */
   withdrawFunds: (amount, currency = 'USD') => {
     const state = get();
+    
+    // Handle invalid inputs
+    if (typeof amount !== 'number' || isNaN(amount) || amount < 0) {
+      return;
+    }
+    
     const amountInUSD = currency === 'PKR' ? amount / state.conversionRate : amount;
+    
+    // Check if user has sufficient balance
+    if (amountInUSD > state.balance) {
+      return;
+    }
     
     set((state) => ({
       balance: state.balance - amountInUSD,
@@ -136,7 +153,13 @@ export const useWalletStore = create<WalletState>((set, get) => ({
    * 
    * @param currency - The currency to set as selected
    */
-  setCurrency: (currency) => set({ selectedCurrency: currency }),
+  setCurrency: (currency) => {
+    // Validate currency parameter
+    if (currency !== 'USD' && currency !== 'PKR') {
+      return;
+    }
+    set({ selectedCurrency: currency });
+  },
   
   /**
    * Get wallet balance in a specific currency
@@ -146,6 +169,11 @@ export const useWalletStore = create<WalletState>((set, get) => ({
    */
   getBalanceInCurrency: (currency) => {
     const state = get();
+    
+    // Handle invalid balance
+    if (typeof state.balance !== 'number' || isNaN(state.balance)) {
+      return 0;
+    }
     
     if (currency === 'USD') {
       return state.balance;
@@ -164,6 +192,11 @@ export const useWalletStore = create<WalletState>((set, get) => ({
    */
   convertAmount: (amount, fromCurrency, toCurrency) => {
     const state = get();
+    
+    // Handle invalid inputs
+    if (typeof amount !== 'number' || isNaN(amount)) {
+      return 0;
+    }
     
     // No conversion needed if currencies are the same
     if (fromCurrency === toCurrency) {

@@ -15,7 +15,7 @@ interface CurrencyContextType {
   setCurrency: (currency: Currency) => void;
   getBalanceInCurrency: (currency: Currency) => number;
   convertAmount: (amount: number, fromCurrency: Currency, toCurrency: Currency) => number;
-  formatAmount: (amount: number, currency: Currency) => string;
+  formatAmount: (amount: number | string, currency: Currency) => string;
   getCurrencySymbol: (currency: Currency) => string;
   conversionRate: number;
 }
@@ -71,19 +71,41 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
   /**
    * Format an amount with the appropriate currency symbol and formatting
    * 
-   * @param amount - The amount to format
+   * @param amount - The amount to format (can be number or string)
    * @param currency - The currency to format in
    * @returns {string} The formatted amount string
    */
-  const formatAmount = (amount: number, currency: Currency): string => {
+  const formatAmount = (amount: number | string, currency: Currency): string => {
+    // Handle edge cases
+    if (amount === null || amount === undefined) {
+      return getCurrencySymbol(currency) + '0';
+    }
+    
+    // Ensure amount is a number
+    let numericAmount: number;
+    if (typeof amount === 'string') {
+      numericAmount = parseFloat(amount);
+      if (isNaN(numericAmount)) {
+        numericAmount = 0;
+      }
+    } else if (typeof amount === 'number') {
+      numericAmount = amount;
+      if (isNaN(numericAmount)) {
+        numericAmount = 0;
+      }
+    } else {
+      // Handle other types (objects, arrays, etc.)
+      numericAmount = 0;
+    }
+    
     const symbol = getCurrencySymbol(currency);
     
     if (currency === 'PKR') {
       // PKR amounts are rounded to whole numbers
-      return `${symbol}${Math.round(amount).toLocaleString()}`;
+      return `${symbol}${Math.round(numericAmount).toLocaleString()}`;
     } else {
       // USD amounts show 2 decimal places
-      return `${symbol}${amount.toFixed(2)}`;
+      return `${symbol}${numericAmount.toFixed(2)}`;
     }
   };
 
