@@ -1,14 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { ERROR_MESSAGES } from '../constants/errorMessages';
+import { UserData } from '../types/Auth';
 import dotenv from "dotenv";
 const { sign } = jwt;
 dotenv.config();
 
-interface UserData {
-    id: string;
-    email: string;
-    role: 'User' | 'Admin';
-}
 
 // ---------------- Generate Token JWT(json web Token) ----------------
 export const generateToken = (userData: UserData): string => {

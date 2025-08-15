@@ -1,14 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { ERROR_MESSAGES, STATUS_CODES } from "../constants/errorMessages";
 import { verify, JwtPayload, VerifyErrors } from "jsonwebtoken";
+import { UserData } from "../types/Auth";
 
 
 
-interface UserPayload {
-    id: string;
-    email: string;
-    role: string;
-}
 
 const SECRET_KEY = process.env.SECRET_KEY || "your_secret_key_here";
 
@@ -22,7 +18,7 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
             });
         }
 
-        verify(token, SECRET_KEY, (err: VerifyErrors | null, decoded: string | UserPayload | JwtPayload | undefined) => {
+        verify(token, SECRET_KEY, (err: VerifyErrors | null, decoded: string | UserData | JwtPayload | undefined) => {
             if (err) {
                 return res.status(STATUS_CODES.UNAUTHORIZED).json({
                     message: ERROR_MESSAGES.JWT.TOKEN_INVALID,
@@ -35,7 +31,7 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
                 });
             }
 
-            const payload = decoded as UserPayload;
+            const payload = decoded as UserData;
 
             (req as any).user = payload;
             next();

@@ -3,14 +3,7 @@ import { ERROR_MESSAGES, STATUS_CODES } from "../../constants/errorMessages";
 import supabase from "../../config/client";
 import { generateToken } from "../../utils/generateToken";
 import bcrypt from "bcrypt";
-
-interface SignupBody {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  conditionagree: boolean;
-}
+import {SignupBody} from "../../types/Auth"
 
 export async function SignupUser(
   req: Request<{}, {}, SignupBody>,
