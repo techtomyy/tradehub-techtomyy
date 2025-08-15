@@ -1,17 +1,12 @@
 import { Request, Response } from "express";
 import supabase from "../../config/client";
 import { ASSETS_ERROR_MESSAGES, ERROR_MESSAGES, STATUS_CODES } from "../../constants/errorMessages";
-
-interface UserPayload {
-    id: string;
-    email: string;
-    role: string;
-}
+import { UserData } from "../../types/Auth";
 
 const bucketName = "assets";
 
 export async function getUserAssets(req: Request, res: Response): Promise<Response> {
-    const user = (req as Request & { user?: UserPayload }).user;
+    const user = (req as Request & { user?: UserData }).user;
 
     if (!user) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({

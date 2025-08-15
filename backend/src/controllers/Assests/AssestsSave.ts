@@ -2,24 +2,8 @@ import { Request, Response } from "express";
 import { ASSETS_ERROR_MESSAGES, STATUS_CODES } from "../../constants/errorMessages";
 import supabase from "../../config/client";
 import { uploadImageToBucket, validateImage } from "./SaveImageBucket";
+import { UserPayload,Assets } from "../../types/Assets";
 
-interface UserPayload {
-  id?: string;
-  name: string;
-  email?: string;
-  role?: string;
-}
-
-interface Assets {
-  title: string;
-  category_name: string;
-  description: string;
-  price: number;
-  followers: number;
-  engagement_rate: number;
-  monthly_view: number;
-  monthly_revenue: number;
-}
 
 export async function AssetsSave(req: Request<{}, {}, Assets>, res: Response): Promise<Response> {
   try {

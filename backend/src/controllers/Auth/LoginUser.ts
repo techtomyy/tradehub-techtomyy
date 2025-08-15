@@ -3,11 +3,8 @@ import { ERROR_MESSAGES,STATUS_CODES } from "../../constants/errorMessages";
 import supabase from "../../config/client";
 import bcrypt from "bcrypt";
 import { generateToken } from "../../utils/generateToken";
+import { LoginBody } from "../../types/Auth";
 
-interface LoginBody {
-  email: string;
-  password: string;
-}
 
 export async function LoginUser(
   req: Request<{}, {}, LoginBody>,
