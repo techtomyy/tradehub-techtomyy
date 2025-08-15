@@ -4,6 +4,7 @@ import { useCurrency } from "@/lib/context/CurrencyContext";
 import { useWalletStore } from "@/lib/store/walletStore";
 import { NavigationLeft } from "./navigation/NavigationLeft";
 import { NavigationRight } from "./navigation/NavigationRight";
+import { MobileNavigation } from "./navigation/MobileNavigation";
 import { User, Notification } from "@/types/navigation";
 
 // Static data
@@ -31,6 +32,15 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo and Main Navigation */}
           <NavigationLeft user={user} />
+          
+          {/* Mobile Navigation Button - Centered on small screens */}
+          <div className="flex lg:hidden">
+            <MobileNavigation 
+              user={user} 
+              selectedCurrency={selectedCurrency}
+              setCurrency={setCurrency}
+            />
+          </div>
           
           {/* Right Side */}
           <NavigationRight 
