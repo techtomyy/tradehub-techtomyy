@@ -27,6 +27,7 @@ interface WalletState {
   balance: number;
   selectedCurrency: Currency;
   conversionRate: number; // PKR to USD rate
+  escrowBalance: number; // Amount held in escrow
   
   // Transaction history
   transactions: Transaction[];
@@ -37,12 +38,15 @@ interface WalletState {
   setCurrency: (currency: Currency) => void;
   getBalanceInCurrency: (currency: Currency) => number;
   convertAmount: (amount: number, fromCurrency: Currency, toCurrency: Currency) => number;
+  getEscrowBalanceInCurrency: (currency: Currency) => number;
+  updateEscrowBalance: (amount: number) => void;
 }
 
 // Constants
 const DEFAULT_BALANCE = 2450; // Base balance in USD
 const DEFAULT_CURRENCY: Currency = 'USD';
 const DEFAULT_CONVERSION_RATE = 287; // 1 USD = 287 PKR (approximate)
+const DEFAULT_ESCROW_BALANCE = 0; // Base escrow balance in USD
 const DEPOSIT_FEE = 5;
 const WITHDRAWAL_FEE = 3;
 
@@ -79,6 +83,7 @@ export const useWalletStore = create<WalletState>((set, get) => ({
   balance: DEFAULT_BALANCE,
   selectedCurrency: DEFAULT_CURRENCY,
   conversionRate: DEFAULT_CONVERSION_RATE,
+  escrowBalance: DEFAULT_ESCROW_BALANCE,
   transactions: SAMPLE_TRANSACTIONS,
   
   /**
@@ -211,5 +216,44 @@ export const useWalletStore = create<WalletState>((set, get) => ({
     else {
       return amount / state.conversionRate;
     }
+  },
+
+  /**
+   * Get escrow balance in a specific currency
+   * 
+   * @param currency - The currency to get escrow balance in
+   * @returns {number} Escrow balance in the specified currency
+   */
+  getEscrowBalanceInCurrency: (currency) => {
+    const state = get();
+    
+    // Handle invalid escrow balance
+    if (typeof state.escrowBalance !== 'number' || isNaN(state.escrowBalance)) {
+      return 0;
+    }
+    
+    if (currency === 'USD') {
+      return state.escrowBalance;
+    } else {
+      return state.escrowBalance * state.conversionRate;
+    }
+  },
+
+  /**
+   * Update escrow balance
+   * 
+   * @param amount - Amount to add/subtract from escrow balance
+   */
+  updateEscrowBalance: (amount) => {
+    const state = get();
+    
+    // Handle invalid inputs
+    if (typeof amount !== 'number' || isNaN(amount)) {
+      return;
+    }
+    
+    set((state) => ({
+      escrowBalance: Math.max(0, state.escrowBalance + amount),
+    }));
   },
 }));

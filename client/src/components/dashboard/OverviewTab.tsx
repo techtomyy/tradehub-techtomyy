@@ -15,27 +15,21 @@ interface OverviewTabProps {
   onTabChange: (tab: string) => void;
 }
 
-/**
- * Overview Tab Component
- * 
- * Main overview tab that displays recent transactions and listings
- * in a two-column grid layout.
- */
-export function OverviewTab({ 
-  userTransactions, 
-  userListings, 
-  selectedCurrency, 
-  formatAmount, 
-  convertAmount, 
-  getTransactionStatusColor, 
-  getStatusColor, 
+export function OverviewTab({
+  userTransactions,
+  userListings,
+  selectedCurrency,
+  formatAmount,
+  convertAmount,
+  getTransactionStatusColor,
+  getStatusColor,
   getCategoryIcon,
   onTabChange
 }: OverviewTabProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Recent Transactions */}
-      <RecentTransactions 
+      <RecentTransactions
         transactions={userTransactions}
         selectedCurrency={selectedCurrency}
         formatAmount={formatAmount}
@@ -43,9 +37,9 @@ export function OverviewTab({
         getStatusColor={getTransactionStatusColor}
         onViewAll={() => onTabChange("transactions")}
       />
-      
+
       {/* Recent Listings */}
-      <RecentListings 
+      <RecentListings
         listings={userListings}
         getStatusColor={getStatusColor}
         getCategoryIcon={getCategoryIcon}

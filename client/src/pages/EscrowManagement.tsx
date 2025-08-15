@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Navigation from "@/components/Navigation";
 import { useToast } from "@/hooks/use-toast";
-import { 
+import {
   EscrowManagement as EscrowManagementComponent,
   DealStatusTimeline,
   InitiateNewEscrow,

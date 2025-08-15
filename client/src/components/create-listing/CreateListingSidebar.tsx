@@ -1,10 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { AlertCircle, CheckCircle, Clock, Shield, Wallet } from "lucide-react";
-import { useCurrency } from "@/lib/context/CurrencyContext";
-import { useWalletStore } from "@/lib/store/walletStore";
-import { Link } from "wouter";
+import { AlertCircle, CheckCircle, Clock, Shield } from "lucide-react";
 
 /**
  * Create Listing Sidebar Component
@@ -13,12 +8,6 @@ import { Link } from "wouter";
  * a listing in the right sidebar.
  */
 export function CreateListingSidebar() {
-  const { selectedCurrency, formatAmount } = useCurrency();
-  const { balance } = useWalletStore();
-  
-  // Placeholder escrow balance - can be updated when escrow functionality is added
-  const escrowBalance = 0;
-
   const guidelines = [
     {
       icon: CheckCircle,
@@ -47,37 +36,6 @@ export function CreateListingSidebar() {
 
   return (
     <div className="space-y-6">
-      {/* Wallet & Escrow Balance */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Wallet className="h-5 w-5 mr-2 text-green-600" />
-            Account Balance
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Wallet Balance</span>
-            <span className="text-sm font-medium text-green-600">
-              {formatAmount(balance, selectedCurrency)}
-            </span>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">In Escrow</span>
-            <span className="text-sm font-medium text-amber-600">
-              {formatAmount(escrowBalance, selectedCurrency)}
-            </span>
-          </div>
-          <Separator />
-          <Link href="/wallet">
-            <Button variant="outline" size="sm" className="w-full hover-golden">
-              Add Funds
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
-
       {/* Guidelines */}
       <Card>
         <CardHeader>
