@@ -17,7 +17,7 @@ export function GoogleSignupButton({ onClick, isLoading }: GoogleSignupButtonPro
     <Button
       type="button"
       variant="outline"
-      className="w-full"
+      className="w-full hover-golden"
       onClick={onClick}
       disabled={isLoading}
     >
