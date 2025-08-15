@@ -191,6 +191,7 @@ export default function Marketplace() {
                   variant={filters.category === category ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleFilterChange({ category })}
+                  className={filters.category === category ? "" : "hover-golden"}
                 >
                  {category === 'all' ? 'All Categories' : category}
                  
@@ -237,6 +238,7 @@ export default function Marketplace() {
                 <Button
                   variant="outline"
                   onClick={() => setCurrentPage(prev => prev + 1)}
+                  className="hover-golden"
                 >
                   Load More Assets
                 </Button>

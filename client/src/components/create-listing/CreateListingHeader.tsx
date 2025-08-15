@@ -12,7 +12,7 @@ export function CreateListingHeader() {
   return (
     <div className="mb-8">
       <Link href="/dashboard">
-        <Button variant="ghost" className="mb-4">
+        <Button variant="ghost" className="mb-4 hover-golden">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>

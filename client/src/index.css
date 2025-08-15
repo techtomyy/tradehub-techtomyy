@@ -21,6 +21,7 @@
   --secondary-foreground: 210 40% 98%;
   --accent: 51 100% 52%; /* #D4AF37 - Gold */
   --accent-foreground: 0 0% 20%;
+  --gold-accent: 51 100% 52%; /* #D4AF37 - Gold */
   --destructive: 0 84% 60%;
   --destructive-foreground: 210 40% 98%;
   --ring: 151 100% 8%;
@@ -49,6 +50,7 @@
   --secondary-foreground: 0 0% 98%;
   --accent: 51 100% 52%; /* #D4AF37 - Gold */
   --accent-foreground: 0 0% 20%;
+  --gold-accent: 51 100% 52%; /* #D4AF37 - Gold */
   --destructive: 0 63% 31%;
   --destructive-foreground: 210 40% 98%;
   --ring: 51 100% 52%;
@@ -107,11 +109,11 @@
   }
   
   .hover-gold {
-    @apply transition-all duration-300 hover:border-yellow-400 hover:shadow-lg hover:shadow-yellow-400/20;
+    @apply transition-all duration-300 hover:border-[hsl(var(--gold-accent))] hover:shadow-lg hover:shadow-[hsl(var(--gold-accent))]/20;
   }
   
   .btn-premium {
-    @apply bg-gradient-to-r from-yellow-400 to-yellow-500 text-emerald-900 font-semibold hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 shadow-lg;
+    @apply bg-gradient-to-r from-yellow-400 to-yellow-500 text-emerald-900 font-semibold hover-golden transition-all duration-300 shadow-lg;
   }
   
   .verified-seller {
@@ -144,6 +146,11 @@
   
   .emerald-gold-gradient {
     @apply bg-gradient-to-r from-emerald-800 via-emerald-700 to-yellow-500;
+  }
+  
+  /* Golden gradient hover effect */
+  .hover-golden {
+    @apply transition-all duration-300 hover:bg-gradient-to-r hover:from-[hsl(var(--gold-accent))] hover:to-[#f7d794] hover:text-white hover:shadow-lg;
   }
 }
 

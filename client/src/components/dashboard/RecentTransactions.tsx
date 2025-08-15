@@ -33,7 +33,7 @@ export function RecentTransactions({
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           Recent Transactions
-          <Button variant="ghost" size="sm" onClick={onViewAll}>
+          <Button variant="ghost" size="sm" onClick={onViewAll} className="hover-golden">
             View All <ArrowUpRight className="h-4 w-4 ml-1" />
           </Button>
         </CardTitle>

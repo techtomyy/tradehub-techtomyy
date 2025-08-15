@@ -35,7 +35,7 @@ export function NavigationLeft({ user }: NavigationLeftProps) {
       <div className="hidden md:flex space-x-6">
         {NAVIGATION_ITEMS.map((item) => (
           <Link key={item.href} href={item.href}>
-            <Button variant="ghost" className="text-gray-600 hover:text-gray-900">
+            <Button variant="ghost" className="text-gray-600 hover-golden">
               {item.label}
             </Button>
           </Link>

@@ -205,7 +205,7 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
 
             {transaction.status !== "completed" && (
               <Link href={`/message/${transaction.id}`}>
-                <Button variant="outline" className="flex-1">
+                <Button variant="outline" className="flex-1 hover-golden">
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Message To Buyer
                 </Button>
@@ -213,7 +213,7 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
             )}
 
             {/* Open Popup instead of just viewing */}
-            <Button variant="outline" onClick={() => setOpen(true)}>
+            <Button variant="outline" onClick={() => setOpen(true)} className="hover-golden">
               <Eye className="h-4 w-4 mr-2" />
               View Details
             </Button>
