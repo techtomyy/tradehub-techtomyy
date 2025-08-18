@@ -5,10 +5,16 @@ import dotenv from "dotenv";
 import authRoute from "./routes/auth";
 import {createAssestsTable} from "./models/ListingTable";
 import assestRoute from "./routes/assests";
+import {initSocket} from "./sockets/index";
+import http from "http";
 
 dotenv.config(); // Load environment variables
 
 const app = express();
+const server = http.createServer(app);
+
+// Init socket
+initSocket(server);
 
 // Middleware
 app.use(cors());
@@ -26,7 +32,7 @@ createAssestsTable()
 
 
 const PORT = Number(process.env.PORT) || 4000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`✅ Server is running on port ${PORT}`);
 });
  
