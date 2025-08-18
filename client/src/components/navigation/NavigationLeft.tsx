@@ -11,7 +11,8 @@ interface NavigationLeftProps {
  * Navigation Left Component
  * 
  * Displays the logo and main navigation links on the left side
- * of the navigation bar.
+ * of the navigation bar. Navigation items are hidden on small screens
+ * where the mobile navigation button is shown instead.
  */
 export function NavigationLeft({ user }: NavigationLeftProps) {
   const NAVIGATION_ITEMS = [
@@ -31,11 +32,11 @@ export function NavigationLeft({ user }: NavigationLeftProps) {
         </div>
       </Link>
 
-      {/* Main Navigation */}
-      <div className="hidden md:flex space-x-6">
+      {/* Main Navigation - Hidden on small screens */}
+      <div className="hidden lg:flex space-x-6">
         {NAVIGATION_ITEMS.map((item) => (
           <Link key={item.href} href={item.href}>
-            <Button variant="ghost" className="text-gray-600 hover:text-gray-900">
+            <Button variant="ghost" className="text-gray-600 hover-golden">
               {item.label}
             </Button>
           </Link>

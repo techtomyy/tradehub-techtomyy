@@ -200,7 +200,7 @@ export function InitiateNewEscrow({ onCreateEscrow, isLoading = false }: Initiat
               </Button>
               <Button 
                 onClick={handleConfirmParticipation}
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white"
+                className="w-full bg-yellow-500 hover-golden text-white"
               >
                 Confirm Your Participation
               </Button>
@@ -219,7 +219,7 @@ export function InitiateNewEscrow({ onCreateEscrow, isLoading = false }: Initiat
             <div className="space-y-2">
               <Button 
                 onClick={handleConfirmParticipation}
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white"
+                className="w-full bg-yellow-500 hover-golden text-white"
               >
                 Confirm Your Participation
               </Button>

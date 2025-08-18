@@ -28,7 +28,7 @@ export function CurrencySelector({ selectedCurrency, setCurrency }: CurrencySele
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+        <Button variant="ghost" size="sm" className="flex items-center space-x-2 hover-golden">
           <Globe className="h-4 w-4" />
           <span className="text-sm font-medium">{selectedCurrency}</span>
         </Button>
@@ -38,6 +38,7 @@ export function CurrencySelector({ selectedCurrency, setCurrency }: CurrencySele
           <DropdownMenuItem 
             key={option.value} 
             onClick={() => setCurrency(option.value)}
+            className="hover-golden"
           >
             {option.label}
           </DropdownMenuItem>

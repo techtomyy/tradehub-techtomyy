@@ -47,7 +47,7 @@ export function RecentTransactions({ userTransactions }: RecentTransactionsProps
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Your Recent Transactions</h2>
           <Link href="/dashboard">
-            <Button variant="outline">View All</Button>
+            <Button variant="outline" className="hover-golden">View All</Button>
           </Link>
         </div>
 

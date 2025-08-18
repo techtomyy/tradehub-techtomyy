@@ -147,7 +147,7 @@ export default function Message() {
               placeholder="Type your message..."
               className="flex-1 min-w-0 border rounded-lg px-4 py-2 focus:outline-none focus:ring focus:ring-blue-200"
             />
-            <button className="shrink-0 bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800">
+            <button className="shrink-0 bg-green-700 text-white px-4 py-2 rounded-lg hover-golden">
               Send
             </button>
           </div>

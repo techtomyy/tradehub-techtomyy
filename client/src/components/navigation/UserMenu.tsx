@@ -59,7 +59,7 @@ export function UserMenu({ user, logout }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full hover-golden">
           <Avatar className="h-10 w-10">
             <AvatarImage
               src={user.profileImageUrl}
@@ -80,7 +80,7 @@ export function UserMenu({ user, logout }: UserMenuProps) {
         
         {/* Menu Items */}
         {USER_MENU_ITEMS.map((item) => (
-          <DropdownMenuItem key={item.href} asChild>
+          <DropdownMenuItem key={item.href} asChild className="hover-golden">
             <Link href={item.href} className="w-full">
               <item.icon className="mr-2 h-4 w-4" />
               <span>{item.label}</span>
@@ -91,7 +91,7 @@ export function UserMenu({ user, logout }: UserMenuProps) {
         <DropdownMenuSeparator />
         
         {/* Logout */}
-        <DropdownMenuItem onClick={logout}>
+        <DropdownMenuItem onClick={logout} className="hover-golden">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>

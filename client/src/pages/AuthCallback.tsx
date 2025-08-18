@@ -17,25 +17,29 @@ export default function AuthCallback() {
       if (data?.session) {
         console.log("User session:", data.session);
 
+        const access_token = data.session.access_token; // 👈 token le liya
+
         // Send token to backend for verification
         try {
           await fetch("https://tradehub-techtomyy-production.up.railway.app/auth/api", {
             method: "POST",
+            credentials: "include",
             headers: {
               "Content-Type": "application/json",
+              "Authorization": `Bearer ${access_token}`, // 👈 yahan bhejna hoga
             },
           });
         } catch (error) {
           console.error("Backend verification failed:", error);
         }
-        
+
         // Show success toast for Google sign-in
         toast({
           title: "✅ Google Sign-in Successful!",
           description: "Welcome back! Redirecting to home page...",
           className: "bg-green-50 border-green-200 text-green-800",
         });
-        
+
         // Navigate to Home after successful authentication
         setTimeout(() => {
           setLocation("/home");

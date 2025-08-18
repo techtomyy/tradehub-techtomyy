@@ -154,7 +154,7 @@ export default function SearchFilters({ filters, onFilterChange, selectedCurrenc
           </div>
           <Separator />
           <Link href="/wallet">
-            <Button variant="outline" size="sm" className="w-full">
+            <Button variant="outline" size="sm" className="w-full hover-golden">
               Add Funds
             </Button>
           </Link>

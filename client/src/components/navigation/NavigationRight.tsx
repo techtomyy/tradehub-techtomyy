@@ -20,7 +20,8 @@ interface NavigationRightProps {
  * Navigation Right Component
  * 
  * Displays the right side of the navigation bar including currency selector,
- * wallet balance, notifications, and user menu.
+ * wallet balance, notifications, and user menu. Some elements are hidden
+ * on small screens to accommodate the mobile navigation button.
  */
 export function NavigationRight({ 
   user, 
@@ -34,19 +35,23 @@ export function NavigationRight({
 }: NavigationRightProps) {
   return (
     <div className="flex items-center space-x-4">
-      {/* Currency Selector */}
-      <CurrencySelector 
-        selectedCurrency={selectedCurrency}
-        setCurrency={setCurrency}
-      />
+      {/* Currency Selector - Hidden on small screens */}
+      <div className="hidden sm:block">
+        <CurrencySelector 
+          selectedCurrency={selectedCurrency}
+          setCurrency={setCurrency}
+        />
+      </div>
 
-      {/* Wallet Balance */}
-      <WalletBalance 
-        walletBalance={walletBalance}
-        selectedCurrency={selectedCurrency}
-        formatAmount={formatAmount}
-        convertAmount={convertAmount}
-      />
+      {/* Wallet Balance - Hidden on small screens */}
+      <div className="hidden sm:block">
+        <WalletBalance 
+          walletBalance={walletBalance}
+          selectedCurrency={selectedCurrency}
+          formatAmount={formatAmount}
+          convertAmount={convertAmount}
+        />
+      </div>
 
       {/* Notifications */}
       <NotificationsDropdown notifications={notifications} />
