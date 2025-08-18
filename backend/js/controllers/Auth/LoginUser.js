@@ -74,8 +74,8 @@ function LoginUser(req, res) {
             res.cookie("token", token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
-                maxAge: 24 * 60 * 60 * 1000, // 24 hours
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                maxAge: 24 * 60 * 60 * 1000,
             });
             // 7. Return success
             return res.status(errorMessages_1.STATUS_CODES.SUCCESS).json({ message: "✅ Login successful!" });

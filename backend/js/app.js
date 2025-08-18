@@ -18,7 +18,10 @@ const server = http_1.default.createServer(app);
 // Init socket
 (0, index_1.initSocket)(server);
 // Middleware
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: true,
+    credentials: true,
+}));
 app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));

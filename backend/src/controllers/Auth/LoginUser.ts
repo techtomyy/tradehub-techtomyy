@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ERROR_MESSAGES,STATUS_CODES } from "../../constants/errorMessages";
+import { ERROR_MESSAGES, STATUS_CODES } from "../../constants/errorMessages";
 import supabase from "../../config/client";
 import bcrypt from "bcrypt";
 import { generateToken } from "../../utils/generateToken";
@@ -75,9 +75,10 @@ export async function LoginUser(
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000,
     });
+
 
     // 7. Return success
     return res.status(STATUS_CODES.SUCCESS).json({ message: "✅ Login successful!" });
