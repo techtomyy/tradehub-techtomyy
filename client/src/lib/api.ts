@@ -80,6 +80,7 @@ export const authApi = {
   async login(credentials: LoginBody): Promise<ApiResponse> {
     return makeRequest<ApiResponse>('/auth/user/login', {
       method: 'POST',
+        credentials: "include",
       body: JSON.stringify(credentials),
     });
   },
@@ -87,6 +88,7 @@ export const authApi = {
   async signup(userData: SignupBody): Promise<ApiResponse> {
     return makeRequest<ApiResponse>('/auth/register/signup', {
       method: 'POST',
+        credentials: "include",
       body: JSON.stringify(userData),
     });
   },
