@@ -21,10 +21,11 @@ function LoginWithGoogle(req, res) {
         var _a;
         try {
             const tokenHeader = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.replace("Bearer ", "");
+            console.log(tokenHeader);
             if (!tokenHeader) {
                 return res.status(errorMessages_1.STATUS_CODES.UNAUTHORIZED).json({ error: errorMessages_1.ERROR_MESSAGES.GOOGLE.TOKEN_MISSING });
             }
-            // 1. Get user from Supabase
+            // 1. Get user from Supabasen
             const { data, error } = yield client_1.default.auth.getUser(tokenHeader);
             if (error || !(data === null || data === void 0 ? void 0 : data.user)) {
                 return res.status(errorMessages_1.STATUS_CODES.UNAUTHORIZED).json({ error: errorMessages_1.ERROR_MESSAGES.GOOGLE.INVALID_TOKEN });
