@@ -8,7 +8,6 @@ const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const auth_1 = __importDefault(require("./routes/auth"));
-const ListingTable_1 = require("./models/ListingTable");
 const assests_1 = __importDefault(require("./routes/assests"));
 const index_1 = require("./sockets/index");
 const http_1 = __importDefault(require("http"));
@@ -30,7 +29,6 @@ app.use("/assests", assests_1.default);
 app.get("/", (req, res) => {
     res.send("Server is live 🚀");
 });
-(0, ListingTable_1.createAssestsTable)();
 const PORT = Number(process.env.PORT) || 4000;
 server.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`);

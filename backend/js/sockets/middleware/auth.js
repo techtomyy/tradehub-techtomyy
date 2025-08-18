@@ -8,6 +8,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const cookie_1 = __importDefault(require("cookie"));
 const socketAuth = (socket, next) => {
     const cookies = socket.handshake.headers.cookie;
+    console.log(cookies);
     if (!cookies)
         return next(new Error("❌ No cookies found"));
     const parsedCookies = cookie_1.default.parse(cookies);

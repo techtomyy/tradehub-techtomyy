@@ -1,5 +1,5 @@
 import supabase from "../../config/client.js";
-import { MessagePayload } from "../../types/Message.js";
+import { MessagePayload } from "../../types/Sockets";
 export const saveMessageDB = async (message:MessagePayload) => {
   try {
     // Supabase insert

@@ -5,6 +5,7 @@ exports.getIO = getIO;
 const socket_io_1 = require("socket.io");
 const auth_1 = require("./middleware/auth");
 const user_1 = require("./user");
+const chat_socket_1 = require("./chat.socket");
 let io = null;
 function initSocket(server) {
     io = new socket_io_1.Server(server, {
@@ -17,10 +18,23 @@ function initSocket(server) {
     io.use(auth_1.socketAuth);
     io.on("connection", (socket) => {
         const user = socket.user;
-        console.log("🟢 Socket connected:", socket.id, user);
-        if (user === null || user === void 0 ? void 0 : user.id) {
+        if (!(user === null || user === void 0 ? void 0 : user.id)) {
+            console.log("User not authenticated, skipping...");
+            return;
+        }
+        try {
             (0, user_1.addUserConnection)(user.id, socket);
         }
+        catch (err) {
+            console.error("User connection error:", err);
+        }
+        const message = {
+            chat_id: 123,
+            sender_id: user.id,
+            receiver_id: 234,
+            message_text: "Hello client"
+        };
+        (0, chat_socket_1.sendMessageToUser)(user.id, message);
         socket.on("disconnect", () => {
             console.log("🔴 Socket disconnected:", socket.id);
             if (user === null || user === void 0 ? void 0 : user.id) {
