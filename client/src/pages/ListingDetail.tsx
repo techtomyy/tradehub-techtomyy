@@ -28,7 +28,7 @@ const CATEGORY_ICONS = {
   website: '🌐',
 } as const;
 
-// Static data
+// Static data - All prices are in USD
 const STATIC_USER: User = { 
   id: "1", 
   name: "Demo User" 
@@ -38,7 +38,7 @@ const STATIC_LISTINGS: Listing[] = [
   {
     id: "1",
     title: "Demo Asset 1",
-    price: 100,
+    price: 100, // Price in USD
     description: "A great digital asset.",
     category: "instagram",
     media: [],
@@ -63,7 +63,7 @@ const STATIC_LISTINGS: Listing[] = [
   {
     id: "2",
     title: "Demo Asset 2",
-    price: 200,
+    price: 200, // Price in USD
     description: "Another awesome asset.",
     category: "youtube",
     media: [],

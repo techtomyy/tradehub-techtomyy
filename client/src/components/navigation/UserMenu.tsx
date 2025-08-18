@@ -24,6 +24,12 @@ interface UserMenuProps {
  * navigation links, and logout functionality.
  */
 export function UserMenu({ user, logout }: UserMenuProps) {
+  // Debug logging
+  console.log('UserMenu - Received user data:', user);
+  console.log('UserMenu - First name:', user.firstName);
+  console.log('UserMenu - Last name:', user.lastName);
+  console.log('UserMenu - Email:', user.email);
+
   const USER_MENU_ITEMS = [
     { href: "/dashboard", icon: User, label: "Dashboard" },
     { href: "/wallet", icon: Wallet, label: "Wallet" },

@@ -41,7 +41,7 @@ export function MobileNavigation({ user, selectedCurrency, setCurrency }: Mobile
   const userInitial = userName.charAt(0).toUpperCase();
 
   return (
-    <div className="md:hidden">
+    <div>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <Button variant="ghost" size="sm" className="p-2">

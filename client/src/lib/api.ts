@@ -13,6 +13,23 @@ export interface SignupBody {
   conditionagree: boolean;
 }
 
+// Add user profile interface
+export interface UserProfile {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  profileImageUrl?: string;
+  kycVerified?: boolean;
+  username?: string;
+  bio?: string;
+  rating?: number;
+  totalSales?: number;
+  walletBalance?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Updated interface to match actual API response
 export interface ApiResponse<T = any> {
   success?: boolean;
@@ -89,5 +106,42 @@ export const authApi = {
       method: 'POST',
       body: JSON.stringify(userData),
     });
+  },
+
+  // Add new method to fetch user profile
+  async getUserProfile(): Promise<ApiResponse<UserProfile>> {
+    try {
+      console.log('API - Attempting to fetch user profile...');
+      const response = await makeRequest<ApiResponse<UserProfile>>('/auth/user/profile', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
+        },
+      });
+      console.log('API - User profile response:', response);
+      return response;
+    } catch (error) {
+      // If profile endpoint doesn't exist, return null
+      console.warn('User profile endpoint not available:', error);
+      return { success: false, message: 'Profile endpoint not available' };
+    }
+  },
+
+  // Fallback method to get user data from login response
+  async getCurrentUser(): Promise<ApiResponse<UserProfile>> {
+    try {
+      console.log('API - Attempting to fetch current user...');
+      const response = await makeRequest<ApiResponse<UserProfile>>('/auth/user/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
+        },
+      });
+      console.log('API - Current user response:', response);
+      return response;
+    } catch (error) {
+      console.warn('Current user endpoint not available:', error);
+      return { success: false, message: 'Current user endpoint not available' };
+    }
   },
 };

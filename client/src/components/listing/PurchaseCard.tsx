@@ -37,11 +37,16 @@ export function PurchaseCard({
     <Card className="sticky top-8">
       <CardHeader>
         <CardTitle className="text-2xl">
-          {formatAmount(
-            parseFloat(listing.price.toString()), 
-            selectedCurrency
-          )}
+          {fees && fees.assetPriceInSelectedCurrency 
+            ? formatAmount(fees.assetPriceInSelectedCurrency, selectedCurrency)
+            : formatAmount(listing.price, selectedCurrency)
+          }
         </CardTitle>
+        {fees && (
+          <p className="text-sm text-gray-500 mt-1">
+            + {formatAmount(fees.buyerFeeInSelectedCurrency, selectedCurrency)} fees
+          </p>
+        )}
       </CardHeader>
       
       <CardContent className="space-y-4">

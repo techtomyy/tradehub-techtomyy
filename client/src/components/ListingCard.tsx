@@ -110,29 +110,29 @@ export default function ListingCard({ listing }: ListingCardProps) {
         </p>
         
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-4 text-sm text-gray-500">
+          <div className="grid grid-cols-2 gap-2 w-full">
             {listing.followers && (
-              <span className="flex items-center">
-                <Users className="h-4 w-4 mr-1" />
-                {listing.followers.toLocaleString()}
+              <span className="flex items-center flex-shrink-0 max-w-full">
+                <Users className="h-4 w-4 mr-1 flex-shrink-0" />
+                <span className="truncate text-sm text-gray-500">{listing.followers.toLocaleString()}</span>
               </span>
             )}
             {listing.engagement && (
-              <span className="flex items-center">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                {listing.engagement}%
+              <span className="flex items-center flex-shrink-0 max-w-full">
+                <TrendingUp className="h-4 w-4 mr-1 flex-shrink-0" />
+                <span className="truncate text-sm text-gray-500">{listing.engagement}%</span>
               </span>
             )}
             {listing.monthlyViews && (
-              <span className="flex items-center">
-                <Eye className="h-4 w-4 mr-1" />
-                {listing.monthlyViews.toLocaleString()}
+              <span className="flex items-center flex-shrink-0 max-w-full">
+                <Eye className="h-4 w-4 mr-1 flex-shrink-0" />
+                <span className="truncate text-sm text-gray-500">{listing.monthlyViews.toLocaleString()}</span>
               </span>
             )}
             {listing.monthlyRevenue && (
-              <span className="flex items-center">
-                <DollarSign className="h-4 w-4 mr-1" />
-                {formatAmount(typeof listing.monthlyRevenue === 'number' ? listing.monthlyRevenue : 0, selectedCurrency)}
+              <span className="flex items-center flex-shrink-0 max-w-full">
+                <DollarSign className="h-4 w-4 mr-1 flex-shrink-0" />
+                <span className="truncate text-sm text-gray-500">{formatAmount(typeof listing.monthlyRevenue === 'number' ? listing.monthlyRevenue : 0, selectedCurrency)}</span>
               </span>
             )}
           </div>

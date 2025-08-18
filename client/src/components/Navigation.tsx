@@ -26,25 +26,48 @@ export default function Navigation() {
     return null;
   }
 
+  // Map user data from useAuth to User interface expected by navigation components
+  const mapUserToNavigationUser = (authUser: any): User => {
+    // Extract first and last names from various possible sources
+    let firstName = authUser.firstName || 
+                   authUser.user_metadata?.firstName || 
+                   authUser.user_metadata?.full_name?.split(' ')[0] ||
+                   authUser.email?.split('@')[0];
+    
+    let lastName = authUser.lastName || 
+                  authUser.user_metadata?.lastName || 
+                  authUser.user_metadata?.full_name?.split(' ')[1] ||
+                  '';
+    
+    // Clean up the names (remove undefined/null values)
+    firstName = firstName || '';
+    lastName = lastName || '';
+    
+    return {
+      firstName: firstName,
+      lastName: lastName,
+      email: authUser.email,
+      profileImageUrl: authUser.profileImageUrl,
+      kycVerified: authUser.kycVerified,
+    };
+  };
+
+  const navigationUser = mapUserToNavigationUser(user);
+
+  // Debug logging
+  console.log('Navigation - Original user from useAuth:', user);
+  console.log('Navigation - Mapped navigation user:', navigationUser);
+
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Main Navigation */}
-          <NavigationLeft user={user} />
-          
-          {/* Mobile Navigation Button - Centered on small screens */}
-          <div className="flex lg:hidden">
-            <MobileNavigation 
-              user={user} 
-              selectedCurrency={selectedCurrency}
-              setCurrency={setCurrency}
-            />
-          </div>
+          <NavigationLeft user={navigationUser} />
           
           {/* Right Side */}
           <NavigationRight 
-            user={user}
+            user={navigationUser}
             walletBalance={walletBalance}
             selectedCurrency={selectedCurrency}
             formatAmount={formatAmount}
@@ -52,6 +75,7 @@ export default function Navigation() {
             setCurrency={setCurrency}
             notifications={notifications}
             logout={logout}
+            showMobileMenu={true}
           />
         </div>
       </div>
