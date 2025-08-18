@@ -25,5 +25,5 @@ export const generateToken = (userData: UserData): string => {
         return ERROR_MESSAGES.JWT.SECRET_KEY_NOT_DEFINE;
     }
 
-    return sign(userData, secretKey, { expiresIn: "6h" });
+    return sign(userData, secretKey, { expiresIn: "1d" });
 };
