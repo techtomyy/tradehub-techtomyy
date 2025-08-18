@@ -6,12 +6,12 @@ import { generateToken } from "../../utils/generateToken";
 export async function LoginWithGoogle(req: Request, res: Response): Promise<Response> {
   try {
     const tokenHeader = req.headers.authorization?.replace("Bearer ", "");
-
+    console.log(tokenHeader)
     if (!tokenHeader) {
       return res.status(STATUS_CODES.UNAUTHORIZED).json({ error: ERROR_MESSAGES.GOOGLE.TOKEN_MISSING });
     }
 
-    // 1. Get user from Supabase
+    // 1. Get user from Supabasen
     const { data, error } = await supabase.auth.getUser(tokenHeader);
     if (error || !data?.user) {
       return res.status(STATUS_CODES.UNAUTHORIZED).json({ error: ERROR_MESSAGES.GOOGLE.INVALID_TOKEN });
