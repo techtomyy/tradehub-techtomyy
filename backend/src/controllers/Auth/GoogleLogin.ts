@@ -97,8 +97,8 @@ export async function LoginWithGoogle(req: Request, res: Response): Promise<Resp
     res.cookie("token", jwtToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict", maxAge: 24 * 60 * 60 * 1000, // 24 hours
-
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     return res.json({
