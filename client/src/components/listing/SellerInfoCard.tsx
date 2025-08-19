@@ -25,7 +25,7 @@ export function SellerInfoCard({ listing }: SellerInfoCardProps) {
           <Avatar>
             <AvatarImage src={listing.seller.profileImageUrl} />
             <AvatarFallback>
-              {listing.seller.firstName?.[0]}{listing.seller.lastName?.[0]}
+                              {listing.seller.firstName?.[0] || ''}{listing.seller.lastName?.[0] || ''}
             </AvatarFallback>
           </Avatar>
           

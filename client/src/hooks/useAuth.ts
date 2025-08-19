@@ -1,35 +1,25 @@
 import { useState, useEffect } from "react";
 import supabase from "@/config/client";
-import { User } from "@supabase/supabase-js";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 import { PROTECTED_ROUTES } from "@/routes/constants";
-import { authApi, UserProfile } from "@/lib/api";
+import { authApi } from "@/lib/api";
+import { User } from "@/types/navigation";
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Function to fetch user profile from API
-  const fetchUserProfile = async (email: string): Promise<UserProfile | null> => {
-    try {
-      // Try to get user profile first
-      const profileResponse = await authApi.getUserProfile();
-      if (profileResponse.success && profileResponse.data) {
-        return profileResponse.data;
-      }
-      
-      // Fallback to current user endpoint
-      const currentUserResponse = await authApi.getCurrentUser();
-      if (currentUserResponse.success && currentUserResponse.data) {
-        return currentUserResponse.data;
-      }
-      
-      // If both endpoints fail, return null
-      return null;
-    } catch (error) {
-      console.error('Failed to fetch user profile:', error);
-      return null;
-    }
+  // Function to create a basic user object from email
+  const createBasicUser = (email: string): User => {
+    return {
+      id: 'api-user',
+      firstName: email.split('@')[0],
+      lastName: '',
+      email: email,
+      profileImageUrl: undefined,
+      kycVerified: false,
+    };
   };
 
   // Check for existing session on mount
@@ -38,60 +28,11 @@ export function useAuth() {
       // Check for API authentication first
       const isApiAuthenticated = localStorage.getItem('isAuthenticated');
       const userEmail = localStorage.getItem('userEmail');
-      const authToken = localStorage.getItem('authToken');
-      
-      if (isApiAuthenticated === 'true' && userEmail && authToken) {
-        console.log("API authentication found, restoring session");
+      if (isApiAuthenticated === 'true' && userEmail) {
         setIsAuthenticated(true);
-        
-        // Check if we have stored user data
-        const storedUserData = localStorage.getItem('userData');
-        let userProfile: UserProfile | null = null;
-        
-        if (storedUserData) {
-          try {
-            userProfile = JSON.parse(storedUserData);
-          } catch (error) {
-            console.warn('Failed to parse stored user data:', error);
-          }
-        }
-        
-        // If no stored data, try to fetch from API
-        if (!userProfile) {
-          userProfile = await fetchUserProfile(userEmail);
-        }
-        
-        if (userProfile) {
-          // Create a user object with profile data
-          const apiUser = {
-            id: userProfile.id,
-            email: userProfile.email,
-            firstName: userProfile.firstName,
-            lastName: userProfile.lastName,
-            profileImageUrl: userProfile.profileImageUrl,
-            kycVerified: userProfile.kycVerified,
-            user_metadata: {
-              full_name: `${userProfile.firstName} ${userProfile.lastName}`,
-            },
-          };
-          setUser(apiUser as any);
-          
-          // Store user data in localStorage for future use
-          localStorage.setItem('userData', JSON.stringify(userProfile));
-        } else {
-          // Fallback to basic user object if profile fetch fails
-          const apiUser = {
-            id: 'api-user',
-            email: userEmail,
-            firstName: userEmail.split('@')[0], // Use email prefix as first name
-            lastName: '', // Empty last name
-            user_metadata: {
-              full_name: userEmail.split('@')[0],
-            },
-          };
-          setUser(apiUser as any);
-        }
-        
+        // Create basic user object from email
+        const userData = createBasicUser(userEmail);
+        setUser(userData);
         setIsLoading(false);
         return;
       }
@@ -102,7 +43,16 @@ export function useAuth() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setIsAuthenticated(true);
-        setUser(session.user);
+        // For Supabase users, create a compatible user object
+        const supabaseUser: User = {
+          id: session.user.id,
+          firstName: session.user.user_metadata?.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || 'User',
+          lastName: session.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+          email: session.user.email || '',
+          profileImageUrl: session.user.user_metadata?.avatar_url,
+          kycVerified: false,
+        };
+        setUser(supabaseUser);
       }
       setIsLoading(false);
     };
@@ -114,7 +64,16 @@ export function useAuth() {
       async (event, session) => {
         if (event === 'SIGNED_IN' && session) {
           setIsAuthenticated(true);
-          setUser(session.user);
+          // Create compatible user object for Supabase
+          const supabaseUser: User = {
+            id: session.user.id,
+            firstName: session.user.user_metadata?.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || 'User',
+            lastName: session.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+            email: session.user.email || '',
+            profileImageUrl: session.user.user_metadata?.avatar_url,
+            kycVerified: false,
+          };
+          setUser(supabaseUser);
         } else if (event === 'SIGNED_OUT') {
           setIsAuthenticated(false);
           setUser(null);
@@ -125,17 +84,7 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Debug authentication state changes
-  useEffect(() => {
-    console.log("Authentication state changed:", { 
-      isAuthenticated, 
-      user: user?.email,
-      userFirstName: (user as any)?.firstName,
-      userLastName: (user as any)?.lastName,
-      isLoading,
-      currentPath: window.location.pathname
-    });
-  }, [isAuthenticated, user, isLoading]);
+
 
   // User data from Supabase or API
   const userData = user || null;
@@ -145,8 +94,6 @@ export function useAuth() {
       // Clear API authentication
       localStorage.removeItem('isAuthenticated');
       localStorage.removeItem('userEmail');
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('userData');
       
 
       
@@ -168,60 +115,10 @@ export function useAuth() {
     try {
       const response = await authApi.login({ email, password });
       if (response.success) {
-        // Store authentication state
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userEmail', email);
-        
-        // Store auth token if provided in response
-        if (response.data?.token) {
-          localStorage.setItem('authToken', response.data.token);
-        }
-        
-        // Check if user data is included in login response
-        let userProfile: UserProfile | null = null;
-        if (response.data?.user) {
-          console.log('Login - User data found in response:', response.data.user);
-          userProfile = response.data.user;
-        } else {
-          console.log('Login - No user data in response, fetching profile...');
-          // Try to fetch user profile from API
-          userProfile = await fetchUserProfile(email);
-        }
-        
-        console.log('Login - Final user profile:', userProfile);
-        
-        if (userProfile) {
-          // Create a user object with profile data
-          const apiUser = {
-            id: userProfile.id,
-            email: userProfile.email,
-            firstName: userProfile.firstName,
-            lastName: userProfile.lastName,
-            profileImageUrl: userProfile.profileImageUrl,
-            kycVerified: userProfile.kycVerified,
-            user_metadata: {
-              full_name: `${userProfile.firstName} ${userProfile.lastName}`,
-            },
-          };
-          setUser(apiUser as any);
-          
-          // Store user data in localStorage for future use
-          localStorage.setItem('userData', JSON.stringify(userProfile));
-        } else {
-          // Fallback to basic user object if profile fetch fails
-          const apiUser = {
-            id: 'api-user',
-            email: email,
-            firstName: email.split('@')[0], // Use email prefix as first name
-            lastName: '', // Empty last name
-            user_metadata: {
-              full_name: email.split('@')[0],
-            },
-          };
-          setUser(apiUser as any);
-        }
-        
         setIsAuthenticated(true);
+        // Create basic user object from email after successful login
+        const userData = createBasicUser(email);
+        setUser(userData);
         return { success: true };
       } else {
         return { success: false, message: response.message };

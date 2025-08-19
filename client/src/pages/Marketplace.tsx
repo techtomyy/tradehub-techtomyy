@@ -1,12 +1,23 @@
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 import Navigation from "@/components/Navigation";
-import ListingCard from "@/components/ListingCard";
-import SearchFilters from "@/components/SearchFilters";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { useCurrency } from "@/lib/context/CurrencyContext";
+import { ListingCardLoader } from "@/components/ui/loading";
+
+// Lazy load components
+const ListingCard = lazy(() => 
+  import("@/components/ListingCard").then(module => ({ 
+    default: module.default 
+  }))
+);
+const SearchFilters = lazy(() => 
+  import("@/components/SearchFilters").then(module => ({ 
+    default: module.default 
+  }))
+);
 
 export default function Marketplace() {
   const { selectedCurrency, convertAmount, formatAmount } = useCurrency();
@@ -146,11 +157,20 @@ export default function Marketplace() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Filters */}
           <div className="lg:col-span-1">
-            <SearchFilters 
-              filters={filters} 
-              onFilterChange={handleFilterChange}
-              selectedCurrency={selectedCurrency}
-            />
+            <Suspense fallback={<div className="animate-pulse space-y-4">
+              <div className="h-6 w-24 bg-gray-200 rounded"></div>
+              <div className="space-y-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-4 w-32 bg-gray-200 rounded"></div>
+                ))}
+              </div>
+            </div>}>
+              <SearchFilters 
+                filters={filters} 
+                onFilterChange={handleFilterChange}
+                selectedCurrency={selectedCurrency}
+              />
+            </Suspense>
           </div>
           {/* Main Content */}
           <div className="lg:col-span-3">
@@ -215,14 +235,15 @@ export default function Marketplace() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {paginatedListings?.map((listing: any) => (
-                  <ListingCard 
-                    key={listing.id} 
-                    listing={{
-                      ...listing,
-                      // Convert price to selected currency for display
-                      price: getListingPriceInCurrency(listing.price)
-                    }} 
-                  />
+                  <Suspense key={listing.id} fallback={<ListingCardLoader />}>
+                    <ListingCard 
+                      listing={{
+                        ...listing,
+                        // Convert price to selected currency for display
+                        price: getListingPriceInCurrency(listing.price)
+                      }} 
+                    />
+                  </Suspense>
                 ))}
                 {(!paginatedListings || paginatedListings.length === 0) && (
                   <div className="col-span-full text-center py-12">

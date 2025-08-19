@@ -194,43 +194,87 @@ export default function TransactionCard({ transaction }: TransactionCardProps) {
           {/* Transaction Steps */}
           {/* ... keep your original steps code here unchanged ... */}
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            {transaction.status === "credentials_sent" && (
-              <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Verify & Complete
+          {/* Action Buttons - Mobile: Equal width, Desktop: Grid layout */}
+          <div className="grid gap-3">
+            {/* Mobile: Equal width buttons in single column */}
+            <div className="grid grid-cols-1 sm:hidden gap-3">
+              {transaction.status === "credentials_sent" && (
+                <Button className="bg-emerald-500 hover:bg-emerald-600 text-white w-full">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Verify & Complete
+                </Button>
+              )}
+
+              {transaction.status !== "completed" && (
+                <Link href={`/message/${transaction.id}`} className="w-full">
+                  <Button variant="outline" className="hover-golden w-full">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Message To Buyer
+                  </Button>
+                </Link>
+              )}
+
+              <Button variant="outline" onClick={() => setOpen(true)} className="hover-golden w-full">
+                <Eye className="h-4 w-4 mr-2" />
+                View Details
               </Button>
-            )}
 
-            {transaction.status !== "completed" && (
-              <Link href={`/message/${transaction.id}`}>
-                <Button variant="outline" className="flex-1 hover-golden">
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Message To Buyer
+              {["payment_received", "credentials_sent", "verified"].includes(
+                transaction.status
+              ) && (
+                <Link href={`/dispute/${transaction.id}`} className="w-full">
+                  <Button
+                    variant="outline"
+                    className="text-red-600 border-red-200 hover:bg-red-50 w-full"
+                  >
+                    <Flag className="h-4 w-4 mr-2" />
+                    Dispute
+                  </Button>
+                </Link>
+              )}
+            </div>
+
+            {/* Desktop: Grid layout - 2x2 for 4 buttons, single row for 3 or fewer */}
+            <div className={`hidden sm:grid gap-3 ${
+              transaction.status === "credentials_sent" 
+                ? "sm:grid-cols-2 sm:grid-rows-2 lg:grid-cols-4 lg:grid-rows-1" 
+                : "sm:grid-cols-3 lg:grid-cols-4"
+            }`}>
+              {transaction.status === "credentials_sent" && (
+                <Button className="bg-emerald-500 hover:bg-emerald-600 text-white w-full">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Verify & Complete
                 </Button>
-              </Link>
-            )}
+              )}
 
-            {/* Open Popup instead of just viewing */}
-            <Button variant="outline" onClick={() => setOpen(true)} className="hover-golden">
-              <Eye className="h-4 w-4 mr-2" />
-              View Details
-            </Button>
+              {transaction.status !== "completed" && (
+                <Link href={`/message/${transaction.id}`} className="w-full">
+                  <Button variant="outline" className="hover-golden w-full">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Message To Buyer
+                  </Button>
+                </Link>
+              )}
 
-            {["payment_received", "credentials_sent", "verified"].includes(
-              transaction.status
-            ) && (
-              <Link href={`/dispute/${transaction.id}`}>
-                <Button
-                  variant="outline"
-                  className="text-red-600 border-red-200 hover:bg-red-50"
-                >
-                  <Flag className="h-4 w-4 mr-2" />
-                  Dispute
-                </Button>
-              </Link>
-            )}
+              <Button variant="outline" onClick={() => setOpen(true)} className="hover-golden w-full">
+                <Eye className="h-4 w-4 mr-2" />
+                View Details
+              </Button>
+
+              {["payment_received", "credentials_sent", "verified"].includes(
+                transaction.status
+              ) && (
+                <Link href={`/dispute/${transaction.id}`} className="w-full">
+                  <Button
+                    variant="outline"
+                    className="text-red-600 border-red-200 hover:bg-red-50 w-full"
+                  >
+                    <Flag className="h-4 w-4 mr-2" />
+                    Dispute
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* Keep Dispute Info */}

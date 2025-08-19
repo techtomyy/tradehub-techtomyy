@@ -37,14 +37,11 @@ export function PurchaseCard({
     <Card className="sticky top-8">
       <CardHeader>
         <CardTitle className="text-2xl">
-          {fees && fees.assetPriceInSelectedCurrency 
-            ? formatAmount(fees.assetPriceInSelectedCurrency, selectedCurrency)
-            : formatAmount(listing.price, selectedCurrency)
-          }
+          {fees ? formatAmount(fees.assetPriceInSelectedCurrency, selectedCurrency) : formatAmount(listing.price, selectedCurrency)}
         </CardTitle>
-        {fees && (
+        {fees && selectedCurrency !== 'USD' && (
           <p className="text-sm text-gray-500 mt-1">
-            + {formatAmount(fees.buyerFeeInSelectedCurrency, selectedCurrency)} fees
+            {formatAmount(listing.price, 'USD')} USD
           </p>
         )}
       </CardHeader>

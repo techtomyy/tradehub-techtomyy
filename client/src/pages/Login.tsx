@@ -103,11 +103,6 @@ export default function Login() {
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('userEmail', data.email);
         
-        // Store auth token if provided in response
-        if (response.data?.token) {
-          localStorage.setItem('authToken', response.data.token);
-        }
-        
         // Show success message
         toast({
           title: "🎉 Login Successful!",
@@ -115,12 +110,8 @@ export default function Login() {
           className: "bg-green-50 border-green-200 text-green-800",
         });
         
-        // Redirect to home page and reload to trigger useAuth hook
+        // Redirect to home page
         setLocation("/home");
-        // Small delay to ensure the toast is shown before redirect
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
         
       } else {
         // Login failed

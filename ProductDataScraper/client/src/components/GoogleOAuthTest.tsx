@@ -19,7 +19,6 @@ export function GoogleOAuthTest() {
       VITE_SUPABASE_KEY: import.meta.env.VITE_SUPABASE_KEY ? "present" : "missing"
     };
     
-    console.log("🔍 Environment Variables:", envVars);
     setTestResults({ type: "environment", data: envVars });
     
     if (!envVars.VITE_SUPABASE_URL || !envVars.VITE_SUPABASE_KEY) {
@@ -55,7 +54,6 @@ export function GoogleOAuthTest() {
       };
       
       setTestResults(result);
-      console.log("🔍 Supabase Connection Test:", result);
       
       if (error) {
         toast({
@@ -98,7 +96,6 @@ export function GoogleOAuthTest() {
       };
       
       setTestResults(testResult);
-      console.log("🔍 Google OAuth Test:", testResult);
       
       if (result.success) {
         toast({
@@ -141,7 +138,6 @@ export function GoogleOAuthTest() {
       };
       
       setTestResults(result);
-      console.log("🔍 Auth Validation Test:", result);
       
       if (isValid) {
         toast({
@@ -178,8 +174,6 @@ export function GoogleOAuthTest() {
       // Import supabase client directly
       const { default: supabase } = await import("@/config/client");
       
-      console.log("🔍 Testing direct Supabase OAuth...");
-      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -194,7 +188,6 @@ export function GoogleOAuthTest() {
       };
       
       setTestResults(result);
-      console.log("🔍 Direct Supabase OAuth Test:", result);
       
       if (error) {
         toast({

@@ -23,7 +23,7 @@ export function NavigationLeft({ user }: NavigationLeftProps) {
   ] as const;
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center space-x-4 xl:space-x-8">
       {/* Logo */}
       <Link href="/home">
         <div className="flex items-center space-x-2 cursor-pointer">
@@ -32,8 +32,8 @@ export function NavigationLeft({ user }: NavigationLeftProps) {
         </div>
       </Link>
 
-      {/* Main Navigation - Hidden on screens smaller than 1072px */}
-      <div className="hidden min-[1072px]:flex space-x-3 min-[1200px]:space-x-6">
+      {/* Main Navigation - Hidden on small screens */}
+      <div className="hidden lg:flex space-x-3 xl:space-x-6">
         {NAVIGATION_ITEMS.map((item) => (
           <Link key={item.href} href={item.href}>
             <Button variant="ghost" className="text-gray-600 hover-golden">

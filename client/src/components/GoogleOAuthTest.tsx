@@ -19,7 +19,6 @@ export function GoogleOAuthTest() {
       VITE_SUPABASE_KEY: import.meta.env.VITE_SUPABASE_KEY ? "present" : "missing"
     };
     
-    console.log("🔍 Environment Variables:", envVars);
     setTestResults({ type: "environment", data: envVars });
     
     if (!envVars.VITE_SUPABASE_URL || !envVars.VITE_SUPABASE_KEY) {
@@ -55,7 +54,6 @@ export function GoogleOAuthTest() {
       };
       
       setTestResults(result);
-      console.log("🔍 Supabase Connection Test:", result);
       
       if (error) {
         toast({
@@ -98,7 +96,6 @@ export function GoogleOAuthTest() {
       };
       
       setTestResults(testResult);
-      console.log("🔍 Google OAuth Test:", testResult);
       
       if (result.success) {
         toast({
@@ -141,7 +138,6 @@ export function GoogleOAuthTest() {
       };
       
       setTestResults(result);
-      console.log("🔍 Auth Validation Test:", result);
       
       if (isValid) {
         toast({
@@ -189,7 +185,6 @@ export function GoogleOAuthTest() {
     };
     
     setTestResults(result);
-    console.log("🔍 Current Auth Status Test:", result);
     
     if (currentStatus) {
       toast({

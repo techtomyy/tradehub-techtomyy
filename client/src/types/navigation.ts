@@ -7,9 +7,12 @@ export interface Notification {
 }
 
 export interface User {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
   profileImageUrl?: string;
   kycVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }

@@ -1,11 +1,21 @@
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/lib/context/CurrencyContext";
 import { useWalletStore } from "@/lib/store/walletStore";
-import { NavigationLeft } from "./navigation/NavigationLeft";
-import { NavigationRight } from "./navigation/NavigationRight";
-import { MobileNavigation } from "./navigation/MobileNavigation";
+import { NavigationLoader } from "@/components/ui/loading";
 import { User, Notification } from "@/types/navigation";
+
+// Lazy load navigation components
+const NavigationLeft = lazy(() => 
+  import("./navigation/NavigationLeft").then(module => ({ 
+    default: module.NavigationLeft 
+  }))
+);
+const NavigationRight = lazy(() => 
+  import("./navigation/NavigationRight").then(module => ({ 
+    default: module.NavigationRight 
+  }))
+);
 
 // Static data
 const DEMO_NOTIFICATIONS: Notification[] = [
@@ -26,57 +36,31 @@ export default function Navigation() {
     return null;
   }
 
-  // Map user data from useAuth to User interface expected by navigation components
-  const mapUserToNavigationUser = (authUser: any): User => {
-    // Extract first and last names from various possible sources
-    let firstName = authUser.firstName || 
-                   authUser.user_metadata?.firstName || 
-                   authUser.user_metadata?.full_name?.split(' ')[0] ||
-                   authUser.email?.split('@')[0];
-    
-    let lastName = authUser.lastName || 
-                  authUser.user_metadata?.lastName || 
-                  authUser.user_metadata?.full_name?.split(' ')[1] ||
-                  '';
-    
-    // Clean up the names (remove undefined/null values)
-    firstName = firstName || '';
-    lastName = lastName || '';
-    
-    return {
-      firstName: firstName,
-      lastName: lastName,
-      email: authUser.email,
-      profileImageUrl: authUser.profileImageUrl,
-      kycVerified: authUser.kycVerified,
-    };
-  };
-
-  const navigationUser = mapUserToNavigationUser(user);
-
-  // Debug logging
-  console.log('Navigation - Original user from useAuth:', user);
-  console.log('Navigation - Mapped navigation user:', navigationUser);
-
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 px-2 xl:px-0">
           {/* Logo and Main Navigation */}
-          <NavigationLeft user={navigationUser} />
+          <Suspense fallback={<NavigationLoader />}>
+            <NavigationLeft user={user} />
+          </Suspense>
+          
+          {/* Spacer for mobile - keeps logo and right side properly positioned */}
+          <div className="flex-1 lg:hidden"></div>
           
           {/* Right Side */}
-          <NavigationRight 
-            user={navigationUser}
-            walletBalance={walletBalance}
-            selectedCurrency={selectedCurrency}
-            formatAmount={formatAmount}
-            convertAmount={convertAmount}
-            setCurrency={setCurrency}
-            notifications={notifications}
-            logout={logout}
-            showMobileMenu={true}
-          />
+          <Suspense fallback={<NavigationLoader />}>
+            <NavigationRight 
+              user={user}
+              walletBalance={walletBalance}
+              selectedCurrency={selectedCurrency}
+              formatAmount={formatAmount}
+              convertAmount={convertAmount}
+              setCurrency={setCurrency}
+              notifications={notifications}
+              logout={logout}
+            />
+          </Suspense>
         </div>
       </div>
     </nav>

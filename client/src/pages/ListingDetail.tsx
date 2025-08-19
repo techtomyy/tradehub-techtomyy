@@ -28,7 +28,7 @@ const CATEGORY_ICONS = {
   website: '🌐',
 } as const;
 
-// Static data - All prices are in USD
+// Static data
 const STATIC_USER: User = { 
   id: "1", 
   name: "Demo User" 
@@ -38,7 +38,7 @@ const STATIC_LISTINGS: Listing[] = [
   {
     id: "1",
     title: "Demo Asset 1",
-    price: 100, // Price in USD
+    price: 100,
     description: "A great digital asset.",
     category: "instagram",
     media: [],
@@ -63,7 +63,7 @@ const STATIC_LISTINGS: Listing[] = [
   {
     id: "2",
     title: "Demo Asset 2",
-    price: 200, // Price in USD
+    price: 200,
     description: "Another awesome asset.",
     category: "youtube",
     media: [],
@@ -158,7 +158,7 @@ export default function ListingDetail() {
 
     toast({
       title: "Offer Sent",
-      description: `Your offer of $${offerAmount} has been sent to the seller.`,
+      description: `Your offer of ${formatAmount(Number(offerAmount), selectedCurrency)} has been sent to the seller.`,
     });
     
     setIsOfferModalOpen(false);

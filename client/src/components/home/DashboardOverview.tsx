@@ -64,19 +64,19 @@ export function DashboardOverview({
   ];
 
   return (
-    <section className="py-8 sm:py-10 md:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 mb-6 sm:mb-7 md:mb-8">
+    <section className="py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {statItems.map((item, index) => (
             <Card key={index}>
-              <CardContent className="p-4 sm:p-5 md:p-6">
+              <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className={`p-2 ${item.iconBg} rounded-lg`}>
-                    <item.icon className={`h-5 w-5 sm:h-5 sm:w-5 md:h-6 md:w-6 ${item.iconColor}`} />
+                    <item.icon className={`h-6 w-6 ${item.iconColor}`} />
                   </div>
-                  <div className="ml-3 sm:ml-3 md:ml-4">
-                    <p className="text-xs sm:text-sm md:text-sm font-medium text-gray-600">{item.label}</p>
-                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">{item.value}</p>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">{item.label}</p>
+                    <p className="text-2xl font-bold text-gray-900">{item.value}</p>
                     {item.showCurrency && (
                       <p className="text-xs text-gray-500">{item.currency}</p>
                     )}

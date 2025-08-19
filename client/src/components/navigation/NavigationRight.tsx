@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { User, Notification } from "@/types/navigation";
 import { Currency } from "@/lib/store/walletStore";
 import { CurrencySelector } from "./CurrencySelector";
 import { WalletBalance } from "./WalletBalance";
 import { NotificationsDropdown } from "./NotificationsDropdown";
 import { UserMenu } from "./UserMenu";
-import { MobileNavigation } from "./MobileNavigation";
+import { Menu, Shield } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Link } from "wouter";
 
 interface NavigationRightProps {
   user: User;
@@ -15,7 +19,6 @@ interface NavigationRightProps {
   setCurrency: (currency: Currency) => void;
   notifications: Notification[];
   logout: () => void;
-  showMobileMenu?: boolean;
 }
 
 /**
@@ -33,24 +36,98 @@ export function NavigationRight({
   convertAmount, 
   setCurrency, 
   notifications, 
-  logout,
-  showMobileMenu 
+  logout 
 }: NavigationRightProps) {
-  return (
-    <div className="flex items-center space-x-4">
-      {/* Mobile Navigation Button - Show on screens smaller than 1072px */}
-      {showMobileMenu && (
-        <div className="max-[1071px]:block min-[1072px]:hidden">
-          <MobileNavigation 
-            user={user} 
-            selectedCurrency={selectedCurrency}
-            setCurrency={setCurrency}
-          />
-        </div>
-      )}
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-      {/* Currency Selector - Hidden on small screens */}
-      <div className="hidden sm:block">
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  return (
+    <div className="flex items-center space-x-2 xl:space-x-4">
+      {/* Hamburger Button - Visible before 1024px viewport */}
+      <div className="block lg:hidden">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="p-2"
+          onClick={toggleMobileMenu}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      </div>
+
+      {/* Mobile Navigation Menu - Appears when hamburger is clicked */}
+      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+        <SheetContent side="left" className="w-80 p-0">
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="flex items-center justify-center p-4 border-b">
+              <Link href="/home" onClick={() => setIsMobileMenuOpen(false)}>
+                <div className="flex items-center space-x-2 cursor-pointer">
+                  <Shield className="h-6 w-6 text-primary" />
+                  <span className="text-lg font-bold text-gray-900">AssetVault</span>
+                </div>
+              </Link>
+            </div>
+
+            {/* Navigation Items */}
+            <nav className="flex-1 p-4">
+              <div className="space-y-2">
+                {[
+                  { href: "/marketplace", label: "Marketplace" },
+                  { href: "/dashboard", label: "Dashboard" },
+                  { href: "/create-listing", label: "Sell Asset" },
+                  { href: "/escrow-management", label: "Escrow Management" }
+                ].map((item) => (
+                  <Link key={item.href} href={item.href} onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start text-left h-12 px-4 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      {item.label}
+                    </Button>
+                  </Link>
+                ))}
+              </div>
+            </nav>
+
+            {/* Currency Selector */}
+            <div className="p-4 border-t border-gray-200">
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-gray-700">Currency</p>
+                <CurrencySelector 
+                  selectedCurrency={selectedCurrency}
+                  setCurrency={setCurrency}
+                />
+              </div>
+            </div>
+
+            {/* User Info */}
+            <div className="p-4 border-t bg-gray-50">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-medium">
+                    {user.firstName?.charAt(0).toUpperCase() || "U"}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    {user.firstName && user.lastName 
+                      ? `${user.firstName} ${user.lastName}` 
+                      : user.firstName || user.lastName || "User"}
+                  </p>
+                  <p className="text-xs text-gray-500">{user.email || "user@example.com"}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Currency Selector - Hidden before 1024px viewport */}
+      <div className="hidden lg:block">
         <CurrencySelector 
           selectedCurrency={selectedCurrency}
           setCurrency={setCurrency}
