@@ -63,7 +63,7 @@ export function PurchaseCard({
         <Button
           size="lg"
           variant="outline"
-          className="w-full"
+          className="w-full bg-golden-50 border-golden-200 text-golden-700 hover-gold"
           onClick={onMakeOffer}
         >
           Make Offer
