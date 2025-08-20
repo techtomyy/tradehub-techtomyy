@@ -131,8 +131,27 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-blue-50 to-purple-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Enhanced background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Subtle geometric shapes */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/20 via-cyan-400/20 to-teal-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-indigo-400/15 via-purple-400/15 to-pink-400/15 rounded-full blur-3xl"></div>
+        
+        {/* Subtle accent lines */}
+        <div className="absolute top-1/4 left-0 w-48 h-px bg-gradient-to-r from-transparent via-blue-400/30 to-transparent"></div>
+        <div className="absolute bottom-1/4 right-0 w-48 h-px bg-gradient-to-l from-transparent via-indigo-400/30 to-transparent"></div>
+        
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, #3b82f6 1px, transparent 0)`,
+            backgroundSize: '60px 60px'
+          }}></div>
+        </div>
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
         {/* Back to Landing */}
         <SignupHeader />
 
@@ -144,12 +163,10 @@ export default function Signup() {
         {/* Divider */}
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
+            <div className="w-full border-t border-white/20"></div>
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-gradient-to-br from-primary/5 via-blue-50 to-purple-50 px-2 text-gray-500">
-              Or continue with
-            </span>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-6 bg-slate-900/80 backdrop-blur-sm text-white/60 font-medium">or continue with</span>
           </div>
         </div>
 
@@ -157,12 +174,14 @@ export default function Signup() {
         <GoogleSignupButton onClick={handleGoogleSignup} isLoading={isLoading} />
 
         {/* Login Link */}
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Already have an account?{" "}
-          <a href="/login" className="text-primary hover:underline font-medium">
-            Sign in
-          </a>
-        </p>
+        <div className="mt-6 text-center">
+          <p className="text-sm text-white/80">
+            Already have an account?{" "}
+            <a href="/login" className="text-blue-400 hover:text-blue-300 underline font-medium">
+              Sign in
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

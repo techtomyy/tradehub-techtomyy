@@ -1,20 +1,33 @@
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 import Navigation from "@/components/Navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrency } from "@/lib/context/CurrencyContext";
+import { DashboardTabLoader } from "@/components/ui/loading";
+import { LazyLoadErrorBoundary } from "@/components/ui/LazyLoadErrorBoundary";
 import { 
   TrendingUp, 
   Users, 
   Star
 } from "lucide-react";
-import { 
-  DashboardHeader,
-  StatsOverview,
-  OverviewTab,
-  ListingsTab,
-  TransactionsTab
-} from "@/components/dashboard";
+import { DashboardHeader, StatsOverview } from "@/components/dashboard";
 import { DashboardStats, UserListing, Transaction } from "@/types/dashboard";
+
+// Lazy load dashboard tab components using the utility function
+const OverviewTab = lazy(() => 
+  import("@/components/dashboard/OverviewTab").then(module => ({ 
+    default: module.OverviewTab 
+  }))
+);
+const ListingsTab = lazy(() => 
+  import("@/components/dashboard/ListingsTab").then(module => ({ 
+    default: module.ListingsTab 
+  }))
+);
+const TransactionsTab = lazy(() => 
+  import("@/components/dashboard/TransactionsTab").then(module => ({ 
+    default: module.TransactionsTab 
+  }))
+);
 
 // Constants
 const TAB_VALUES = {
@@ -196,29 +209,41 @@ export default function Dashboard() {
           </TabsList>
           
           <TabsContent value={TAB_VALUES.OVERVIEW} className="space-y-6">
-            <OverviewTab 
-              userTransactions={USER_TRANSACTIONS}
-              userListings={USER_LISTINGS}
-              selectedCurrency={selectedCurrency}
-              formatAmount={formatAmount}
-              convertAmount={convertAmount}
-              getTransactionStatusColor={getTransactionStatusColor}
-              getStatusColor={getStatusColor}
-              getCategoryIcon={getCategoryIcon}
-              onTabChange={setActiveTab}
-            />
+            <LazyLoadErrorBoundary>
+              <Suspense fallback={<DashboardTabLoader />}>
+                <OverviewTab 
+                  userTransactions={USER_TRANSACTIONS}
+                  userListings={USER_LISTINGS}
+                  selectedCurrency={selectedCurrency}
+                  formatAmount={formatAmount}
+                  convertAmount={convertAmount}
+                  getTransactionStatusColor={getTransactionStatusColor}
+                  getStatusColor={getStatusColor}
+                  getCategoryIcon={getCategoryIcon}
+                  onTabChange={setActiveTab}
+                />
+              </Suspense>
+            </LazyLoadErrorBoundary>
           </TabsContent>
           
           <TabsContent value={TAB_VALUES.LISTINGS} className="space-y-6">
-            <ListingsTab 
-              userListings={USER_LISTINGS}
-              getStatusColor={getStatusColor}
-              getCategoryIcon={getCategoryIcon}
-            />
+            <LazyLoadErrorBoundary>
+              <Suspense fallback={<DashboardTabLoader />}>
+                <ListingsTab 
+                  userListings={USER_LISTINGS}
+                  getStatusColor={getStatusColor}
+                  getCategoryIcon={getCategoryIcon}
+                />
+              </Suspense>
+            </LazyLoadErrorBoundary>
           </TabsContent>
           
           <TabsContent value={TAB_VALUES.TRANSACTIONS} className="space-y-6">
-            <TransactionsTab userTransactions={USER_TRANSACTIONS} />
+            <LazyLoadErrorBoundary>
+              <Suspense fallback={<DashboardTabLoader />}>
+                <TransactionsTab userTransactions={USER_TRANSACTIONS} />
+              </Suspense>
+            </LazyLoadErrorBoundary>
           </TabsContent>
         </Tabs>
       </div>

@@ -15,8 +15,6 @@ export default function AuthCallback() {
         return;
       }
       if (data?.session) {
-        console.log("User session:", data.session);
-
         const access_token = data.session.access_token; // 👈 token le liya
 
         // Send token to backend for verification

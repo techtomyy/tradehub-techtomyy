@@ -149,29 +149,56 @@ export default function Login() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-blue-50 to-purple-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Enhanced background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Subtle geometric shapes */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/20 via-cyan-400/20 to-teal-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-indigo-400/15 via-purple-400/15 to-pink-400/15 rounded-full blur-3xl"></div>
+        
+        {/* Subtle accent lines */}
+        <div className="absolute top-1/4 left-0 w-48 h-px bg-gradient-to-r from-transparent via-blue-400/30 to-transparent"></div>
+        <div className="absolute bottom-1/4 right-0 w-48 h-px bg-gradient-to-l from-transparent via-indigo-400/30 to-transparent"></div>
+        
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, #3b82f6 1px, transparent 0)`,
+            backgroundSize: '60px 60px'
+          }}></div>
+        </div>
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
         {/* Back to Landing */}
         <Link href="/">
-          <Button variant="ghost" className="mb-6">
+          <Button 
+            variant="ghost" 
+            className="mb-8 text-white/80 hover:text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300 rounded-full px-6 border border-white/20 hover:border-white/40 shadow-sm hover:shadow-lg"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Home
           </Button>
         </Link>
 
         {/* Login Card */}
-        <Card className="shadow-xl border-0">
-          <CardHeader className="text-center pb-6">
-            <div className="flex justify-center mb-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <Shield className="h-6 w-6 text-primary" />
+        <Card className="shadow-2xl border-0 bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 backdrop-blur-2xl rounded-3xl overflow-hidden relative">
+          {/* Professional accent line */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
+          
+          <CardHeader className="text-center pb-8 pt-12 px-8 relative z-10">
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl transform hover:scale-105 transition-all duration-300 group">
+                <Shield className="h-10 w-10 text-white group-hover:scale-110 transition-transform duration-300" />
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-900">Welcome Back</CardTitle>
-            <p className="text-gray-600">Sign in to your AssetVault account</p>
+            <CardTitle className="text-3xl font-bold text-slate-900 mb-3">
+              Welcome Back
+            </CardTitle>
+            <p className="text-slate-600 text-lg">Sign in to your AssetVault account</p>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="px-8 pb-12 relative z-10">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                 <FormField
@@ -179,11 +206,14 @@ export default function Login() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel className="text-sm font-semibold text-slate-700 mb-3 block">
+                        Email Address
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="email"
                           placeholder="Enter your email"
+                          className="h-14 px-5 rounded-2xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all duration-300 bg-white/90 backdrop-blur-sm hover:bg-white hover:border-blue-400 hover:shadow-md"
                           {...field}
                         />
                       </FormControl>
@@ -197,25 +227,28 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel className="text-sm font-semibold text-slate-700 mb-3 block">
+                        Password
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showPassword ? "text" : "password"}
                             placeholder="Enter your password"
+                            className="h-14 px-5 pr-14 rounded-2xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all duration-300 bg-white/90 backdrop-blur-sm hover:bg-white hover:border-blue-400 hover:shadow-md"
                             {...field}
                           />
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            className="absolute right-2 top-2 h-10 w-10 rounded-xl hover:bg-blue-50 transition-all duration-200 text-slate-500 hover:text-blue-600"
                             onClick={() => setShowPassword(!showPassword)}
                           >
                             {showPassword ? (
-                              <EyeOff className="h-4 w-4 text-gray-400" />
+                              <EyeOff className="h-4 w-4" />
                             ) : (
-                              <Eye className="h-4 w-4 text-gray-400" />
+                              <Eye className="h-4 w-4" />
                             )}
                           </Button>
                         </div>
@@ -230,21 +263,22 @@ export default function Login() {
                     control={form.control}
                     name="rememberMe"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                         <FormControl>
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="rounded-lg border-2 border-slate-300 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-500 data-[state=checked]:to-indigo-500 data-[state=checked]:border-blue-500"
                           />
                         </FormControl>
-                        <FormLabel className="text-sm font-normal">
+                        <FormLabel className="text-sm font-medium text-slate-700 cursor-pointer">
                           Remember me
                         </FormLabel>
                       </FormItem>
                     )}
                   />
                   <Link href="/forgot-password">
-                    <Button variant="link" className="text-sm px-0">
+                    <Button variant="link" className="text-sm px-0 text-blue-600 hover:text-blue-700 font-medium hover:underline">
                       Forgot password?
                     </Button>
                   </Link>
@@ -252,29 +286,47 @@ export default function Login() {
 
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full h-14 bg-gradient-to-r from-blue-500 via-indigo-600 to-purple-600 hover:from-blue-600 hover:via-indigo-700 hover:to-purple-700 text-white font-semibold text-lg rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5"
                   size="lg"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Signing In..." : "Sign In"}
+                  {isLoading ? (
+                    <div className="flex items-center space-x-3">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Signing In...</span>
+                    </div>
+                  ) : (
+                    "Sign In"
+                  )}
                 </Button>
                 
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-200"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-6 bg-white/95 backdrop-blur-sm text-slate-500 font-medium">or continue with</span>
+                  </div>
+                </div>
+
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full flex items-center justify-center space-x-2 hover-golden"
+                  className="w-full h-14 border-2 border-slate-200 hover:border-blue-400 bg-white/90 backdrop-blur-sm text-slate-700 hover:text-blue-700 hover:bg-blue-50/80 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5 flex items-center justify-center space-x-3 shadow-sm hover:shadow-md"
                   onClick={handleGoogleLogin}
                   disabled={isLoading}
                 >
-                  <FcGoogle className="h-5 w-5" />
-                  <span>{isLoading ? "Signing in..." : "Sign in with Google"}</span>
+                  <FcGoogle className="h-6 w-6" />
+                  <span className="font-semibold text-lg">
+                    {isLoading ? "Signing in..." : "Sign in with Google"}
+                  </span>
                 </Button>
 
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">
+                <div className="text-center pt-6">
+                  <p className="text-sm text-slate-600">
                     Don't have an account?{" "}
                     <Link href="/signup">
-                      <Button variant="link" className="p-0 h-auto font-semibold">
+                      <Button variant="link" className="p-0 h-auto font-semibold text-blue-600 hover:text-blue-700 hover:underline text-lg">
                         Sign up
                       </Button>
                     </Link>
@@ -284,6 +336,22 @@ export default function Login() {
             </Form>
           </CardContent>
         </Card>
+
+        {/* Additional info card */}
+        <div className="mt-8 text-center">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-white/40 shadow-sm">
+            <p className="text-xs text-slate-600">
+              By signing in, you agree to our{" "}
+              <Link href="/terms" className="text-blue-600 hover:text-blue-700 underline font-medium">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="text-blue-600 hover:text-blue-700 underline font-medium">
+                Privacy Policy
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

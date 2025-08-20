@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCurrency } from "@/lib/context/CurrencyContext";
+import { useLazyImage } from "@/hooks/useLazyImage";
 import { Users, TrendingUp, Eye, DollarSign, Star, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 
@@ -30,6 +31,10 @@ interface ListingCardProps {
 
 export default function ListingCard({ listing }: ListingCardProps) {
   const { selectedCurrency, formatAmount } = useCurrency();
+  const { imageRef, isInView, isLoaded, hasError } = useLazyImage({
+    rootMargin: '50px',
+    threshold: 0.1
+  });
   
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -60,11 +65,32 @@ export default function ListingCard({ listing }: ListingCardProps) {
     <Card className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
       <div className="relative">
         {listing.media && listing.media[0] ? (
-          <img
-            src={listing.media[0]}
-            alt={listing.title}
-            className="w-full h-48 object-cover"
-          />
+          <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+            {isInView && (
+              <img
+                ref={imageRef}
+                src={listing.media[0]}
+                alt={listing.title}
+                className={`w-full h-48 object-cover transition-opacity duration-300 ${
+                  isLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+                loading="lazy"
+              />
+            )}
+            {!isLoaded && isInView && (
+              <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+                <div className="text-gray-400">Loading...</div>
+              </div>
+            )}
+            {hasError && (
+              <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
+                <div className="text-gray-400 text-center">
+                  <div className="text-2xl mb-2">📷</div>
+                  <div className="text-sm">Image unavailable</div>
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="w-full h-48 bg-gradient-to-br from-primary to-blue-700 flex items-center justify-center">
             <span className="text-6xl">{getCategoryIcon(listing.category)}</span>
@@ -109,29 +135,29 @@ export default function ListingCard({ listing }: ListingCardProps) {
           {listing.description}
         </p>
         
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-4 text-sm text-gray-500">
+        <div className="mb-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 text-sm text-gray-500 w-full">
             {listing.followers && (
-              <span className="flex items-center">
-                <Users className="h-4 w-4 mr-1" />
+              <span className="flex items-center text-xs sm:text-sm">
+                <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 {listing.followers.toLocaleString()}
               </span>
             )}
             {listing.engagement && (
-              <span className="flex items-center">
-                <TrendingUp className="h-4 w-4 mr-1" />
+              <span className="flex items-center text-xs sm:text-sm">
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 {listing.engagement}%
               </span>
             )}
             {listing.monthlyViews && (
-              <span className="flex items-center">
-                <Eye className="h-4 w-4 mr-1" />
+              <span className="flex items-center text-xs sm:text-sm">
+                <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 {listing.monthlyViews.toLocaleString()}
               </span>
             )}
             {listing.monthlyRevenue && (
-              <span className="flex items-center">
-                <DollarSign className="h-4 w-4 mr-1" />
+              <span className="flex items-center text-xs sm:text-sm">
+                <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                 {formatAmount(typeof listing.monthlyRevenue === 'number' ? listing.monthlyRevenue : 0, selectedCurrency)}
               </span>
             )}

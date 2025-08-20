@@ -1,8 +1,12 @@
+import { Suspense, lazy } from "react";
 import { Router } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
-import AppRoutes from "@/routes";
+import { AppLoader } from "@/components/ui/loading";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { CurrencyProvider } from "@/lib/context/CurrencyContext";
+import socket from "./socket/connection";
+// Lazy load the main routes component
+const AppRoutes = lazy(() => import("@/routes"));
 
 /**
  * Main App Component
@@ -12,14 +16,20 @@ import { CurrencyProvider } from "@/lib/context/CurrencyContext";
  * - Error boundary for graceful error handling
  * - Currency context for global currency management
  * - Toast notifications system
+ * - Lazy loading for improved performance
  */
 export default function App() {
   return (
+    
+    
     <Router>
+      
       <ErrorBoundary>
         <CurrencyProvider>
           <div className="min-h-screen bg-background">
-            <AppRoutes />
+            <Suspense fallback={<AppLoader />}>
+              <AppRoutes />
+            </Suspense>
             <Toaster />
           </div>
         </CurrencyProvider>

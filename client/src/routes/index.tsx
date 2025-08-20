@@ -1,23 +1,27 @@
 import { Route, Switch } from "wouter";
+import { Suspense, lazy } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { PUBLIC_ROUTES, PROTECTED_ROUTES } from "./constants";
-import Landing from "@/pages/Landing";
-import Login from "@/pages/Login";
-import Signup from "@/pages/Signup";
-import Home from "@/pages/Home";
-import Dashboard from "@/pages/Dashboard";
-import Marketplace from "@/pages/Marketplace";
-import CreateListing from "@/pages/CreateListing";
-import ListingDetail from "@/pages/ListingDetail";
-import Inbox from "@/pages/Inbox";
-import Message from "@/pages/Message";
-import Dispute from "@/pages/Dispute";
-import AuthCallback from "@/pages/AuthCallback";
-import NotFound from "@/pages/not-found";
+import { PageLoader } from "@/components/ui/loading";
 import { RouteErrorBoundary } from "@/components/ErrorBoundary";
-import Wallet from "@/pages/wallet";
-import Settings from "@/pages/settings";
-import EscrowManagement from "@/pages/EscrowManagement";
+
+// Lazy load all page components
+const Landing = lazy(() => import("@/pages/Landing"));
+const Login = lazy(() => import("@/pages/Login"));
+const Signup = lazy(() => import("@/pages/Signup"));
+const Home = lazy(() => import("@/pages/Home"));
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Marketplace = lazy(() => import("@/pages/Marketplace"));
+const CreateListing = lazy(() => import("@/pages/CreateListing"));
+const ListingDetail = lazy(() => import("@/pages/ListingDetail"));
+const Inbox = lazy(() => import("@/pages/Inbox"));
+const Message = lazy(() => import("@/pages/Message"));
+const Dispute = lazy(() => import("@/pages/Dispute"));
+const AuthCallback = lazy(() => import("@/pages/AuthCallback"));
+const NotFound = lazy(() => import("@/pages/not-found"));
+const Wallet = lazy(() => import("@/pages/wallet"));
+const Settings = lazy(() => import("@/pages/settings"));
+const EscrowManagement = lazy(() => import("@/pages/EscrowManagement"));
 
 // Types
 interface RouteConfig {
@@ -90,6 +94,7 @@ const PROTECTED_ROUTES_CONFIG: RouteConfig[] = [
  * 
  * Main routing component that handles all application routes.
  * Includes public routes, protected routes, and a 404 fallback.
+ * All routes are lazy loaded for improved performance.
  */
 export default function AppRoutes() {
   return (
@@ -98,7 +103,9 @@ export default function AppRoutes() {
       {PUBLIC_ROUTES_CONFIG.map(({ path, component: Component }) => (
         <Route key={path} path={path}>
           <RouteErrorBoundary>
-            <Component />
+            <Suspense fallback={<PageLoader />}>
+              <Component />
+            </Suspense>
           </RouteErrorBoundary>
         </Route>
       ))}
@@ -107,7 +114,9 @@ export default function AppRoutes() {
       {PROTECTED_ROUTES_CONFIG.map(({ path, component: Component }) => (
         <Route key={path} path={path}>
           <RouteErrorBoundary>
-            <ProtectedRoute component={Component} />
+            <Suspense fallback={<PageLoader />}>
+              <ProtectedRoute component={Component} />
+            </Suspense>
           </RouteErrorBoundary>
         </Route>
       ))}
@@ -115,7 +124,9 @@ export default function AppRoutes() {
       {/* 404 Route - Catch all unmatched routes */}
       <Route path="*">
         <RouteErrorBoundary>
-          <NotFound />
+          <Suspense fallback={<PageLoader />}>
+            <NotFound />
+          </Suspense>
         </RouteErrorBoundary>
       </Route>
     </Switch>
