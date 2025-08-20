@@ -10,7 +10,7 @@ let io: Server<ClientToServerEvents, ServerToClientEvents> | null = null;
 export function initSocket(server: HttpServer) {
   io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
     cors: {
-      origin: "*",
+      origin: "http://localhost:5174",
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -39,7 +39,11 @@ export function initSocket(server: HttpServer) {
     };
 
     sendMessageToUser(user.id, message);
-  
+
+    socket.on("message-receive", (messages) => {
+    console.log("📩 New message from client:", messages);
+  });
+
 
   socket.on("disconnect", () => {
     console.log("🔴 Socket disconnected:", socket.id);

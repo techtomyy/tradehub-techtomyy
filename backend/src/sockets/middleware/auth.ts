@@ -1,6 +1,8 @@
 import { Socket } from "socket.io";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import cookie from "cookie";
+import dotenv from "dotenv";
+dotenv.config(); // Load environment variables
 
 interface DecodedToken extends JwtPayload {
   id: string;
@@ -21,10 +23,10 @@ export const socketAuth = (socket: Socket, next: (err?: Error) => void) => {
   try {
     const decoded = jwt.verify(
       token,
-      process.env.ADMIN_SECRET_KEY as string
+      process.env.SECRET_KEY as string
     ) as DecodedToken;
 
-    if (decoded.role === "user") {
+    if (decoded.role === "User") {
       console.log("✅ user authenticated:", decoded.email);
 
       // save decoded user inside socket
