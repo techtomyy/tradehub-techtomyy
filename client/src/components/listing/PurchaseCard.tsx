@@ -37,11 +37,13 @@ export function PurchaseCard({
     <Card className="sticky top-8">
       <CardHeader>
         <CardTitle className="text-2xl">
-          {formatAmount(
-            parseFloat(listing.price.toString()), 
-            selectedCurrency
-          )}
+          {fees ? formatAmount(fees.assetPriceInSelectedCurrency, selectedCurrency) : formatAmount(listing.price, selectedCurrency)}
         </CardTitle>
+        {fees && selectedCurrency !== 'USD' && (
+          <p className="text-sm text-gray-500 mt-1">
+            {formatAmount(listing.price, 'USD')} USD
+          </p>
+        )}
       </CardHeader>
       
       <CardContent className="space-y-4">
@@ -61,7 +63,7 @@ export function PurchaseCard({
         <Button
           size="lg"
           variant="outline"
-          className="w-full"
+          className="w-full bg-golden-50 border-golden-200 text-golden-700 hover-gold"
           onClick={onMakeOffer}
         >
           Make Offer

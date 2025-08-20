@@ -56,6 +56,8 @@ export function UserMenu({ user, logout }: UserMenuProps) {
     return 'User';
   };
 
+
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -74,7 +76,7 @@ export function UserMenu({ user, logout }: UserMenuProps) {
       
       <DropdownMenuContent className="w-56" align="end" forceMount>
         {/* User Info */}
-        <UserInfo user={user} />
+        <UserInfo user={user} getUserInitials={getUserInitials} getDisplayName={getDisplayName} />
         
         <DropdownMenuSeparator />
         
@@ -106,23 +108,47 @@ export function UserMenu({ user, logout }: UserMenuProps) {
  * Displays user information in the user menu dropdown
  * including name, email, and verification status.
  */
-function UserInfo({ user }: { user: UserType }) {
+function UserInfo({ 
+  user, 
+  getUserInitials, 
+  getDisplayName 
+}: { 
+  user: User;
+  getUserInitials: () => string;
+  getDisplayName: () => string;
+}) {
+  const getFullName = (): string => {
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    if (user.firstName) {
+      return user.firstName;
+    }
+    return 'User';
+  };
+
   return (
-    <div className="flex items-center justify-start gap-2 p-2">
-      <div className="flex flex-col space-y-1 leading-none">
-        <p className="font-medium">
-          {user.firstName && user.lastName 
-            ? `${user.firstName} ${user.lastName}`
-            : user.firstName || user.email || 'User'
-          }
+    <div className="flex items-center justify-start gap-3 p-3">
+      <Avatar className="h-12 w-12">
+        <AvatarImage
+          src={user.profileImageUrl}
+          alt={getDisplayName()}
+        />
+        <AvatarFallback className="text-sm font-semibold">
+          {getUserInitials()}
+        </AvatarFallback>
+      </Avatar>
+      <div className="flex flex-col space-y-1 leading-none min-w-0">
+        <p className="font-semibold text-sm truncate">
+          {getFullName()}
         </p>
         {user.email && (
-          <p className="w-[200px] truncate text-sm text-muted-foreground">
+          <p className="w-[180px] truncate text-xs text-muted-foreground">
             {user.email}
           </p>
         )}
         {user.kycVerified && (
-          <Badge variant="outline" className="w-fit">
+          <Badge variant="outline" className="w-fit mt-1">
             <Shield className="h-3 w-3 mr-1" />
             KYC Verified
           </Badge>

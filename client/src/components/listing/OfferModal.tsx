@@ -40,7 +40,11 @@ export function OfferModal({
         </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+            className="bg-golden-50 border-golden-200 text-golden-700 hover-gold"
+          >
             Cancel
           </Button>
           <Button onClick={onSubmit}>

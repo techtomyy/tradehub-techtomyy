@@ -108,7 +108,7 @@ export default function MessagingModal({ isOpen, onClose, transactionId }: Messa
               <Avatar>
                 <AvatarImage src={otherUser.profileImageUrl} />
                 <AvatarFallback>
-                  {otherUser.firstName?.[0]}{otherUser.lastName?.[0]}
+                  {otherUser.firstName?.[0] || ''}{otherUser.lastName?.[0] || ''}
                 </AvatarFallback>
               </Avatar>
             )}
@@ -139,9 +139,9 @@ export default function MessagingModal({ isOpen, onClose, transactionId }: Messa
                 {message.senderId !== user?.id && (
                   <Avatar className="w-8 h-8">
                     <AvatarImage src={otherUser?.profileImageUrl} />
-                    <AvatarFallback className="text-xs">
-                      {otherUser?.firstName?.[0]}{otherUser?.lastName?.[0]}
-                    </AvatarFallback>
+                                      <AvatarFallback className="text-xs">
+                    {otherUser?.firstName?.[0] || ''}{otherUser?.lastName?.[0] || ''}
+                  </AvatarFallback>
                   </Avatar>
                 )}
                 
@@ -184,7 +184,7 @@ export default function MessagingModal({ isOpen, onClose, transactionId }: Messa
                   <Avatar className="w-8 h-8">
                     <AvatarImage src={user.profileImageUrl} />
                     <AvatarFallback className="text-xs">
-                      {user.firstName?.[0]}{user.lastName?.[0]}
+                      {user.firstName?.[0] || ''}{user.lastName?.[0] || ''}
                     </AvatarFallback>
                   </Avatar>
                 )}

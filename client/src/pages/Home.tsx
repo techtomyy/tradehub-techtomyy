@@ -1,15 +1,23 @@
+import { Suspense, lazy } from "react";
 import Navigation from "@/components/Navigation";
 import { useWalletStore } from "@/lib/store/walletStore";
 import { useInboxStore } from "@/lib/store/inboxStore";
 import { useCurrency } from "@/lib/context/CurrencyContext";
+import { HomeSectionLoader } from "@/components/ui/loading";
 import { 
   HeroSection,
   DashboardOverview,
-  FeaturedListings,
   RecentTransactions,
   FloatingInboxButton
 } from "@/components/home";
 import { FeaturedListing, DashboardStats, Transaction } from "@/types/home";
+
+// Lazy load the FeaturedListings component
+const FeaturedListings = lazy(() => 
+  import("@/components/home/FeaturedListings").then(module => ({ 
+    default: module.FeaturedListings 
+  }))
+);
 
 export default function Home() {
   const walletBalance = useWalletStore((state) => state.balance);
@@ -189,7 +197,9 @@ export default function Home() {
       />
 
       {/* Featured Listings */}
-      <FeaturedListings featuredListings={featuredListings} />
+      <Suspense fallback={<HomeSectionLoader />}>
+        <FeaturedListings featuredListings={featuredListings} />
+      </Suspense>
 
       {/* Recent Transactions */}
       <RecentTransactions userTransactions={userTransactions} />

@@ -1,13 +1,26 @@
 import { useState, useEffect } from "react";
 import supabase from "@/config/client";
-import { User } from "@supabase/supabase-js";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 import { PROTECTED_ROUTES } from "@/routes/constants";
 import { authApi } from "@/lib/api";
+import { User } from "@/types/navigation";
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Function to create a basic user object from email
+  const createBasicUser = (email: string): User => {
+    return {
+      id: 'api-user',
+      firstName: email.split('@')[0],
+      lastName: '',
+      email: email,
+      profileImageUrl: undefined,
+      kycVerified: false,
+    };
+  };
 
   // Check for existing session on mount
   useEffect(() => {
@@ -16,17 +29,10 @@ export function useAuth() {
       const isApiAuthenticated = localStorage.getItem('isAuthenticated');
       const userEmail = localStorage.getItem('userEmail');
       if (isApiAuthenticated === 'true' && userEmail) {
-        console.log("API authentication found, restoring session");
         setIsAuthenticated(true);
-        // Create a user object for API authentication
-        const apiUser = {
-          id: 'api-user',
-          email: userEmail,
-          user_metadata: {
-            full_name: userEmail.split('@')[0],
-          },
-        };
-        setUser(apiUser as any);
+        // Create basic user object from email
+        const userData = createBasicUser(userEmail);
+        setUser(userData);
         setIsLoading(false);
         return;
       }
@@ -37,7 +43,16 @@ export function useAuth() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setIsAuthenticated(true);
-        setUser(session.user);
+        // For Supabase users, create a compatible user object
+        const supabaseUser: User = {
+          id: session.user.id,
+          firstName: session.user.user_metadata?.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || 'User',
+          lastName: session.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+          email: session.user.email || '',
+          profileImageUrl: session.user.user_metadata?.avatar_url,
+          kycVerified: false,
+        };
+        setUser(supabaseUser);
       }
       setIsLoading(false);
     };
@@ -49,7 +64,16 @@ export function useAuth() {
       async (event, session) => {
         if (event === 'SIGNED_IN' && session) {
           setIsAuthenticated(true);
-          setUser(session.user);
+          // Create compatible user object for Supabase
+          const supabaseUser: User = {
+            id: session.user.id,
+            firstName: session.user.user_metadata?.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || 'User',
+            lastName: session.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+            email: session.user.email || '',
+            profileImageUrl: session.user.user_metadata?.avatar_url,
+            kycVerified: false,
+          };
+          setUser(supabaseUser);
         } else if (event === 'SIGNED_OUT') {
           setIsAuthenticated(false);
           setUser(null);
@@ -60,15 +84,7 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Debug authentication state changes
-  useEffect(() => {
-    console.log("Authentication state changed:", { 
-      isAuthenticated, 
-      user: user?.email,
-      isLoading,
-      currentPath: window.location.pathname
-    });
-  }, [isAuthenticated, user, isLoading]);
+
 
   // User data from Supabase or API
   const userData = user || null;
@@ -100,7 +116,9 @@ export function useAuth() {
       const response = await authApi.login({ email, password });
       if (response.success) {
         setIsAuthenticated(true);
-        // You might want to store user data from the response here
+        // Create basic user object from email after successful login
+        const userData = createBasicUser(email);
+        setUser(userData);
         return { success: true };
       } else {
         return { success: false, message: response.message };

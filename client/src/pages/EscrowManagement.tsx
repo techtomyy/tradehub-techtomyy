@@ -8,9 +8,12 @@ import {
   DisputeResolution
 } from "@/components/escrow";
 import { EscrowDeal, TimelineStep } from "@/types/escrow";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle } from "lucide-react";
 
 export default function EscrowManagementPage() {
   const { toast } = useToast();
+  const [currentView, setCurrentView] = useState<'main' | 'dispute'>('main');
 
   // Mock data for escrow deals - matching the exact data from images
   const [escrowDeals] = useState<EscrowDeal[]>([
@@ -88,15 +91,12 @@ export default function EscrowManagementPage() {
     });
   };
 
-  const handleSubmitDispute = (dealId: string, disputeDetails: string) => {
-    const deal = escrowDeals.find(d => d.id === dealId);
-    if (deal) {
-      toast({
-        title: "Dispute Submitted",
-        description: `Dispute submitted for ${deal.deal}. Our team will review and respond within 7 business days.`,
-        variant: "destructive",
-      });
-    }
+  const handleNavigateToDispute = () => {
+    setCurrentView('dispute');
+  };
+
+  const handleBackToMain = () => {
+    setCurrentView('main');
   };
 
   return (
@@ -107,30 +107,58 @@ export default function EscrowManagementPage() {
         {/* Header - Matching the TradeHub header from images */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">TradeHub</h1>
-          <p className="text-gray-600 mt-2">Escrow Management Dashboard</p>
+          <p className="text-gray-600 mt-2">
+            {currentView === 'main' ? 'Escrow Management Dashboard' : 'Dispute Resolution Center'}
+          </p>
         </div>
 
-        {/* Vertical Layout - All components stacked in a single column */}
-        <div className="space-y-8">
-          {/* 1. Escrow Management Table */}
-          <EscrowManagementComponent 
-            deals={escrowDeals}
-            onConfirmCompletion={handleConfirmCompletion}
-            onRaiseDispute={handleRaiseDispute}
-          />
+        {currentView === 'main' ? (
+          /* Main Escrow Management View */
+          <div className="space-y-8">
+            {/* 1. Escrow Management Table */}
+            <EscrowManagementComponent 
+              deals={escrowDeals}
+              onConfirmCompletion={handleConfirmCompletion}
+              onRaiseDispute={handleRaiseDispute}
+              onNavigateToDispute={handleNavigateToDispute}
+            />
 
-          {/* 2. Deal Status Timeline */}
-          <DealStatusTimeline steps={timelineSteps} />
+            {/* 2. Deal Status Timeline */}
+            <DealStatusTimeline steps={timelineSteps} />
 
-          {/* 3. Initiate New Escrow */}
-          <InitiateNewEscrow onCreateEscrow={handleCreateEscrow} />
+            {/* 3. Initiate New Escrow */}
+            <InitiateNewEscrow onCreateEscrow={handleCreateEscrow} />
 
-          {/* 4. Dispute Resolution */}
-          <DisputeResolution 
-            deals={escrowDeals}
-            onSubmitDispute={handleSubmitDispute}
-          />
-        </div>
+            {/* 4. Quick Dispute Access */}
+            <div className="flex justify-center">
+              <Button
+                onClick={handleNavigateToDispute}
+                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-8 py-3 text-lg"
+              >
+                <AlertTriangle className="h-5 w-5 mr-2" />
+                Raise Dispute
+              </Button>
+            </div>
+          </div>
+        ) : (
+          /* Dispute Resolution View */
+          <div className="space-y-8">
+            <div className="flex items-center justify-between">
+              <Button
+                variant="outline"
+                onClick={handleBackToMain}
+                className="mb-4"
+              >
+                ← Back to Escrow Management
+              </Button>
+            </div>
+            
+            <DisputeResolution 
+              deals={escrowDeals}
+              onSubmitDispute={handleRaiseDispute}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

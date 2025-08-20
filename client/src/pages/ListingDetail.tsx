@@ -158,7 +158,7 @@ export default function ListingDetail() {
 
     toast({
       title: "Offer Sent",
-      description: `Your offer of $${offerAmount} has been sent to the seller.`,
+      description: `Your offer of ${formatAmount(Number(offerAmount), selectedCurrency)} has been sent to the seller.`,
     });
     
     setIsOfferModalOpen(false);
