@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AppLoader } from "@/components/ui/loading";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { CurrencyProvider } from "@/lib/context/CurrencyContext";
-
+import socket from "./socket/connection";
 // Lazy load the main routes component
 const AppRoutes = lazy(() => import("@/routes"));
 
@@ -20,7 +20,10 @@ const AppRoutes = lazy(() => import("@/routes"));
  */
 export default function App() {
   return (
+    
+    
     <Router>
+      
       <ErrorBoundary>
         <CurrencyProvider>
           <div className="min-h-screen bg-background">
