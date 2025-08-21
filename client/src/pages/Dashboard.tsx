@@ -7,10 +7,18 @@ import { LazyLoadErrorBoundary } from "@/components/ui/LazyLoadErrorBoundary";
 import { 
   TrendingUp, 
   Users, 
-  Star
+  Star,
+  Plus,
+  Award,
+  Activity,
+  Bell,
+  Zap
 } from "lucide-react";
-import { DashboardHeader, StatsOverview } from "@/components/dashboard";
+import { DashboardHeader, StatsOverview, AnalyticsModal } from "@/components/dashboard";
 import { DashboardStats, UserListing, Transaction } from "@/types/dashboard";
+import { AnimatePresence, motion } from "framer-motion";
+import { useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 
 // Lazy load dashboard tab components using the utility function
 const OverviewTab = lazy(() => 
@@ -174,6 +182,15 @@ const USER_TRANSACTIONS: Transaction[] = [
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<string>(TAB_VALUES.OVERVIEW);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [notifications] = useState([
+    { id: 1, message: "New transaction completed!", type: "success", time: "2 min ago" },
+    { id: 2, message: "Your listing has been viewed 15 times", type: "info", time: "1 hour ago" },
+    { id: 3, message: "Payment received for Asset #2", type: "success", time: "3 hours ago" }
+  ]);
   const { selectedCurrency, formatAmount, convertAmount } = useCurrency();
 
   // Utility functions
@@ -199,14 +216,122 @@ export default function Dashboard() {
         
         {/* Stats Overview */}
         <StatsOverview stats={DASHBOARD_STATS} selectedCurrency={selectedCurrency} formatAmount={formatAmount} convertAmount={convertAmount} />
-        
-        {/* Main Content */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value={TAB_VALUES.OVERVIEW}>Overview</TabsTrigger>
-            <TabsTrigger value={TAB_VALUES.LISTINGS}>My Listings</TabsTrigger>
-            <TabsTrigger value={TAB_VALUES.TRANSACTIONS}>Transactions</TabsTrigger>
+        {/* Quick Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mb-8"
+        >
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Zap className="w-5 h-5 text-blue-600" />
+              Quick Actions
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { icon: Plus, label: "List Asset", color: "from-blue-500 to-purple-600", onClick: () => setLocation("/create-listing") },
+                { icon: Activity, label: "View Analytics", color: "from-green-500 to-emerald-600", onClick: () => setShowAnalytics(true) },
+                { icon: Award, label: "Earn Rewards", color: "from-amber-500 to-orange-600", onClick: () => toast({ title: "Coming Soon!", description: "Rewards system will be available soon.", variant: "default" }) },
+                { icon: Bell, label: "Notifications", color: "from-pink-500 to-rose-600", onClick: () => setShowNotifications(!showNotifications) }
+              ].map((action, index) => (
+                <motion.button
+                  key={action.label}
+                  onClick={action.onClick}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`p-4 rounded-xl bg-gradient-to-r ${action.color} text-white shadow-lg hover:shadow-xl transition-all duration-300 text-center cursor-pointer`}
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <action.icon className="w-6 h-6" />
+                    <span className="text-sm font-medium">{action.label}</span>
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+        {/* Notifications Panel */}
+        <AnimatePresence>
+          {showNotifications && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+              className="mb-8"
+            >
+              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <Bell className="w-5 h-5 text-blue-600" />
+                    Recent Notifications
+                  </h3>
+                  <button
+                    onClick={() => setShowNotifications(false)}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {notifications.map((notification, index) => (
+                    <motion.div
+                      key={notification.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
+                      className={`flex items-center justify-between p-3 rounded-lg ${
+                        notification.type === 'success' ? 'bg-green-50 border border-green-200' :
+                        notification.type === 'info' ? 'bg-blue-50 border border-blue-200' :
+                        'bg-gray-50 border border-gray-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${
+                          notification.type === 'success' ? 'bg-green-500' :
+                          notification.type === 'info' ? 'bg-blue-500' :
+                          'bg-gray-500'
+                        }`} />
+                        <span className="text-sm text-gray-700">{notification.message}</span>
+                      </div>
+                      <span className="text-xs text-gray-500">{notification.time}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+          {/* Enhanced Main Content */}
+          <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <div className="bg-white rounded-2xl p-2 shadow-lg border border-gray-100">
+              <TabsList className="grid w-full grid-cols-3 bg-transparent">
+                <TabsTrigger 
+                  value={TAB_VALUES.OVERVIEW}
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
+                >
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger 
+                  value={TAB_VALUES.LISTINGS}
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
+                >
+                  My Listings
+                </TabsTrigger>
+                <TabsTrigger 
+                  value={TAB_VALUES.TRANSACTIONS}
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
+                >
+                  Transactions
+                </TabsTrigger>
           </TabsList>
+            </div>
           
           <TabsContent value={TAB_VALUES.OVERVIEW} className="space-y-6">
             <LazyLoadErrorBoundary>
@@ -246,7 +371,17 @@ export default function Dashboard() {
             </LazyLoadErrorBoundary>
           </TabsContent>
         </Tabs>
+        </motion.div>
       </div>
+
+      {/* Analytics Modal */}
+      <AnalyticsModal
+        isOpen={showAnalytics}
+        onClose={() => setShowAnalytics(false)}
+        selectedCurrency={selectedCurrency}
+        formatAmount={(amount: number, currency: 'USD' | 'PKR') => formatAmount(amount, currency)}
+        convertAmount={convertAmount}
+      />
     </div>
   );
 }

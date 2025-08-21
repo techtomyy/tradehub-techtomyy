@@ -8,3 +8,4 @@ export { RecentListings } from './RecentListings';
 export { RecentTransactions } from './RecentTransactions';
 export { EmptyListingsState } from './EmptyListingsState';
 export { EmptyTransactionsState } from './EmptyTransactionsState';
+export { AnalyticsModal } from './AnalyticsModal';

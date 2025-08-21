@@ -1,4 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  CreditCard, 
+  Banknote, 
+  Wallet, 
+  Zap,
+  Shield,
+  Gift
+} from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useWalletStore } from "@/lib/store/walletStore";
 import { useToast } from "@/hooks/use-toast";
@@ -35,6 +46,7 @@ export default function WalletPage() {
 
     const [addAmount, setAddAmount] = useState("");
     const [withdrawAmount, setWithdrawAmount] = useState("");
+    const [showConfetti, setShowConfetti] = useState(false);
 
     // Card-related states
     const [cardNumber, setCardNumber] = useState("");
@@ -45,25 +57,45 @@ export default function WalletPage() {
     const [cardType, setCardType] = useState("Unknown");
 
     // Saved cards
-    const [savedCards, setSavedCards] = useState<SavedCard[]>([{ type: "Visa", last4: "1234" }]);
+    const [savedCards, setSavedCards] = useState<SavedCard[]>([
+        { type: "Visa", last4: "1234" },
+        { type: "Mastercard", last4: "5678" }
+    ]);
+
+    // Mock data for enhanced features
+    const [monthlySpending] = useState([
+        { month: "Jan", amount: 1200 },
+        { month: "Feb", amount: 1800 },
+        { month: "Mar", amount: 1400 },
+        { month: "Apr", amount: 2200 },
+        { month: "May", amount: 1600 },
+        { month: "Jun", amount: 1900 }
+    ]);
+
+    const [quickActions] = useState([
+        { icon: CreditCard, label: "Add Card", color: "from-blue-500 to-purple-600" },
+        { icon: Banknote, label: "Deposit", color: "from-green-500 to-emerald-600" },
+        { icon: Wallet, label: "Withdraw", color: "from-orange-500 to-red-600" },
+        { icon: Gift, label: "Rewards", color: "from-pink-500 to-rose-600" }
+    ]);
 
     // Get card type icon with unique symbols
     const getCardIcon = (cardType: string) => {
         switch (cardType) {
             case "Visa":
-                return visa; // Visa symbol
+                return visa;
             case "Mastercard":
-                return mastercard; // Mastercard symbol
+                return mastercard;
             case "American Express":
-                return amex; // Amex symbol
+                return amex;
             case "Discover":
-                return discover; // Discover symbol
+                return discover;
             case "JCB":
-                return jcb; // JCB symbol
+                return jcb;
             case "Diners Club":
-                return dinersclub; // Diners Club symbol
+                return dinersclub;
             default:
-                return "💳"; // Default card icon
+                return "💳";
         }
     };
 
@@ -92,6 +124,12 @@ export default function WalletPage() {
         if (!isNaN(amount)) {
             addFunds(amount, selectedCurrency);
             setAddAmount("");
+            setShowConfetti(true);
+            setTimeout(() => setShowConfetti(false), 3000);
+            toast({ 
+                title: "Funds Added!", 
+                description: `Successfully added ${formatAmount(amount, selectedCurrency)} to your wallet` 
+            });
         }
     };
 
@@ -100,6 +138,10 @@ export default function WalletPage() {
         if (!isNaN(amount)) {
             withdrawFunds(amount, selectedCurrency);
             setWithdrawAmount("");
+            toast({ 
+                title: "Withdrawal Successful!", 
+                description: `Successfully withdrew ${formatAmount(amount, selectedCurrency)} from your wallet` 
+            });
         }
     };
 
@@ -125,15 +167,59 @@ export default function WalletPage() {
             const last4 = cardNumber.slice(-4);
             setSavedCards([...savedCards, { type: cardType, last4 }]);
             clearCardForm();
+            toast({ title: "Card Saved!", description: "Your payment method has been added successfully" });
         }
     };
 
+    // Calculate statistics
+    const totalSpent = monthlySpending.reduce((sum, item) => sum + item.amount, 0);
+    const avgSpending = totalSpent / monthlySpending.length;
+    const spendingTrend = monthlySpending[monthlySpending.length - 1].amount > avgSpending ? "up" : "down";
+
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
             <Navigation />
 
-            <div className="max-w-4xl mx-auto py-12 px-4">
-                {/* Wallet Header */}
+            {/* Confetti Effect */}
+            <AnimatePresence>
+                {showConfetti && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 pointer-events-none z-50"
+                    >
+                        {[...Array(50)].map((_, i) => (
+                            <motion.div
+                                key={i}
+                                className="absolute w-2 h-2 bg-yellow-400 rounded-full"
+                                initial={{
+                                    x: Math.random() * window.innerWidth,
+                                    y: -10,
+                                    rotate: 0
+                                }}
+                                animate={{
+                                    y: window.innerHeight + 10,
+                                    rotate: 360,
+                                    x: Math.random() * window.innerWidth
+                                }}
+                                transition={{
+                                    duration: 3 + Math.random() * 2,
+                                    ease: "easeOut"
+                                }}
+                            />
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                {/* Enhanced Wallet Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
                 <WalletHeader 
                     balance={balance}
                     selectedCurrency={selectedCurrency}
@@ -141,8 +227,107 @@ export default function WalletPage() {
                     getBalanceInCurrency={getBalanceInCurrency}
                     setCurrency={setCurrency}
                 />
+                </motion.div>
 
-                {/* Add / Withdraw Funds */}
+                {/* Quick Actions Grid */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
+                    className="mt-8"
+                >
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <Zap className="w-5 h-5 text-blue-600" />
+                        Quick Actions
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {quickActions.map((action, index) => (
+                            <motion.button
+                                key={action.label}
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                className={`p-4 rounded-xl bg-gradient-to-r ${action.color} text-white shadow-lg hover:shadow-xl transition-all duration-300`}
+                                onClick={() => {
+                                    if (action.label === "Add Card") setAddCard(true);
+                                    if (action.label === "Deposit") setAddAmount("100");
+                                    if (action.label === "Withdraw") setWithdrawAmount("50");
+                                }}
+                            >
+                                <div className="flex flex-col items-center gap-2">
+                                    <action.icon className="w-6 h-6" />
+                                    <span className="text-sm font-medium">{action.label}</span>
+                                </div>
+                            </motion.button>
+                        ))}
+                    </div>
+                </motion.div>
+
+                {/* Statistics Cards */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6"
+                >
+                    <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-gray-600">Total Spent</p>
+                                <p className="text-2xl font-bold text-gray-900">
+                                    {formatAmount(totalSpent, selectedCurrency)}
+                                </p>
+                            </div>
+                            <div className={`p-3 rounded-full ${spendingTrend === 'up' ? 'bg-green-100' : 'bg-red-100'}`}>
+                                {spendingTrend === 'up' ? (
+                                    <TrendingUp className="w-6 h-6 text-green-600" />
+                                ) : (
+                                    <TrendingDown className="w-6 h-6 text-red-600" />
+                                )}
+                            </div>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">
+                            {spendingTrend === 'up' ? '↗' : '↘'} {Math.abs(monthlySpending[monthlySpending.length - 1].amount - avgSpending).toFixed(0)}% from average
+                        </p>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-gray-600">Active Cards</p>
+                                <p className="text-2xl font-bold text-gray-900">{savedCards.length}</p>
+                            </div>
+                            <div className="p-3 rounded-full bg-blue-100">
+                                <CreditCard className="w-6 h-6 text-blue-600" />
+                            </div>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">
+                            {savedCards.length > 1 ? 'Multiple payment methods' : 'Add more cards'}
+                        </p>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-gray-600">Security Score</p>
+                                <p className="text-2xl font-bold text-gray-900">98%</p>
+                            </div>
+                            <div className="p-3 rounded-full bg-emerald-100">
+                                <Shield className="w-6 h-6 text-emerald-600" />
+                            </div>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">
+                            Excellent security rating
+                        </p>
+                    </div>
+                </motion.div>
+
+                {/* Enhanced Add / Withdraw Funds */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                    className="mt-8"
+                >
                 <AddWithdrawFunds 
                     addAmount={addAmount}
                     setAddAmount={setAddAmount}
@@ -150,16 +335,34 @@ export default function WalletPage() {
                     setWithdrawAmount={setWithdrawAmount}
                     handleAddFunds={handleAddFunds}
                     handleWithdrawFunds={handleWithdrawFunds}
+                    selectedCurrency={selectedCurrency}
+                    formatAmount={formatAmount}
+                    convertAmount={convertAmount}
                 />
+                </motion.div>
 
-                {/* Linked Payment Method */}
+                {/* Enhanced Payment Methods */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                    className="mt-8"
+                >
                 <PaymentMethods 
                     savedCards={savedCards}
                     setAddCard={setAddCard}
                 />
+                </motion.div>
 
                 {/* Add Card Form */}
+                <AnimatePresence>
                 {addCard && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.3 }}
+                        >
                     <AddCardForm 
                         cardNumber={cardNumber}
                         setCardNumber={setCardNumber}
@@ -175,15 +378,24 @@ export default function WalletPage() {
                         clearCardForm={clearCardForm}
                         handleSaveCard={handleSaveCard}
                     />
-                )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                {/* Transaction History */}
+                {/* Enhanced Transaction History */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.5 }}
+                    className="mt-8"
+                >
                 <TransactionHistory 
                     transactions={transactions}
                     selectedCurrency={selectedCurrency}
                     formatAmount={formatAmount}
                     convertAmount={convertAmount}
                 />
+                </motion.div>
             </div>
         </div>
     );

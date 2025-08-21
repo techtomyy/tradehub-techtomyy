@@ -27,6 +27,9 @@ export interface AddWithdrawFundsProps {
   setWithdrawAmount: (amount: string) => void;
   handleAddFunds: () => void;
   handleWithdrawFunds: () => void;
+  selectedCurrency: 'USD' | 'PKR';
+  formatAmount: (amount: number, currency: 'USD' | 'PKR') => string;
+  convertAmount: (amount: number, fromCurrency: 'USD' | 'PKR', toCurrency: 'USD' | 'PKR') => number;
 }
 
 export interface PaymentMethodsProps {

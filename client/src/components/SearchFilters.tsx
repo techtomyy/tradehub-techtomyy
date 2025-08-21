@@ -6,12 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { X, Wallet } from "lucide-react";
+import { X, Wallet, DollarSign } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrency } from "@/lib/context/CurrencyContext";
 import { Currency } from "@/lib/store/walletStore";
 import { useWalletStore } from "@/lib/store/walletStore";
 import { Link } from "wouter";
+import { motion } from "framer-motion";
 
 interface SearchFiltersProps {
   filters: {
@@ -131,35 +132,53 @@ export default function SearchFilters({ filters, onFilterChange, selectedCurrenc
 
   return (
     <div className="space-y-6">
-      {/* Wallet Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Wallet className="h-5 w-5 mr-2 text-emerald-600" />
-            Wallet
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Available Balance</span>
-            <span className="text-lg font-semibold text-gray-900">
-              {formatAmount(getWalletBalanceInCurrency(), selectedCurrency)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">In Escrow</span>
-            <span className="text-sm font-medium text-amber-600">
-              {formatAmount(getEscrowBalanceInCurrency(), selectedCurrency)}
-            </span>
-          </div>
-          <Separator />
-          <Link href="/wallet">
-            <Button variant="outline" size="sm" className="w-full hover-golden">
-              Add Funds
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
+     {/* Enhanced Wallet Overview */}
+     <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+      >
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl">
+                <Wallet className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-lg font-semibold text-gray-900">Wallet Overview</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-between items-center p-3 bg-white/60 rounded-xl border border-emerald-200">
+              <span className="text-sm text-gray-700 font-medium">Available Balance</span>
+              <span className="text-xl font-bold text-emerald-700">
+                {formatAmount(getWalletBalanceInCurrency(), selectedCurrency)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-white/60 rounded-xl border border-amber-200">
+              <span className="text-sm text-gray-700 font-medium">In Escrow</span>
+              <span className="text-lg font-semibold text-amber-700">
+                {formatAmount(getEscrowBalanceInCurrency(), selectedCurrency)}
+              </span>
+            </div>
+            <Separator className="bg-emerald-200" />
+            <Link href="/wallet">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 hover:from-emerald-600 hover:to-teal-700 shadow-md hover:shadow-lg transition-all duration-300"
+                >
+                  <DollarSign className="h-4 w-4 mr-2" />
+                  Add Funds
+                </Button>
+              </motion.div>
+            </Link>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Filters */}
       <Card>

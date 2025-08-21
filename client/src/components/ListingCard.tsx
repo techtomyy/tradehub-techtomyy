@@ -3,7 +3,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCurrency } from "@/lib/context/CurrencyContext";
 import { useLazyImage } from "@/hooks/useLazyImage";
-import { Users, TrendingUp, Eye, DollarSign, Star, CheckCircle } from "lucide-react";
+import { Users, TrendingUp, Eye, DollarSign, Star, CheckCircle, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+import { Heart, Share2 } from "lucide-react";
 import { Link } from "wouter";
 
 interface ListingCardProps {
@@ -35,7 +37,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
     rootMargin: '50px',
     threshold: 0.1
   });
-  
+
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'instagram': return '📷';
@@ -49,12 +51,12 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'instagram': return 'bg-pink-100 text-pink-800';
-      case 'youtube': return 'bg-red-100 text-red-800';
-      case 'tiktok': return 'bg-gray-100 text-gray-800';
-      case 'twitter': return 'bg-blue-100 text-blue-800';
-      case 'website': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'instagram': return 'from-pink-500 to-rose-600';
+      case 'youtube': return 'from-red-500 to-pink-600';
+      case 'tiktok': return 'from-gray-500 to-slate-600';
+      case 'twitter': return 'from-blue-500 to-indigo-600';
+      case 'website': return 'from-green-500 to-emerald-600';
+      default: return 'from-gray-500 to-slate-600';
     }
   };
 
@@ -71,9 +73,8 @@ export default function ListingCard({ listing }: ListingCardProps) {
                 ref={imageRef}
                 src={listing.media[0]}
                 alt={listing.title}
-                className={`w-full h-48 object-cover transition-opacity duration-300 ${
-                  isLoaded ? 'opacity-100' : 'opacity-0'
-                }`}
+                className={`w-full h-48 object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'
+                  }`}
                 loading="lazy"
               />
             )}
@@ -96,28 +97,71 @@ export default function ListingCard({ listing }: ListingCardProps) {
             <span className="text-6xl">{getCategoryIcon(listing.category)}</span>
           </div>
         )}
-        
-        <div className="absolute top-3 left-3">
-          <Badge className={getCategoryColor(listing.category)}>
-            {listing.category.charAt(0).toUpperCase() + listing.category.slice(1)}
-          </Badge>
-        </div>
-        
-        <div className="absolute top-3 right-3">
-          {listing.verificationStatus === 'verified' && (
-            <Badge className="bg-emerald-500 text-white">
-              <CheckCircle className="h-3 w-3 mr-1" />
-              Verified
-            </Badge>
-          )}
-          {listing.featured && (
-            <Badge className="bg-amber-500 text-white ml-1">
-              Featured
-            </Badge>
-          )}
+
+          {/* Enhanced Badges Row */}
+          <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
+            {/* Category Badge */}
+            <motion.div
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Badge className={`bg-gradient-to-r ${getCategoryColor(listing.category)} text-white border-0 shadow-lg px-3 py-1`}>
+                {listing.category.charAt(0).toUpperCase() + listing.category.slice(1)}
+              </Badge>
+            </motion.div>
+            
+            {/* Status Badges */}
+            <div className="flex gap-2 items-center">
+              {listing.verificationStatus === 'verified' && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                >
+                  <Badge className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-0 shadow-lg flex items-center mt-1">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Verified
+                  </Badge>
+                </motion.div>
+              )}
+              {listing.featured && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.3, delay: 0.2 }}
+                >
+                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg flex items-center">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    Featured
+                  </Badge>
+                </motion.div>
+              )}
+            </div>
+          </div>
+
+        {/* Quick Actions Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center">
+            {/* Heart Button */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-colors duration-200"
+            >
+              <Heart className="w-4 h-4" />
+            </motion.button>
+
+            {/* Share Button */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-colors duration-200"
+            >
+              <Share2 className="w-4 h-4" />
+            </motion.button>
+          </div>
         </div>
       </div>
-      
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors">
@@ -130,11 +174,11 @@ export default function ListingCard({ listing }: ListingCardProps) {
             </div>
           )}
         </div>
-        
+
         <p className="text-gray-600 text-sm mb-4 line-clamp-2">
           {listing.description}
         </p>
-        
+
         <div className="mb-4">
           <div className="grid grid-cols-2 gap-3 sm:gap-4 text-sm text-gray-500 w-full">
             {listing.followers && (
@@ -163,7 +207,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
             )}
           </div>
         </div>
-        
+
         <div className="flex items-center justify-between">
           <div>
             <span className="text-2xl font-bold text-gray-900">
@@ -172,7 +216,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
             <span className="text-sm text-gray-500 ml-1">+ fees</span>
           </div>
           <Link href={`/listing/${listing.id}`}>
-            <Button 
+            <Button
               className="bg-primary text-white hover:bg-blue-700 transition-colors"
               size="sm"
             >
