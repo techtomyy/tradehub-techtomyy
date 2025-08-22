@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.socketAuth = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const cookie_1 = __importDefault(require("cookie"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config(); // Load environment variables
 const socketAuth = (socket, next) => {
     const cookies = socket.handshake.headers.cookie;
     console.log(cookies);
@@ -16,8 +18,8 @@ const socketAuth = (socket, next) => {
     if (!token)
         return next(new Error("❌ No token in cookies"));
     try {
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.ADMIN_SECRET_KEY);
-        if (decoded.role === "user") {
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+        if (decoded.role === "User") {
             console.log("✅ user authenticated:", decoded.email);
             // save decoded user inside socket
             socket.user = decoded;
