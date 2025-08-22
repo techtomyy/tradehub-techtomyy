@@ -3,7 +3,7 @@ import { Server as HttpServer } from "http";
 import { ClientToServerEvents, ServerToClientEvents } from "../types/Sockets";
 import { socketAuth } from "./middleware/auth";
 import { addUserConnection, removeUserConnection } from "./user";
-import { sendMessageToUser } from "./chat.socket";
+import { saveMessageDB } from "../controllers/messages/saveMessage";
 import { MessagePayload } from "../types/Sockets";
 let io: Server<ClientToServerEvents, ServerToClientEvents> | null = null;
 
@@ -24,6 +24,9 @@ export function initSocket(server: HttpServer) {
       console.log("User not authenticated, skipping...");
       return;
     }
+    socket.on("register", (userId) => {
+      userId
+    });
 
     try {
       addUserConnection(user.id, socket);
@@ -31,27 +34,20 @@ export function initSocket(server: HttpServer) {
       console.error("User connection error:", err);
     }
 
-    const message: MessagePayload = {
-      chat_id: 123,
-      sender_id: user.id,
-      receiver_id: 234,
-      message_text: "Hello client"
-    };
 
-    sendMessageToUser(user.id, message);
 
     socket.on("message-receive", (messages) => {
-    console.log("📩 New message from client:", messages);
-  });
+     saveMessageDB(messages);
+    });
 
 
-  socket.on("disconnect", () => {
-    console.log("🔴 Socket disconnected:", socket.id);
-    if (user?.id) {
-      removeUserConnection(user.id);
-    }
+    socket.on("disconnect", () => {
+      console.log("🔴 Socket disconnected:", socket.id);
+      if (user?.id) {
+        removeUserConnection(user.id);
+      }
+    });
   });
-});
 }
 
 export function getIO() {
