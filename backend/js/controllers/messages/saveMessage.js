@@ -15,18 +15,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.saveMessageDB = void 0;
 const client_js_1 = __importDefault(require("../../config/client.js"));
 const saveMessageDB = (message) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
-        // Supabase insert
+        // 👇 insert only specific columns jo tumhare table me hain
         const { data, error } = yield client_js_1.default
             .from("messages")
-            .insert([message]) // message = { sender_id, receiver_id, text, ... }
+            .insert([
+            {
+                chat_id: message.chat_id,
+                sender_id: message.sender_id,
+                receiver_id: message.receiver_id,
+                message_text: message.message_text,
+                is_read: (_a = message.is_read) !== null && _a !== void 0 ? _a : false,
+            },
+        ])
             .select();
         if (error)
             throw error;
-        return data[0]; // inserted row return karein
+        return data[0]; // ✅ return inserted row
     }
     catch (error) {
-        console.error("Error saving message:", error.message);
+        console.error("❌ Error saving message:", error.message);
         throw error;
     }
 });

@@ -5,12 +5,12 @@ exports.getIO = getIO;
 const socket_io_1 = require("socket.io");
 const auth_1 = require("./middleware/auth");
 const user_1 = require("./user");
-const chat_socket_1 = require("./chat.socket");
+const saveMessage_1 = require("../controllers/messages/saveMessage");
 let io = null;
 function initSocket(server) {
     io = new socket_io_1.Server(server, {
         cors: {
-            origin: "*",
+            origin: "http://localhost:5174",
             methods: ["GET", "POST"],
             credentials: true,
         },
@@ -22,19 +22,18 @@ function initSocket(server) {
             console.log("User not authenticated, skipping...");
             return;
         }
+        socket.on("register", (userId) => {
+            userId;
+        });
         try {
             (0, user_1.addUserConnection)(user.id, socket);
         }
         catch (err) {
             console.error("User connection error:", err);
         }
-        const message = {
-            chat_id: 123,
-            sender_id: user.id,
-            receiver_id: 234,
-            message_text: "Hello client"
-        };
-        (0, chat_socket_1.sendMessageToUser)(user.id, message);
+        socket.on("message-receive", (messages) => {
+            (0, saveMessage_1.saveMessageDB)(messages);
+        });
         socket.on("disconnect", () => {
             console.log("🔴 Socket disconnected:", socket.id);
             if (user === null || user === void 0 ? void 0 : user.id) {

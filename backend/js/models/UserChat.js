@@ -15,18 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.chatTables = void 0;
 const client_1 = __importDefault(require("../config/client"));
 const chatTables = () => __awaiter(void 0, void 0, void 0, function* () {
-    // Chats table
-    const chatsTable = `
-CREATE TABLE IF NOT EXISTS public.chats (
-  chat_id SERIAL PRIMARY KEY,
-  chat_name VARCHAR(100),
-  created_at TIMESTAMP DEFAULT NOW()
-);`;
     // Messages table
     const messagesTable = `
 CREATE TABLE IF NOT EXISTS public.messages (
   message_id SERIAL PRIMARY KEY DEFAULT gen_random_uuid() ,
-  chat_id INT REFERENCES public.chats(chat_id) ON DELETE CASCADE,
   sender_id INT NOT NULL, -- assign from JSON token in backend
   receiver_id INT NOT NULL, -- assign from backend logic
   message_text TEXT,
@@ -35,10 +27,6 @@ CREATE TABLE IF NOT EXISTS public.messages (
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );`;
-    // Execute chats table query
-    const { error: chatsError } = yield client_1.default.rpc('execute_sql', { sql: chatsTable });
-    if (chatsError)
-        return console.error("❌ Chats table error:", chatsError.message);
     // Execute messages table query
     const { error: messagesError } = yield client_1.default.rpc('execute_sql', { sql: messagesTable });
     if (messagesError)
