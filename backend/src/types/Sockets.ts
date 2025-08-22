@@ -3,7 +3,10 @@ export interface MessagePayload {
   sender_id: number;
   receiver_id: number;
   message_text: string;
+  time:string,
+  is_read:boolean
 }
+
 
 // types/Sockets.ts
 export interface ServerToClientEvents {
@@ -13,8 +16,8 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   register: (userId: string) => void;
   "message-receive": (message: { senderId: string; receiverId: string; text: string }) => void;
-}
 
+}
 
 
 export interface InterServerEvents {
